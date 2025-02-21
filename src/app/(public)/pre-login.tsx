@@ -5,14 +5,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 // SVG imports
 import Background from '@/src/svg/pre-logowanie/background';
 import KadraLogo from '@/src/svg/pre-logowanie/kadra-logo';
+import { router } from 'expo-router';
 
-interface PreLoginProps {
-  onSignInPress: () => void;
-  onSignUpPress: () => void;
-}
 
-export function PreLogin({ onSignInPress, onSignUpPress }: PreLoginProps) {
+export default function PreLogin() {
   const { width, height } = Dimensions.get('window');
+
+  const onSignInPress = () => {
+    router.push("/(public)/sign-in");
+  }
+
+  const onSignUpPress = () => {
+    router.push("/(public)/sign-up");
+  }
 
   return (
     <View className="flex-1 relative bg-white">

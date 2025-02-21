@@ -1,14 +1,10 @@
-// // app/(auth)/index.tsx
-// import React from 'react';
-// import { router } from 'expo-router';
-// import CustomAuthFlow from '../../components/auth/CustomAuthFlow';
+import { View, Text } from "@/src/components/Themed";
+import React from "react";
 
-// export default function AuthScreen() {
-//   return (
-//     <CustomAuthFlow
-//       onAuthComplete={() => {
-//         router.replace('/(tabs)');
-//       }}
-//     />
-//   );
-// }
+export default function Page() {
+  return (
+    <View className="flex-1 justify-center items-center">
+      <Text className="text-2xl">Welcome to the authenticated area</Text>
+    </View>
+  );
+}

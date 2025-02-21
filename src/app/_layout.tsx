@@ -1,32 +1,27 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Slot, SplashScreen, Stack } from "expo-router";
+import AuthProvider from "../context/AuthProvider";
 import { Amplify } from 'aws-amplify';
-
-import { useColorScheme } from '@/src/components/useColorScheme';
 import outputs from '../../amplify_outputs.json';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useFonts } from 'expo-font';
+import { useEffect, useState } from 'react';
 
 import "../../global.css"
-import CustomAuthFlow from '../components/auth/CustomAuthFlow';
-import { getCurrentUser } from 'aws-amplify/auth';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export {
   ErrorBoundary,
 } from 'expo-router';
 
-export const unstable_settings = {
-  initialRouteName: '(tabs)',
-};
+// export const unstable_settings = {
+//   initialRouteName: '(tabs)',
+// };
 
 SplashScreen.preventAutoHideAsync();
 Amplify.configure(outputs);
 
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
+export default function Root() {
+  const [fontsLoaded, fontsError] = useFonts({
     PoppinsBlack: require('../../assets/fonts/Poppins-Black.ttf'),
     PoppinsBold: require('../../assets/fonts/Poppins-Bold.ttf'),
     PoppinsExtraBold: require('../../assets/fonts/Poppins-ExtraBold.ttf'),
@@ -38,58 +33,27 @@ export default function RootLayout() {
     PoppinsThin: require('../../assets/fonts/Poppins-Thin.ttf'),
     ...FontAwesome.font,
   });
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+    if (fontsError) throw fontsError;
+  }, [fontsError]);
 
   useEffect(() => {
-    if (loaded) {
+    if (fontsLoaded && authLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded, authLoaded]);
 
-  // On app launch, check if the user is already authenticated.
-  useEffect(() => {
-    (async () => {
-      try {
-        const user = await getCurrentUser();
-        if (user) {
-          setIsAuthenticated(true);
-        }
-      } catch (err) {
-        console.log("No authenticated user found");
-      }
-    })();
-  }, []);
-
-  if (!loaded) {
+  if (!fontsLoaded) {
     return null;
   }
 
-  if (!isAuthenticated) {
-    return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <CustomAuthFlow onAuthComplete={() => setIsAuthenticated(true)} />
-      </GestureHandlerRootView>
-    );
-  }
-
   return (
-    <RootLayoutNav />
-  );
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider onAuthLoaded={() => setAuthLoaded(true)}>
+        <Stack screenOptions={{ headerShown: false }} />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }

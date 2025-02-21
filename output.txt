@@ -1,1262 +1,175 @@
-=== FILE START: context/AuthProvider.tsx ===
+=== FILE START: AuthProvider.tsx ===
+import { ReactNode, createContext, useEffect, useState, useContext } from "react";
+import { router, useSegments } from "expo-router";
+import { signIn as amplifySignIn, signOut as amplifySignOut, confirmSignUp, getCurrentUser, resendSignUpCode, signUp } from "aws-amplify/auth";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { Alert } from "react-native";
 
-=== FILE END: context/AuthProvider.tsx ===
-
-=== FILE START: app/+not-found.tsx ===
-import { Link, Stack } from 'expo-router';
-
-import { Text, View } from '@/src/components/Themed';
-
-export default function NotFoundScreen() {
-  return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <View className="flex flex-1 items-center justify-center p-5">
-        <Text className="text-xl font-bold">This screen doesn't exist.</Text>
-
-        <Link href="/" className="mt-4 py-4">
-          <Text className="text-base text-link">Go to home screen!</Text>
-        </Link>
-      </View>
-    </>
-  );
-}
-
-=== FILE END: app/+not-found.tsx ===
-
-=== FILE START: app/_layout.tsx ===
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Amplify } from 'aws-amplify';
-
-import { useColorScheme } from '@/src/components/useColorScheme';
-import outputs from '../../amplify_outputs.json';
-
-import "../../global.css"
-import CustomAuthFlow from '../components/auth/CustomAuthFlow';
-import { getCurrentUser } from 'aws-amplify/auth';
-
-export {
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  initialRouteName: '(tabs)',
+type User = {
+  id: string;
+  username?: string;
 };
 
-SplashScreen.preventAutoHideAsync();
-Amplify.configure(outputs);
+type AuthContextType = {
+  user: User | null;
+  login: (username: string, password: string) => Promise<boolean>;
+  register: (username: string, password: string, preferredName: string) => Promise<boolean>;
+  confirmRegister: (username: string, code: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  resendCode: (username: string) => Promise<void>;
+};
 
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    PoppinsBlack: require('../../assets/fonts/Poppins-Black.ttf'),
-    PoppinsBold: require('../../assets/fonts/Poppins-Bold.ttf'),
-    PoppinsExtraBold: require('../../assets/fonts/Poppins-ExtraBold.ttf'),
-    PoppinsExtraLight: require('../../assets/fonts/Poppins-ExtraLight.ttf'),
-    PoppinsLight: require('../../assets/fonts/Poppins-Light.ttf'),
-    PoppinsMedium: require('../../assets/fonts/Poppins-Medium.ttf'),
-    PoppinsRegular: require('../../assets/fonts/Poppins-Regular.ttf'),
-    PoppinsSemiBold: require('../../assets/fonts/Poppins-SemiBold.ttf'),
-    PoppinsThin: require('../../assets/fonts/Poppins-Thin.ttf'),
-    ...FontAwesome.font,
-  });
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+function useProtectedRoute(user: User | null, loading: boolean, segments: string[]) {
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+    if (loading) return;
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    // Our folder groups: authenticated pages are under (auth)
+    const inAuthGroup = segments[0] === "(auth)";
+    console.log("Segments:", segments);
+    console.log("In auth group:", inAuthGroup);
+    console.log("User:", user);
+
+    if (!user && inAuthGroup) {
+      // If not logged in but in an authenticated group, redirect to login
+      console.log("Redirecting to login");
+      router.replace("/(public)/pre-login");
+    } else if (user && !inAuthGroup) {
+      // If logged in but not inside auth group, send to the tabs area
+      console.log("Redirecting to tabs");
+      router.replace("/(auth)/(tabs)/");
     }
-  }, [loaded]);
+  }, [user, segments, loading]);
+}
 
-  // On app launch, check if the user is already authenticated.
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  login: async () => false,
+  register: async () => false,
+  confirmRegister: async () => false,
+  logout: async () => {},
+  resendCode: async () => {},
+});
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an <AuthProvider />");
+  }
+  return context;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
+  onAuthLoaded?: () => void;
+}
+
+export default function AuthProvider({ children, onAuthLoaded }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const segments = useSegments();
+
   useEffect(() => {
-    (async () => {
+    async function checkUser() {
       try {
-        const user = await getCurrentUser();
-        if (user) {
-          setIsAuthenticated(true);
+        const currentUser = await getCurrentUser();
+        console.log("Current user:", currentUser);
+        if (currentUser) {
+          setUser({
+            id: currentUser.userId,
+            username: currentUser?.signInDetails?.loginId,
+          });
         }
-      } catch (err) {
-        console.log("No authenticated user found");
+      } catch {
+        // No current user
+      } finally {
+        setLoading(false);
+        if (onAuthLoaded) {
+          onAuthLoaded();
+        }
       }
-    })();
+    }
+    checkUser();
   }, []);
 
-  if (!loaded) {
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      // Call AWS Amplify’s signIn method
+      await amplifySignIn({ username, password });
+      // You might extract more data from userData as needed
+      const userData = await getCurrentUser();
+      setUser({
+        id: userData.userId,
+        username: userData?.signInDetails?.loginId,
+      });
+      return true;
+    } catch (error) {
+      console.error("Error signing in:", error);
+      return false;
+    }
+  };
+
+  const register = async (email: string, password: string, preferredName: string): Promise<boolean> => {
+    try {
+      // Call AWS Amplify’s signUp method
+      await signUp({
+              username: email,
+              password,
+              options: {
+                userAttributes: {
+                  email,
+                  preferred_username: preferredName,
+                },
+              },
+            });
+      return true;
+    } catch (error) {
+      console.error("Error signing up:", error);
+      return false;
+    }
+  }
+
+  const confirmRegister = async (email: string, code: string): Promise<boolean> => {
+    try {
+      // Call AWS Amplify’s confirmSignUp method
+      await confirmSignUp({ username: email, confirmationCode: code });
+      return true;
+    } catch (error) {
+      console.error("Error confirming sign up:", error);
+      return false;
+    }
+  }
+
+  const logout = async () => {
+    try {
+      await amplifySignOut({ global: true });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    } finally {
+      setUser(null);
+    }
+  };
+
+  const resendCode = async (username: string) => {
+    try {
+      await resendSignUpCode({ username});
+      Alert.alert("Success", "Verification code has been resent.");
+    } catch (err: any) {
+      Alert.alert("Error", err.message || "Error resending code");
+    }
+  }
+
+  if (loading) {
     return null;
   }
 
-  if (!isAuthenticated) {
-    return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <CustomAuthFlow onAuthComplete={() => setIsAuthenticated(true)} />
-      </GestureHandlerRootView>
-    );
-  }
+  useProtectedRoute(user, loading, segments);
 
   return (
-    <RootLayoutNav />
+    <AuthContext.Provider value={{ user, login, register, confirmRegister, logout, resendCode }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
-  );
-}
-
-=== FILE END: app/_layout.tsx ===
-
-=== FILE START: app/modal.tsx ===
-import { StatusBar } from 'expo-status-bar';
-import { Platform } from 'react-native';
-import { View, Text  } from '@/src/components/Themed';
-
-import EditScreenInfo from '@/src/components/EditScreenInfo';
-
-export default function ModalScreen() {
-  return (
-    <View className="flex flex-1 items-center justify-center">
-      <Text className="text-xl font-bold">Modal</Text>
-      <View className="my-7 h-[1px] w-[80%] bg-black/10"/>
-      <EditScreenInfo path="src/app/modal.tsx" />
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </View>
-  );
-}
-
-=== FILE END: app/modal.tsx ===
-
-=== FILE START: app/(tabs)/index.tsx ===
-// app/(tabs)/index.tsx
-import React from 'react';
-import { View, Text, Button } from 'react-native';
-import { signOut } from 'aws-amplify/auth';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-export default function TabOneScreen() {
-  const handleSignOut = async () => {
-    try {
-      await signOut({ global: true });
-      // On sign-out, the RootLayout auth check will redirect to /auth.
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  return (
-    <SafeAreaView className="flex-1 items-center justify-center">
-      <Button title="Sign Out" onPress={handleSignOut} />
-      <Text className="text-xl font-bold">Tab One</Text>
-    </SafeAreaView>
-  );
-}
-
-=== FILE END: app/(tabs)/index.tsx ===
-
-=== FILE START: app/(tabs)/two.tsx ===
-// app/(tabs)/two.tsx
-import React from 'react';
-import { View, Text } from 'react-native';
-
-export default function TabTwoScreen() {
-  return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-xl font-bold">Tab Two</Text>
-    </View>
-  );
-}
-
-=== FILE END: app/(tabs)/two.tsx ===
-
-=== FILE START: app/(tabs)/_layout.tsx ===
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-
-import Colors from '@/src/constants/Colors';
-import { useColorScheme } from '@/src/components/useColorScheme';
-import { useClientOnlyValue } from '@/src/components/useClientOnlyValue';
-import { cn } from '@/src/utils/cn';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} className="-mb-[3px]" {...props} />;
-}
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    className={cn(
-                      'mr-4',
-                      (pressed) && 'opacity-50',
-                    )}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
-}
-
-=== FILE END: app/(tabs)/_layout.tsx ===
-
-=== FILE START: app/(auth)/index.tsx ===
-// // app/(auth)/index.tsx
-// import React from 'react';
-// import { router } from 'expo-router';
-// import CustomAuthFlow from '../../components/auth/CustomAuthFlow';
-
-// export default function AuthScreen() {
-//   return (
-//     <CustomAuthFlow
-//       onAuthComplete={() => {
-//         router.replace('/(tabs)');
-//       }}
-//     />
-//   );
-// }
-
-=== FILE END: app/(auth)/index.tsx ===
-
-=== FILE START: app/(auth)/_layout.tsx ===
-// // app/(auth)/_layout.tsx
-// import React from 'react';
-// import { Text } from 'react-native';
-// import { Slot, Redirect } from 'expo-router';
-// import { useSession } from '../ctx';
-
-// export default function AuthLayout() {
-//   const { session, isLoading } = useSession();
-
-//   if (isLoading) {
-//     return <Text>Loading...</Text>;
-//   }
-
-//   if (session) {
-//     return <Redirect href="/(tabs)" />;
-//   }
-
-//   return <Slot />;
-// }
-
-=== FILE END: app/(auth)/_layout.tsx ===
-
-=== FILE START: constants/Colors.ts ===
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
-
-export default {
-  link: '#2e78b7',
-  light: {
-    text: '#000',
-    background: '#fff',
-    tint: tintColorLight,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#fff',
-    background: '#000',
-    tint: tintColorDark,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorDark,
-  },
-};
-
-=== FILE END: constants/Colors.ts ===
-
-=== FILE START: utils/cn.ts ===
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-=== FILE END: utils/cn.ts ===
-
-=== FILE START: components/ExternalLink.tsx ===
-import { Link } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
-import React from 'react';
-import { Platform } from 'react-native';
-
-export function ExternalLink(
-  props: Omit<React.ComponentProps<typeof Link>, 'href'> & { href: string }
-) {
-  return (
-    <Link
-      target="_blank"
-      {...props}
-      // @ts-expect-error: External URLs are not typed.
-      href={props.href}
-      onPress={(e) => {
-        if (Platform.OS !== 'web') {
-          // Prevent the default behavior of linking to the default browser on native.
-          e.preventDefault();
-          // Open the link in an in-app browser.
-          WebBrowser.openBrowserAsync(props.href as string);
-        }
-      }}
-    />
-  );
-}
-
-=== FILE END: components/ExternalLink.tsx ===
-
-=== FILE START: components/Themed.tsx ===
-/**
- * Learn more about Light and Dark modes:
- * https://docs.expo.io/guides/color-schemes/
- */
-
-import { Text as DefaultText, View as DefaultView } from 'react-native';
-
-import { useColorScheme } from './useColorScheme';
-import { cn } from '../utils/cn';
-
-type ThemeProps = {
-  lightColor?: string;
-  darkColor?: string;
-};
-
-export type TextProps = ThemeProps & DefaultText['props'];
-export type ViewProps = ThemeProps & DefaultView['props'];
-
-export function useThemedColor(styleType: 'text' | 'background') {
-  const theme = useColorScheme();
-
-  if (styleType === 'background') {
-    return (theme === 'light') ? 'bg-light-background' : 'bg-dark-background';
-  } else if (styleType === 'text') {
-    return (theme === 'light') ? 'text-light-text' : 'text-dark-text';
-  }
-}
-
-export function Text(props: TextProps) {
-  const { className, ...otherProps } = props;
-  const textColor = useThemedColor('text');
-
-  return <DefaultText className={cn(
-    textColor,
-    className
-  )} {...otherProps} />;
-}
-
-export function View(props: ViewProps) {
-  const { className, ...otherProps } = props;
-  const backgroundColor = useThemedColor('background');
-
-  return <DefaultView className={cn(
-    backgroundColor,
-    className
-  )} {...otherProps} />;
-}
-
-=== FILE END: components/Themed.tsx ===
-
-=== FILE START: components/EditScreenInfo.tsx ===
-import React from 'react';
-
-import { ExternalLink } from './ExternalLink';
-import { MonoText } from './StyledText';
-import { Text, View } from './Themed';
-
-export default function EditScreenInfo({ path }: { path: string }) {
-  return (
-    <View>
-      <View className="items-center mx-12">
-        <Text className="text-lg text-center">
-          Open up the code for this screen:
-        </Text>
-
-        <View className="rounded px-1 my-2">
-          <MonoText>{path}</MonoText>
-        </View>
-
-        <Text className="text-lg text-center">
-          Change any of the text, save the file, and your app will automatically update.
-        </Text>
-      </View>
-
-      <View className="mt-4 mx-5 items-center">
-        <ExternalLink
-          className="py-4"
-          href="https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet">
-          <Text className="text-center text-link">
-            Tap here if your app doesn't automatically update after making changes
-          </Text>
-        </ExternalLink>
-      </View>
-    </View>
-  );
-}
-=== FILE END: components/EditScreenInfo.tsx ===
-
-=== FILE START: components/StyledText.tsx ===
-import { cn } from '../utils/cn';
-import { Text, TextProps } from './Themed';
-
-export function MonoText(props: TextProps) {
-  return <Text {...props} className={cn(
-    "font-[SpaceMono]",
-    props.className,
-  )} />;
-}
-
-=== FILE END: components/StyledText.tsx ===
-
-=== FILE START: components/useClientOnlyValue.ts ===
-// This function is web-only as native doesn't currently support server (or build-time) rendering.
-export function useClientOnlyValue<S, C>(server: S, client: C): S | C {
-  return client;
-}
-
-=== FILE END: components/useClientOnlyValue.ts ===
-
-=== FILE START: components/useColorScheme.ts ===
-export { useColorScheme } from 'react-native';
-
-=== FILE END: components/useColorScheme.ts ===
-
-=== FILE START: components/useClientOnlyValue.web.ts ===
-import React from 'react';
-
-// `useEffect` is not invoked during server rendering, meaning
-// we can use this to determine if we're on the server or not.
-export function useClientOnlyValue<S, C>(server: S, client: C): S | C {
-  const [value, setValue] = React.useState<S | C>(server);
-  React.useEffect(() => {
-    setValue(client);
-  }, [client]);
-
-  return value;
-}
-
-=== FILE END: components/useClientOnlyValue.web.ts ===
-
-=== FILE START: components/auth/CustomPreLogin.tsx ===
-import React from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-// SVG imports
-import Background from '@/src/svg/pre-logowanie/background';
-import KadraLogo from '@/src/svg/pre-logowanie/kadra-logo';
-
-interface PreLoginProps {
-  onSignInPress: () => void;
-  onSignUpPress: () => void;
-}
-
-export function PreLogin({ onSignInPress, onSignUpPress }: PreLoginProps) {
-  const { width, height } = Dimensions.get('window');
-
-  return (
-    <View className="flex-1 relative bg-white">
-    {/* Background absolutely positioned behind everything */}
-      <View className="absolute w-full h-full">
-        <Background
-          width={width}
-          height={height}
-          preserveAspectRatio="xMinYMin slice"
-        />
-        {/* Kadra logo pinned at a consistent spot over the wave */}
-        <View className="absolute top-16 self-center">
-          <KadraLogo />
-        </View>
-      </View>
-
-      <SafeAreaView className="flex-1 ">
-        <View className="flex-1 items-center justify-end px-4 pb-12">
-          <Text className="text-[#DAC081] text-2xl font-poppins-bold text-center mb-2">
-            ODKRYJ SWOJĄ PASJĘ
-          </Text>
-          <Text className="text-[#A1A4B2] text-base text-center font-poppins-light mb-20">
-            Znajdz zajecia dla siebie {'\n'}i rob to, co kochasz
-          </Text>
-
-          <TouchableOpacity
-            onPress={onSignInPress}
-            className="bg-[#89A8B2] rounded-full py-4 px-16 mb-6"
-          >
-            <Text className="text-white font-poppins-extrabold text-center text-base">
-              ZALOGUJ SIĘ
-            </Text>
-          </TouchableOpacity>
-
-          <View className="flex-row justify-center">
-            <Text className="text-[#A1A4B2] mr-1 font-poppins-regular">NIE POSIADASZ KONTA?</Text>
-            <TouchableOpacity onPress={onSignUpPress}>
-              <Text className="text-[#89A8B2] font-poppins-bold">ZAREJESTRUJ SIĘ</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </SafeAreaView>
-    </View>
-  );
-}
-
-=== FILE END: components/auth/CustomPreLogin.tsx ===
-
-=== FILE START: components/auth/CustomConfirmSignUp.tsx ===
-import { confirmSignUp } from "aws-amplify/auth";
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-export interface ConfirmSignUpProps {
-    email: string;
-    onConfirmSuccess: () => void;
-    onResendCode: () => void;
-}
-
-export function CustomConfirmSignUp({
-    email,
-    onConfirmSuccess,
-    onResendCode,
-}: ConfirmSignUpProps) {
-    const [code, setCode] = useState('');
-    const [error, setError] = useState('');
-
-    const handleConfirm = async () => {
-        try {
-        await confirmSignUp({username: email, confirmationCode: code});
-        onConfirmSuccess();
-        } catch (err: any) {
-        setError(err.message || 'Error confirming sign up');
-        }
-    };
-
-    return (
-        <SafeAreaView className="flex-1 justify-center items-center bg-gray-100 p-6">
-            <View className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-                <Text className="text-2xl font-bold mb-4 text-center">Potwierdź rejestrację</Text>
-                <Text className="text-center mb-4">Kod weryfikacyjny został wysłany do {email}</Text>
-                {error ? <Text className="text-red-500 text-center mb-2">{error}</Text> : null}
-                <TextInput
-                placeholder="Wpisz kod weryfikacyjny"
-                value={code}
-                onChangeText={setCode}
-                keyboardType="number-pad"
-                className="border border-gray-300 rounded p-3 mb-4"
-                />
-                <TouchableOpacity onPress={handleConfirm} className="bg-purple-500 rounded p-3">
-                <Text className="text-white text-center font-semibold">Potwierdź</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={onResendCode} className="mt-4">
-                <Text className="text-blue-500 text-center">Wyślij ponownie kod</Text>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
-    );
-}
-=== FILE END: components/auth/CustomConfirmSignUp.tsx ===
-
-=== FILE START: components/auth/CustomSignUp.tsx ===
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Dimensions } from 'react-native';
-import { signUp } from 'aws-amplify/auth';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
-
-// Wave background
-import LogowanieBackground from '@/src/svg/logowanie/background';
-
-// react-native-size-matters
-import { scale, verticalScale } from 'react-native-size-matters';
-
-export interface SignUpProps {
-  onSwitchToSignIn: () => void;
-  onSignUpSuccess: (email: string) => void;
-  onBackPress?: () => void;
-}
-
-export function CustomSignUp({
-  onSwitchToSignIn,
-  onSignUpSuccess,
-  onBackPress,
-}: SignUpProps) {
-  const [email, setEmail] = useState('');
-  const [preferredName, setPreferredName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const { width, height } = Dimensions.get('window');
-
-  const handleSignUp = async () => {
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-    try {
-      await signUp({
-        username: email,
-        password,
-        options: {
-          userAttributes: {
-            email,
-            preferred_username: preferredName,
-          },
-        },
-      });
-      onSignUpSuccess(email);
-    } catch (err: any) {
-      setError(err.message || 'Error signing up');
-    }
-  };
-
-  return (
-    <View className="flex-1 relative bg-white">
-      {/* Wave background behind everything */}
-      <View className="absolute w-full h-full">
-        <LogowanieBackground
-          width={width}
-          height={height}
-          preserveAspectRatio="xMinYMin slice"
-        />
-      </View>
-
-      <KeyboardAwareScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingHorizontal: scale(20),
-          paddingTop: verticalScale(20),
-          paddingBottom: verticalScale(20),
-        }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <SafeAreaView style={{ flex: 1 }}>
-          {/* Back arrow button (only if you want it) */}
-          {onBackPress && (
-            <TouchableOpacity
-              onPress={onBackPress}
-              style={{
-                marginBottom: verticalScale(10),
-              }}
-            >
-              <Ionicons name="arrow-back" size={scale(24)} color="#000" />
-            </TouchableOpacity>
-          )}
-
-          {/* Main content */}
-          <View>
-            {/* Title */}
-            <Text
-              style={{
-                fontSize: scale(24),
-                marginBottom: verticalScale(20),
-              }}
-              className="self-center font-poppins-bold text-center"
-            >
-              Dołącz do nas!
-            </Text>
-
-            {/* Facebook Button */}
-            <TouchableOpacity
-              style={{
-                paddingVertical: verticalScale(14),
-                borderRadius: scale(25),
-                marginBottom: verticalScale(8),
-              }}
-              className="flex-row items-center justify-center bg-[#615EEE]"
-            >
-              <FontAwesome
-                name="facebook"
-                size={scale(20)}
-                color="#fff"
-                style={{ marginRight: scale(8) }}
-              />
-              <Text
-                style={{ fontSize: scale(14) }}
-                className="text-white font-poppins-medium"
-              >
-                KONTYNUUJ PRZEZ FACEBOOKA
-              </Text>
-            </TouchableOpacity>
-
-            {/* Google Button */}
-            <TouchableOpacity
-              style={{
-                paddingVertical: verticalScale(14),
-                borderRadius: scale(25),
-                marginBottom: verticalScale(16),
-              }}
-              className="flex-row items-center justify-center bg-[#FAF8F5] border border-gray-200"
-            >
-              <FontAwesome
-                name="google"
-                size={scale(20)}
-                color="#DB4437"
-                style={{ marginRight: scale(8) }}
-              />
-              <Text
-                style={{ fontSize: scale(14), color: '#333' }}
-                className="font-poppins-medium"
-              >
-                KONTYNUUJ PRZEZ GOOGLE
-              </Text>
-            </TouchableOpacity>
-
-            {/* Separator text */}
-            <Text
-              style={{
-                fontSize: scale(14),
-                marginTop: verticalScale(8),
-                marginBottom: verticalScale(20),
-              }}
-              className="text-center text-[#A1A4B2] font-poppins-bold"
-            >
-              lub zarejestruj się przez {'\n'} adres e-mail
-            </Text>
-
-            {/* Error message */}
-            {error ? (
-              <Text
-                style={{
-                  fontSize: scale(12),
-                  marginBottom: verticalScale(10),
-                }}
-                className="text-red-500 text-center"
-              >
-                {error}
-              </Text>
-            ) : null}
-
-            {/* Name field */}
-            <TextInput
-              placeholder="Imię"
-              placeholderTextColor="#9c9c9c"
-              value={preferredName}
-              onChangeText={setPreferredName}
-              autoCapitalize="words"
-              style={{
-                borderRadius: scale(8),
-                padding: scale(14),
-                marginBottom: verticalScale(12),
-                fontSize: scale(14),
-              }}
-              className="border border-[#C9C9C9] bg-[#F2F3F7] text-[#A1A4B2] font-poppins-light"
-            />
-
-            {/* Email field */}
-            <TextInput
-              placeholder="Adres e-mail"
-              placeholderTextColor="#9c9c9c"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              style={{
-                borderRadius: scale(8),
-                padding: scale(14),
-                marginBottom: verticalScale(12),
-                fontSize: scale(14),
-              }}
-              className="border border-[#C9C9C9] bg-[#F2F3F7] text-[#A1A4B2] font-poppins-light"
-            />
-
-            {/* Password field */}
-            <TextInput
-              placeholder="Hasło"
-              placeholderTextColor="#9c9c9c"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={{
-                borderRadius: scale(8),
-                padding: scale(14),
-                marginBottom: verticalScale(12),
-                fontSize: scale(14),
-              }}
-              className="border border-[#C9C9C9] bg-[#F2F3F7] text-[#A1A4B2] font-poppins-light"
-            />
-
-            {/* Confirm Password field */}
-            <TextInput
-              placeholder="Potwierdź hasło"
-              placeholderTextColor="#9c9c9c"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              style={{
-                borderRadius: scale(8),
-                padding: scale(14),
-                marginBottom: verticalScale(12),
-                fontSize: scale(14),
-              }}
-              className="border border-[#C9C9C9] bg-[#F2F3F7] text-[#A1A4B2] font-poppins-light"
-            />
-
-            {/* Sign Up button */}
-            <TouchableOpacity
-              onPress={handleSignUp}
-              style={{
-                paddingVertical: verticalScale(14),
-                borderRadius: scale(25),
-                marginTop: verticalScale(10),
-                marginBottom: verticalScale(8),
-              }}
-              className="bg-darkblue"
-            >
-              <Text
-                style={{ fontSize: scale(14) }}
-                className="text-white text-center font-poppins-bold"
-              >
-                KONTYNUUJ
-              </Text>
-            </TouchableOpacity>
-
-            {/* Bottom link */}
-            <View className="flex-row justify-center mt-4">
-              <Text
-                style={{ fontSize: scale(14) }}
-                className="text-[#9c9c9c] mr-1 font-poppins-regular"
-              >
-                MASZ JUŻ KONTO?
-              </Text>
-              <TouchableOpacity onPress={onSwitchToSignIn}>
-                <Text
-                  style={{ fontSize: scale(14) }}
-                  className="text-darkblue font-poppins-bold"
-                >
-                  ZALOGUJ SIĘ
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </SafeAreaView>
-      </KeyboardAwareScrollView>
-    </View>
-  );
-}
-
-=== FILE END: components/auth/CustomSignUp.tsx ===
-
-=== FILE START: components/auth/CustomAuthFlow.tsx ===
-import React, { useState } from "react";
-import { Alert } from "react-native";
-import { resendSignUpCode } from "aws-amplify/auth";
-import { CustomConfirmSignUp } from "./CustomConfirmSignUp";
-import { CustomSignUp } from "./CustomSignUp";
-import { CustomSignIn } from "./CustomSignIn";
-import { PreLogin } from "./CustomPreLogin";
-
-type AuthState = 'preLogin' | 'signIn' | 'signUp' | 'confirmSignUp';
-
-export interface CustomAuthFlowProps {
-  onAuthComplete: () => void;
-}
-
-export default function CustomAuthFlow({ onAuthComplete }: CustomAuthFlowProps) {
-  const [authState, setAuthState] = useState<AuthState>('preLogin');
-  const [emailForConfirmation, setEmailForConfirmation] = useState('');
-  const [history, setHistory] = useState<AuthState[]>(['preLogin']);
-
-  function goToState(next: AuthState) {
-    setHistory(prev => [...prev, next]);
-    setAuthState(next);
-  }
-
-  function goBack() {
-    setHistory(prev => {
-      if (prev.length > 1) {
-        const newHistory = prev.slice(0, -1);
-        const newState = newHistory[newHistory.length - 1];
-        setAuthState(newState);
-        return newHistory;
-      }
-      return prev;
-    })
-  }
-
-  const handleSignUpSuccess = (email: string) => {
-    setEmailForConfirmation(email);
-    goToState('confirmSignUp');
-  };
-
-  const handleConfirmSuccess = () => {
-    goToState('signIn');
-  };
-
-  const handleResendCode = async () => {
-    try {
-      await resendSignUpCode({username: emailForConfirmation});
-      Alert.alert('Success', 'Nowy kod weryfikacyjny został wysłany.');
-    } catch (err) {
-      Alert.alert('Error', (err as any).message || 'Error resending code');
-    }
-  };
-
-  if (authState === 'preLogin') {
-    return (
-      <PreLogin
-        onSignInPress={() => goToState('signIn')}
-        onSignUpPress={() => goToState('signUp')}
-      />
-    );
-  }
-
-  return (
-    <>
-      {authState === 'signIn' && (
-        <CustomSignIn
-          onSwitchToSignUp={() => goToState('signUp')}
-          onSignInSuccess={onAuthComplete}
-          onBackPress={goBack}
-        />
-      )}
-      {authState === 'signUp' && (
-        <CustomSignUp
-          onSwitchToSignIn={() => goToState('signIn')}
-          onSignUpSuccess={handleSignUpSuccess}
-          onBackPress={goBack}
-        />
-      )}
-      {authState === 'confirmSignUp' && (
-        <CustomConfirmSignUp
-          email={emailForConfirmation}
-          onConfirmSuccess={handleConfirmSuccess}
-          onResendCode={handleResendCode}
-        />
-      )}
-    </>
-  );
-}
-=== FILE END: components/auth/CustomAuthFlow.tsx ===
-
-=== FILE START: components/auth/CustomSignIn.tsx ===
-import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Dimensions } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { signIn } from 'aws-amplify/auth';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Icons from Expo Vector Icons
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
-
-// Wave background from your svg/logowanie folder
-import LogowanieBackground from '@/src/svg/logowanie/background';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
-import Animated, { useSharedValue, runOnJS } from 'react-native-reanimated';
-
-
-
-interface SignInProps {
-  onSwitchToSignUp: () => void;
-  onSignInSuccess: () => void;
-  onBackPress: () => void;
-}
-
-export function CustomSignIn({
-  onSwitchToSignUp,
-  onSignInSuccess,
-  onBackPress,
-}: SignInProps) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  
-  const translationX = useSharedValue(0);
-
-  const { width, height } = Dimensions.get('window');
-
-  const handleSignIn = async () => {
-    try {
-      await signIn({ username, password });
-      onSignInSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Błąd logowania');
-    }
-  };
-
-  const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      translationX.value = event.translationX;
-    })
-    .onEnd(() => {
-      if (translationX.value > 100) {
-        runOnJS(onBackPress)();
-      }
-      translationX.value = 0;
-    });
-
-  return (
-    <GestureDetector gesture={panGesture}>
-      <View className="flex-1 relative bg-white">
-        {/* Wave background behind everything */}
-        <View className="absolute w-full h-full">
-          <LogowanieBackground
-            width={width}
-            height={height}
-            preserveAspectRatio="xMinYMin slice"
-          />
-        </View>
-
-        <KeyboardAwareScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingHorizontal: scale(20),
-            paddingTop: verticalScale(20),
-            paddingBottom: verticalScale(20),
-          }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <SafeAreaView style={{ flex: 1 }}>
-            {/* Back arrow button */}
-            <TouchableOpacity
-              onPress={onBackPress}
-              style={{
-                marginBottom: verticalScale(10),
-              }}
-            >
-              <Ionicons name="arrow-back" size={scale(24)} color="#000" />
-            </TouchableOpacity>
-
-            {/* Main content */}
-            <View>
-              {/* Title */}
-              <Text
-                style={{
-                  fontSize: scale(24),
-                  marginBottom: verticalScale(20),
-                }}
-                className="self-center font-poppins-bold text-center"
-              >
-                Witaj ponownie!
-              </Text>
-
-              {/* Facebook Button */}
-              <TouchableOpacity
-                style={{
-                  paddingVertical: verticalScale(14),
-                  borderRadius: scale(25),
-                  marginBottom: verticalScale(8),
-                }}
-                className="flex-row items-center justify-center bg-[#615EEE]"
-              >
-                <FontAwesome
-                  name="facebook"
-                  size={scale(20)}
-                  color="#fff"
-                  style={{ marginRight: scale(8) }}
-                />
-                <Text
-                  style={{ fontSize: scale(14) }}
-                  className="text-white font-poppins-medium"
-                >
-                  KONTYNUUJ PRZEZ FACEBOOKA
-                </Text>
-              </TouchableOpacity>
-
-              {/* Google Button */}
-              <TouchableOpacity
-                style={{
-                  paddingVertical: verticalScale(14),
-                  borderRadius: scale(25),
-                  marginBottom: verticalScale(16),
-                }}
-                className="flex-row items-center justify-center bg-[#FAF8F5] border border-gray-200"
-              >
-                <FontAwesome
-                  name="google"
-                  size={scale(20)}
-                  color="#DB4437"
-                  style={{ marginRight: scale(8) }}
-                />
-                <Text
-                  style={{ fontSize: scale(14), color: '#333' }}
-                  className="font-poppins-medium"
-                >
-                  KONTYNUUJ PRZEZ GOOGLE
-                </Text>
-              </TouchableOpacity>
-
-              {/* Separator text */}
-              <Text
-                style={{
-                  fontSize: scale(14),
-                  marginTop: verticalScale(8),
-                  marginBottom: verticalScale(30),
-                }}
-                className="text-center text-[#A1A4B2] font-poppins-bold"
-              >
-                lub zaloguj się przez {'\n'} adres e-mail
-              </Text>
-
-              {/* Error message */}
-              {error ? (
-                <Text
-                  style={{
-                    fontSize: scale(12),
-                    marginBottom: verticalScale(10),
-                  }}
-                  className="text-red-500 text-center"
-                >
-                  {error}
-                </Text>
-              ) : null}
-
-              {/* Email field */}
-              <TextInput
-                placeholder="Adres e-mail"
-                placeholderTextColor="#9c9c9c"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-                style={{
-                  borderRadius: scale(8),
-                  padding: scale(14),
-                  marginBottom: verticalScale(16),
-                  fontSize: scale(14),
-                }}
-                className="border border-[#C9C9C9] bg-[#F2F3F7] text-[#A1A4B2] font-poppins-light"
-              />
-
-              {/* Password field */}
-              <TextInput
-                placeholder="Hasło"
-                placeholderTextColor="#9c9c9c"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-                style={{
-                  borderRadius: scale(8),
-                  padding: scale(14),
-                  marginBottom: verticalScale(12),
-                  fontSize: scale(14),
-                }}
-                className="border border-[#C9C9C9] bg-[#F2F3F7] text-[#A1A4B2] font-poppins-light"
-              />
-
-              {/* Sign In button */}
-              <TouchableOpacity
-                onPress={handleSignIn}
-                style={{
-                  paddingVertical: verticalScale(14),
-                  borderRadius: scale(25),
-                  marginTop: verticalScale(10),
-                  marginBottom: verticalScale(12),
-                }}
-                className="bg-darkblue"
-              >
-                <Text
-                  style={{ fontSize: scale(14) }}
-                  className="text-white text-center font-poppins-bold"
-                >
-                  ZALOGUJ SIĘ
-                </Text>
-              </TouchableOpacity>
-
-              {/* Forgot Password link */}
-              <TouchableOpacity
-                style={{ marginBottom: verticalScale(30) }}
-              >
-                <Text
-                  style={{ fontSize: scale(14) }}
-                  className="text-[#9c9c9c] text-center font-poppins-bold"
-                >
-                  Zapomniałeś hasła?
-                </Text>
-              </TouchableOpacity>
-
-              {/* Bottom link */}
-              <View className="flex-row justify-center">
-                <Text
-                  style={{ fontSize: scale(14) }}
-                  className="text-[#9c9c9c] mr-1 font-poppins-regular"
-                >
-                  NIE POSIADASZ KONTA?
-                </Text>
-                <TouchableOpacity onPress={onSwitchToSignUp}>
-                  <Text
-                    style={{ fontSize: scale(14) }}
-                    className="text-darkblue font-poppins-bold"
-                  >
-                    ZAREJESTRUJ SIĘ
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </SafeAreaView>
-        </KeyboardAwareScrollView>
-      </View>
-    </GestureDetector>
-  );
-}
-
-=== FILE END: components/auth/CustomSignIn.tsx ===
-
-=== FILE START: components/__tests__/StyledText-test.js ===
-import * as React from 'react';
-import renderer from 'react-test-renderer';
-
-import { MonoText } from '../StyledText';
-
-it(`renders correctly`, () => {
-  const tree = renderer.create(<MonoText>Snapshot test!</MonoText>).toJSON();
-
-  expect(tree).toMatchSnapshot();
-});
-
-=== FILE END: components/__tests__/StyledText-test.js ===
+=== FILE END: AuthProvider.tsx ===
 

@@ -1,0 +1,167 @@
+import { ReactNode, createContext, useEffect, useState, useContext } from "react";
+import { router, useSegments } from "expo-router";
+import { signIn as amplifySignIn, signOut as amplifySignOut, confirmSignUp, getCurrentUser, resendSignUpCode, signUp } from "aws-amplify/auth";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { Alert } from "react-native";
+
+type User = {
+  id: string;
+  username?: string;
+};
+
+type AuthContextType = {
+  user: User | null;
+  login: (username: string, password: string) => Promise<boolean>;
+  register: (username: string, password: string, preferredName: string) => Promise<boolean>;
+  confirmRegister: (username: string, code: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  resendCode: (username: string) => Promise<void>;
+};
+
+function useProtectedRoute(user: User | null, loading: boolean, segments: string[]) {
+  useEffect(() => {
+    if (loading) return;
+
+    // Our folder groups: authenticated pages are under (auth)
+    const inAuthGroup = segments[0] === "(auth)";
+    console.log("Segments:", segments);
+    console.log("In auth group:", inAuthGroup);
+    console.log("User:", user);
+
+    if (!user && inAuthGroup) {
+      // If not logged in but in an authenticated group, redirect to login
+      console.log("Redirecting to login");
+      router.replace("/(public)/pre-login");
+    } else if (user && !inAuthGroup) {
+      // If logged in but not inside auth group, send to the tabs area
+      console.log("Redirecting to tabs");
+      router.replace("/(auth)/(tabs)/");
+    }
+  }, [user, segments, loading]);
+}
+
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  login: async () => false,
+  register: async () => false,
+  confirmRegister: async () => false,
+  logout: async () => {},
+  resendCode: async () => {},
+});
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an <AuthProvider />");
+  }
+  return context;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
+  onAuthLoaded?: () => void;
+}
+
+export default function AuthProvider({ children, onAuthLoaded }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const segments = useSegments();
+
+  useEffect(() => {
+    async function checkUser() {
+      try {
+        const currentUser = await getCurrentUser();
+        console.log("Current user:", currentUser);
+        if (currentUser) {
+          setUser({
+            id: currentUser.userId,
+            username: currentUser?.signInDetails?.loginId,
+          });
+        }
+      } catch {
+        // No current user
+      } finally {
+        setLoading(false);
+        if (onAuthLoaded) {
+          onAuthLoaded();
+        }
+      }
+    }
+    checkUser();
+  }, []);
+
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      // Call AWS Amplify’s signIn method
+      await amplifySignIn({ username, password });
+      // You might extract more data from userData as needed
+      const userData = await getCurrentUser();
+      setUser({
+        id: userData.userId,
+        username: userData?.signInDetails?.loginId,
+      });
+      return true;
+    } catch (error) {
+      console.error("Error signing in:", error);
+      return false;
+    }
+  };
+
+  const register = async (email: string, password: string, preferredName: string): Promise<boolean> => {
+    try {
+      // Call AWS Amplify’s signUp method
+      await signUp({
+              username: email,
+              password,
+              options: {
+                userAttributes: {
+                  email,
+                  preferred_username: preferredName,
+                },
+              },
+            });
+      return true;
+    } catch (error) {
+      console.error("Error signing up:", error);
+      return false;
+    }
+  }
+
+  const confirmRegister = async (email: string, code: string): Promise<boolean> => {
+    try {
+      // Call AWS Amplify’s confirmSignUp method
+      await confirmSignUp({ username: email, confirmationCode: code });
+      return true;
+    } catch (error) {
+      console.error("Error confirming sign up:", error);
+      return false;
+    }
+  }
+
+  const logout = async () => {
+    try {
+      await amplifySignOut({ global: true });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    } finally {
+      setUser(null);
+    }
+  };
+
+  const resendCode = async (username: string) => {
+    try {
+      await resendSignUpCode({ username});
+      Alert.alert("Success", "Verification code has been resent.");
+    } catch (err: any) {
+      Alert.alert("Error", err.message || "Error resending code");
+    }
+  }
+
+  useProtectedRoute(user, loading, segments);
+
+  return (
+    <AuthContext.Provider value={{ user, login, register, confirmRegister, logout, resendCode }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
