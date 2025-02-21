@@ -1,4 +1,6 @@
+import { useAuth } from "@/src/context/AuthProvider";
 import { confirmSignUp } from "aws-amplify/auth";
+import { router, useGlobalSearchParams } from "expo-router";
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,20 +11,27 @@ export interface ConfirmSignUpProps {
     onResendCode: () => void;
 }
 
-export function CustomConfirmSignUp({
-    email,
-    onConfirmSuccess,
-    onResendCode,
-}: ConfirmSignUpProps) {
+export default function CustomConfirmSignUp() {
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
+    const { email } = useGlobalSearchParams();
+    const emailString = Array.isArray(email) ? email[0] : email;
+    const { resendCode, confirmRegister} = useAuth();
+
+    const onConfirmSuccess = () => {
+        router.push("/(public)/sign-in");
+    }
+    
+    const onResendCode = async () => {
+        await resendCode(emailString);
+    }
 
     const handleConfirm = async () => {
         try {
-        await confirmSignUp({username: email, confirmationCode: code});
-        onConfirmSuccess();
+            await confirmRegister(emailString, code);
+            onConfirmSuccess();
         } catch (err: any) {
-        setError(err.message || 'Error confirming sign up');
+            setError(err.message || 'Error confirming sign up');
         }
     };
 

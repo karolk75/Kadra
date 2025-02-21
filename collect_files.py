@@ -32,7 +32,7 @@ def collect_files_contents(root_dir, output_file):
 
 if __name__ == "__main__":
     # Always use the current directory as the directory to scan
-    directory_to_scan = "src"
+    directory_to_scan = "src/context"
     output_filename = "output.txt"
     collect_files_contents(directory_to_scan, output_filename)
     print("Completed writing files and contents to", output_filename)
