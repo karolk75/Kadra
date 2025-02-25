@@ -1,9 +1,12 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
-import { useColorScheme } from "@/src/components/useColorScheme";
+import { useColorScheme } from "@/src/hooks/useColorScheme";
 import Colors from "@/src/constants/Colors";
 
+export const unstable_settings = {
+  initialRouteName: 'index',
+};
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];

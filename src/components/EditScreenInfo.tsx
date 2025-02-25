@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
-import { ExternalLink } from './ExternalLink';
-import { MonoText } from './StyledText';
-import { Text, View } from './Themed';
+import { ExternalLink } from "./ExternalLink";
+import { MonoText } from "./StyledText";
+import { Text, View } from "./Themed";
 
 export default function EditScreenInfo({ path }: { path: string }) {
   return (
@@ -17,16 +17,19 @@ export default function EditScreenInfo({ path }: { path: string }) {
         </View>
 
         <Text className="text-lg text-center">
-          Change any of the text, save the file, and your app will automatically update.
+          Change any of the text, save the file, and your app will automatically
+          update.
         </Text>
       </View>
 
       <View className="mt-4 mx-5 items-center">
         <ExternalLink
           className="py-4"
-          href="https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet">
+          href="https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet"
+        >
           <Text className="text-center text-link">
-            Tap here if your app doesn't automatically update after making changes
+            Tap here if your app doesn't automatically update after making
+            changes
           </Text>
         </ExternalLink>
       </View>

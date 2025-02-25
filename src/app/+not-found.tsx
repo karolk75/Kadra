@@ -1,11 +1,12 @@
-import { Link, Stack } from 'expo-router';
+import { Link, Stack } from "expo-router";
 
-import { Text, View } from '@/src/components/Themed';
+import { Text, View } from "@/src/components/Themed";
+import React from "react";
 
 export default function NotFoundScreen() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
+      <Stack.Screen options={{ title: "Oops!" }} />
       <View className="flex flex-1 items-center justify-center p-5">
         <Text className="text-xl font-bold">This screen doesn't exist.</Text>
 
