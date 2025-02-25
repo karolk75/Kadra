@@ -13,5 +13,13 @@ export const auth = defineAuth({
       mutable: true,
       required: true,
     },
+    familyName: {
+      mutable: true,
+      required: true,
+    },
+    phoneNumber: {
+      mutable: true,
+      required: true,
+    },
   },
 });

@@ -1,14 +1,14 @@
 import * as React from "react"
 import Svg, {
-  G,
-  Rect,
-  Path,
   Circle,
+  ClipPath,
+  Defs,
   Ellipse,
+  G,
   Line,
   Mask,
-  Defs,
-  ClipPath
+  Path,
+  Rect
 } from "react-native-svg"
 /* SVGR has dropped some elements not supported by react-native-svg: filter */
 
