@@ -15,5 +15,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
-, "src/svg/pre-logowanie/kadra-logo.jsx"  ]
+, "src/svg/pre-login/kadra-logo.jsx", "src/svg/main/offers.jsx"  ]
 }

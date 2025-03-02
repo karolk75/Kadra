@@ -3,15 +3,15 @@ import React, { useState } from "react";
 import { Dimensions, View } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 
-import { BackButton } from "@/src/components/BackButton";
-import { ErrorMessage } from "@/src/components/ErrorMessage";
+import { BackButton } from "@/src/components/auth/BackButton";
+import { ErrorMessage } from "@/src/components/auth/ErrorMessage";
 import { KeyboardAwareContainer } from "@/src/components/KeyboardAwareContainer";
-import { AuthBackground } from "@/src/components/auth/AuthBackground";
+import { Background } from "@/src/components/Background";
 import { AuthButton } from "@/src/components/auth/AuthButton";
 import { AuthInput } from "@/src/components/auth/AuthInput";
 import { AuthTitle } from "@/src/components/auth/AuthTitle";
 import { useSession } from "@/src/context";
-import LogowanieBackground from "@/src/svg/logowanie/background";
+import LoginBackground from "@/src/svg/background";
 
 export default function CustomSignUp() {
   const [firstName, setFirstName] = useState("");
@@ -48,7 +48,7 @@ export default function CustomSignUp() {
 
   return (
     <View className="flex-1 relative bg-white">
-      <AuthBackground BackgroundComponent={LogowanieBackground} />
+      <Background BackgroundComponent={LoginBackground} />
 
       <KeyboardAwareContainer>
         <BackButton />

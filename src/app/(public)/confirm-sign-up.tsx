@@ -3,17 +3,17 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { scale } from "react-native-size-matters";
 
-import { AuthBackground } from "@/src/components/auth/AuthBackground";
+import { Background } from "@/src/components/Background";
 import { AuthButton } from "@/src/components/auth/AuthButton";
 import { AuthInput } from "@/src/components/auth/AuthInput";
 import { AuthTitle } from "@/src/components/auth/AuthTitle";
-import { BackButton } from "@/src/components/BackButton";
-import { BottomLink } from "@/src/components/BottomLink";
-import { ErrorMessage } from "@/src/components/ErrorMessage";
+import { BackButton } from "@/src/components/auth/BackButton";
+import { BottomLink } from "@/src/components/auth/BottomLink";
+import { ErrorMessage } from "@/src/components/auth/ErrorMessage";
 import { KeyboardAwareContainer } from "@/src/components/KeyboardAwareContainer";
-import { SeparatorText } from "@/src/components/SeparatorText";
+import { SeparatorText } from "@/src/components/auth/SeparatorText";
 import { useSession } from "@/src/context";
-import LogowanieBackground from "@/src/svg/logowanie/background";
+import LoginBackground from "@/src/svg/background";
 
 export default function CustomConfirmSignUp() {
   const [code, setCode] = useState("");
@@ -47,7 +47,7 @@ export default function CustomConfirmSignUp() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }} className="relative">
-      <AuthBackground BackgroundComponent={LogowanieBackground} />
+      <Background BackgroundComponent={LoginBackground} />
 
       <KeyboardAwareContainer>
         <BackButton />

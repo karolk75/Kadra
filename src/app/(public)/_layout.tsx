@@ -6,7 +6,7 @@ export default function PublicLayout() {
   const { session, isLoading } = useSession();
 
   if (isLoading) return <Text>Loading...</Text>;
-  if (session) return <Redirect href="/(auth)/(tabs)/" />;
+  if (session) return <Redirect href="/(auth)/(tabs)" />;
 
   return (
     <Stack
