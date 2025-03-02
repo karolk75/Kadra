@@ -1,0 +1,21 @@
+<svg width="35" height="30" viewBox="0 0 35 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="path-1-inside-1_496_753" fill="white">
+<rect y="3.15784" width="35" height="26.8421" rx="2"/>
+</mask>
+<rect y="3.15784" width="35" height="26.8421" rx="2" fill="white" stroke="#DAC081" stroke-width="6" mask="url(#path-1-inside-1_496_753)"/>
+<rect y="1.57898" width="35" height="4.73684" rx="2" fill="#DAC081"/>
+<ellipse cx="28.0814" cy="3.55262" rx="1.22093" ry="1.18421" fill="white"/>
+<ellipse cx="7.73256" cy="3.55262" rx="1.22093" ry="1.18421" fill="white"/>
+<line x1="7.82559" x2="7.82559" y2="3.94737" stroke="#DAC081"/>
+<line x1="28.1744" x2="28.1744" y2="3.94737" stroke="#DAC081"/>
+<rect x="3.25583" y="8.6842" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="3.25583" y="16.579" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="8.13953" y="16.579" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="3.25583" y="20.5264" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="8.13953" y="8.6842" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="13.0233" y="8.6842" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="17.907" y="8.6842" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="3.25583" y="12.6316" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="8.13953" y="12.6316" width="2.44186" height="2.36842" fill="#DAC081"/>
+<rect x="13.0233" y="12.6316" width="2.44186" height="2.36842" fill="#DAC081"/>
+</svg>
