@@ -31,6 +31,7 @@ module.exports = {
         "poppins-regular": ["PoppinsRegular"],
         "poppins-semibold": ["PoppinsSemiBold"],
         "poppins-thin": ["PoppinsThin"],
+        "poppins-italic": ["PoppinsItalic"],
       }
     },
   },
