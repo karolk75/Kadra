@@ -1,146 +1,38 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { scale, verticalScale } from "react-native-size-matters";
+import { Ionicons } from "@expo/vector-icons";
 
-import { Background } from "@/src/components/Background";
-import { KeyboardAwareContainer } from "@/src/components/KeyboardAwareContainer";
-import { SearchBar } from "@/src/components/main/SearchBar";
-import { formatMessageTime } from "@/src/components/messages/ConversationView";
-import { UserAttributes } from "@/src/context";
-import { useStorageState } from "@/src/context/useStorageState";
-import ScreenBackground from "@/src/svg/background";
-import KadraLogo from "@/src/svg/pre-login/kadra-logo";
-import BoyAvatar from "@/src/svg/avatars/boyAvatar";
-import GirlAvatar from "@/src/svg/avatars/girlAvatar";
+import { Background } from "@/components/Background";
+import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
+import { SearchBar } from "@/components/main/SearchBar";
+import { UserAttributes } from "@/context";
+import { useStorageState } from "@/context/useStorageState";
+import { getMockTeachers } from "@/data/mockData";
+import BoyAvatar from "@/svg/avatars/boyAvatar";
+import GirlAvatar from "@/svg/avatars/girlAvatar";
+import ScreenBackground from "@/svg/background";
+import { TeacherContact } from "@/types/TeacherContact";
+import { formatMessageTime } from "@/utils/utils";
+import { ConversationSelectionModal } from "@/components/messages/ConversationSelectionModal";
 
-// Types
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "teacher";
-  timestamp: Date;
-  read: boolean;
-}
-
-interface TeacherContact {
-  id: string;
-  name: string;
-  lastMessage?: string;
-  lastMessageTime?: Date;
-  unreadCount: number;
-  avatar: React.ReactNode;
-  subject: string;
-  isOnline: boolean;
-}
-
-// Mock data for teachers
-const MOCK_TEACHERS: TeacherContact[] = [
-  {
-    id: "1",
-    name: "Anna Kowalska",
-    lastMessage:
-      "Dzień dobry, czy możemy przełożyć jutrzejsze zajęcia na późniejszą godzinę?",
-    lastMessageTime: new Date(new Date().getTime() - 25 * 60 * 1000), // 25 min ago
-    unreadCount: 2,
-    avatar: <GirlAvatar />,
-    subject: "Matematyka",
-    isOnline: true,
-  },
-  {
-    id: "2",
-    name: "Tomasz Nowak",
-    lastMessage: "Proszę o przygotowanie prezentacji na następny tydzień.",
-    lastMessageTime: new Date(new Date().getTime() - 2 * 60 * 60 * 1000), // 2 hours ago
-    unreadCount: 0,
-    avatar: <BoyAvatar />,
-    subject: "Język Polski",
-    isOnline: false,
-  },
-  {
-    id: "3",
-    name: "Magdalena Wiśniewska Długie-Nazwisko",
-    lastMessage: "Sprawdzian z algebry zostanie przełożony na przyszły piątek.",
-    lastMessageTime: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    unreadCount: 0,
-    avatar: <GirlAvatar />,
-    subject: "Fizyka",
-    isOnline: true,
-  },
-  {
-    id: "4",
-    name: "Piotr Zieliński",
-    lastMessage: "Proszę o przesłanie zadania domowego do końca tygodnia.",
-    lastMessageTime: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    unreadCount: 0,
-    avatar: <BoyAvatar />,
-    subject: "Chemia",
-    isOnline: false,
-  },
-];
-
-// Mock conversation data
-const MOCK_CONVERSATIONS: Record<string, Message[]> = {
-  "1": [
-    {
-      id: "m1",
-      text: "Dzień dobry, mam pytanie odnośnie jutrzejszych zajęć.",
-      sender: "user",
-      timestamp: new Date(new Date().getTime() - 30 * 60 * 1000),
-      read: true,
-    },
-    {
-      id: "m2",
-      text: "Dzień dobry, o co chodzi?",
-      sender: "teacher",
-      timestamp: new Date(new Date().getTime() - 28 * 60 * 1000),
-      read: true,
-    },
-    {
-      id: "m3",
-      text: "Czy moglibyśmy przełożyć jutrzejsze zajęcia na późniejszą godzinę?",
-      sender: "user",
-      timestamp: new Date(new Date().getTime() - 27 * 60 * 1000),
-      read: true,
-    },
-    {
-      id: "m4",
-      text: "Dzień dobry, czy możemy przełożyć jutrzejsze zajęcia na późniejszą godzinę?",
-      sender: "teacher",
-      timestamp: new Date(new Date().getTime() - 25 * 60 * 1000),
-      read: false,
-    },
-    {
-      id: "m5",
-      text: "Poproszę też o informację, jakie będą wymagane materiały na te zajęcia.",
-      sender: "teacher",
-      timestamp: new Date(new Date().getTime() - 25 * 60 * 1000),
-      read: false,
-    },
-  ],
-  "2": [
-    {
-      id: "m1",
-      text: "Dzień dobry, jakie materiały są potrzebne na następne zajęcia?",
-      sender: "user",
-      timestamp: new Date(new Date().getTime() - 4 * 60 * 60 * 1000),
-      read: true,
-    },
-    {
-      id: "m2",
-      text: "Proszę o przygotowanie prezentacji na następny tydzień.",
-      sender: "teacher",
-      timestamp: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
-      read: true,
-    },
-  ],
-};
+const MOCK_TEACHERS: TeacherContact[] = getMockTeachers(
+  <BoyAvatar />,
+  <GirlAvatar />
+);
 
 export default function MessagesScreen() {
   const [attributes] = useStorageState<UserAttributes>("attributes");
   const [contacts, setContacts] = useState(MOCK_TEACHERS);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  
+  // State for conversation modal
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  // Get unique schools from teachers
+  const schools = [...new Set(MOCK_TEACHERS.map(teacher => teacher.school))];
 
   // Handle opening a chat with a teacher
   const handleOpenChat = (teacherId: string) => {
@@ -153,9 +45,14 @@ export default function MessagesScreen() {
 
     // Navigate to the teacher conversation screen
     router.push({
-      pathname: "/(auth)/teacher-conversation",
-      params: { teacherId },
+      pathname: "/(auth)/conversation",
+      params: { id: teacherId },
     });
+  };
+
+  // Handle creating a new conversation
+  const handleNewConversation = () => {
+    setModalVisible(true);
   };
 
   // Filter contacts based on search query
@@ -175,21 +72,8 @@ export default function MessagesScreen() {
 
       <KeyboardAwareContainer>
         <ScrollView className="flex-1" style={{ paddingHorizontal: scale(8) }}>
-          {/* Logo */}
-          <View
-            className="items-center"
-            style={{ marginBottom: verticalScale(10) }}
-          >
-            <KadraLogo />
-          </View>
-
           {/* Header */}
-          <View
-            style={{
-              marginTop: verticalScale(5),
-              marginBottom: verticalScale(5),
-            }}
-          >
+          <View style={{ marginBottom: verticalScale(5) }}>
             <Text
               className="font-poppins-bold text-lightblue"
               style={{ fontSize: scale(24) }}
@@ -201,7 +85,7 @@ export default function MessagesScreen() {
 
           {/* Search Box */}
           <SearchBar
-            placeholder="Wyszukaj nauczyciela..."
+            placeholder="Wyszukaj..."
             onChangeText={setSearchQuery}
             onIconPress={() => console.log("Search pressed")}
           />
@@ -220,9 +104,6 @@ export default function MessagesScreen() {
                   <View className="h-12 w-12 bg-lightblue rounded-full overflow-hidden justify-center items-center">
                     {teacher.avatar}
                   </View>
-                  {teacher.isOnline && (
-                    <View className="absolute right-0 bottom-0 h-3 w-3 bg-green-500 rounded-full border-2 border-white" />
-                  )}
                 </View>
 
                 {/* Message preview */}
@@ -287,6 +168,35 @@ export default function MessagesScreen() {
           </View>
         </ScrollView>
       </KeyboardAwareContainer>
+
+      {/* New Conversation Button */}
+      <TouchableOpacity
+        className="absolute bg-lightblue rounded-full justify-center items-center shadow-md"
+        style={{
+          width: scale(56),
+          height: scale(56),
+          bottom: verticalScale(20),
+          right: scale(20),
+          elevation: 4,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+        }}
+        onPress={handleNewConversation}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="chatbubble-ellipses-outline" size={scale(24)} color="white" />
+      </TouchableOpacity>
+
+      {/* Conversation Selection Modal */}
+      <ConversationSelectionModal 
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        schools={schools}
+        teachers={MOCK_TEACHERS}
+        onSelectTeacher={handleOpenChat}
+      />
     </View>
   );
 }

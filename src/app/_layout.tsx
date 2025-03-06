@@ -79,7 +79,7 @@ export default function Root() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView className="flex-1">
       <SessionProvider>
         <Slot />
       </SessionProvider>

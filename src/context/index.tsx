@@ -83,7 +83,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   if (session && user) fetchAuthSession({ forceRefresh: true });
 
-  const handleAuthError = (error: unknown) => {
+  const handleAuthError = (error: unknown): AuthError => {
     const parsedError = parseAuthError(error);
     setError(parsedError);
     console.error(parsedError);
@@ -127,7 +127,11 @@ export function SessionProvider(props: React.PropsWithChildren) {
         return false;
       } catch (error) {
         handleAuthError(error);
-        throw error;
+        // if (parsedError.name === "UserAlreadyAuthenticatedException") {
+        //   console.log("User already authenticated");
+        //   await signOut();
+        // }
+        return false;
       }
     },
     signUp: async (
