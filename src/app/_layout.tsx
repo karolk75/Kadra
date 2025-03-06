@@ -16,7 +16,7 @@ import { useColorScheme } from "../lib/useColorScheme";
 export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: "(tabs)",
+  initialRouteName: "(tabs)/",
   screenOptions: {
     gestureEnabled: true,
   },
@@ -38,6 +38,7 @@ export default function Root() {
     PoppinsRegular: require("../../assets/fonts/Poppins-Regular.ttf"),
     PoppinsSemiBold: require("../../assets/fonts/Poppins-SemiBold.ttf"),
     PoppinsThin: require("../../assets/fonts/Poppins-Thin.ttf"),
+    PoppinsItalic: require("../../assets/fonts/Poppins-Italic.ttf"),
     ...FontAwesome.font,
   });
 
@@ -78,7 +79,7 @@ export default function Root() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView className="flex-1">
       <SessionProvider>
         <Slot />
       </SessionProvider>

@@ -1,26 +1,41 @@
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
 export default function TabBarIcon({ 
   icon: Icon, 
-  color, 
   focused,
   label
 }: { 
   icon: React.ElementType; 
-  color: string;
   focused: boolean;
   label: string;
 }) {
   return (
-    <View className="items-center justify-center" style={{ paddingTop: verticalScale(10), paddingBottom: verticalScale(5) }}>
-      <Icon width={scale(50)} height={verticalScale(20)} color={focused ? "#D4B97B" : "#CCCCCC"} focused={focused} />
+    <View className="items-center justify-center w-[25vw] h-full" style={styles.container}>
+      <Icon 
+        width={scale(30)} 
+        height={verticalScale(24)} 
+        color={focused ? "#D4B97B" : "#CCCCCC"} 
+        focused={focused} 
+      />
       <Text 
-        className={focused ? "text-[#D4B97B] font-poppins-medium text" : "text-[#9E9E9E] font-poppins-regular"}
-        style={{ fontSize: scale(10), marginTop: verticalScale(5) }}
+        className={focused ? "text-gold font-poppins-medium" : "text-gray font-poppins-regular text-center"}
+        style={styles.label}
+        numberOfLines={1}
       >
         {label}
       </Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: verticalScale(7)
+  },
+  label: {
+    fontSize: scale(10),
+    marginTop: verticalScale(2),
+    lineHeight: verticalScale(13)
+  }
+});

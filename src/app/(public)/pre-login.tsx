@@ -5,11 +5,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { scale, verticalScale } from "react-native-size-matters";
 
 // SVG imports
-import { AuthBackground } from "@/src/components/auth/AuthBackground";
-import { AuthButton } from "@/src/components/auth/AuthButton";
-import { BottomLink } from "@/src/components/BottomLink";
-import Background from "@/src/svg/pre-logowanie/background";
-import KadraLogo from "@/src/svg/pre-logowanie/kadra-logo";
+import { Background } from "@/components/Background";
+import { AuthButton } from "@/components/auth/AuthButton";
+import { BottomLink } from "@/components/auth/BottomLink";
+import PreLoginBackground from "@/svg/pre-login/background";
+import KadraLogo from "@/svg/pre-login/kadra-logo";
 
 export default function PreLogin() {
   const onSignInPress = () => {
@@ -22,7 +22,7 @@ export default function PreLogin() {
 
   return (
     <View className="flex-1 relative bg-white">
-      <AuthBackground BackgroundComponent={Background} />
+      <Background BackgroundComponent={PreLoginBackground} />
 
       <View className="absolute top-16 self-center">
         <KadraLogo />

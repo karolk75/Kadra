@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require("./src/constants/Colors");
 
 module.exports = {
   // NOTE: Update this to include the paths to all of your component files.
@@ -15,8 +14,13 @@ module.exports = {
         darkblue: "#89A8B2",
         lightblue: "#B3C8CF",
         beige: "#E5E1DA",
+        gold: "#D4B97B",
+        gray: {
+          DEFAULT: "#9E9E9E",  
+          light: "#CCCCCC"
+        }
       },
-      screen: {
+      screens: {
         sm: { max: '809px' }, // Mobile (iPhone 3 - iPhone XS Max).
         md: { min: '810px', max: '1000px' }, // Mobile (matches max: iPhone 11 Pro Max landscape @ 896px).
         lg: { min: '1001px' }, 
@@ -31,6 +35,7 @@ module.exports = {
         "poppins-regular": ["PoppinsRegular"],
         "poppins-semibold": ["PoppinsSemiBold"],
         "poppins-thin": ["PoppinsThin"],
+        "poppins-italic": ["PoppinsItalic"],
       }
     },
   },

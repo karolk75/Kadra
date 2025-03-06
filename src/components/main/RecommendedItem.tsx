@@ -1,14 +1,12 @@
-import React from "react";
-import { Image, Text, TouchableOpacity, View, ImageSourcePropType } from "react-native";
+import { RecommendedItemData } from "@/types/RecommendedItemData";
+import {
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet
+} from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-
-export type RecommendedItemData = {
-  id: number;
-  title: string;
-  subtitle: string;
-  backgroundImage: ImageSourcePropType;
-  logoImage: ImageSourcePropType;
-};
 
 type RecommendedItemProps = {
   item: RecommendedItemData;
@@ -21,54 +19,36 @@ export const RecommendedItem = ({
   item,
   color,
   screenWidth,
-  onPress
+  onPress,
 }: RecommendedItemProps) => {
   return (
     <View
       className="flex-1 rounded-sm"
-      style={{
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
-        elevation: 8,
-      }}
+      style={styles.container}
     >
       <TouchableOpacity
-        className={`rounded-2xl overflow-hidden border-${color}`}
+        className="rounded-2xl overflow-hidden"
         style={{
           marginHorizontal: scale(8),
           width: scale(screenWidth * 0.55),
           height: scale(screenWidth * 0.55 * 0.7),
           borderWidth: scale(6),
+          borderColor: color,
         }}
         onPress={() => onPress?.(item)}
       >
         <View className="flex-1 relative">
-          <View
-            style={{
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-            }}
-          >
+          <View className="w-full h-full absolute">
             <Image
               source={item.backgroundImage}
-              style={{
-                width: "100%",
-                height: "100%",
-              }}
+              className="w-full h-full"
               resizeMode="cover"
             />
           </View>
 
           {/* Semi-transparent overlay */}
           <View
-            className="absolute bottom-0 left-0 right-0 bg-white opacity-50"
-            style={{ height: "30%" }}
+            className="absolute bottom-0 left-0 right-0 bg-white opacity-50 h-1/3"
           />
 
           {/* Logo */}
@@ -95,7 +75,7 @@ export const RecommendedItem = ({
             <Text
               className="font-poppins-bold"
               style={{
-                fontSize: screenWidth * 0.030,
+                fontSize: screenWidth * 0.03,
                 lineHeight: screenWidth * 0.035,
               }}
               numberOfLines={1}
@@ -116,4 +96,17 @@ export const RecommendedItem = ({
       </TouchableOpacity>
     </View>
   );
-}; 
+};
+
+const styles = StyleSheet.create({
+  container: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+  },
+});

@@ -8,7 +8,7 @@ function SvgComponent(props) {
       <Svg
         width="100%"
         height="100%"
-        viewBox="0 0 159 230"
+        viewBox="0 0 159 215"
         preserveAspectRatio="xMidYMid slice"
       >
         <Rect width={159} height={201} rx={5} fill="#B3C8CF" />

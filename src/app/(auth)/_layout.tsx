@@ -1,6 +1,6 @@
-import { Redirect, Slot, Stack } from 'expo-router';
-import { useSession } from '@/src/context';
-import { Text } from 'react-native';
+import { useSession } from "@/context";
+import { Redirect, Stack } from "expo-router";
+import { Platform, Text } from "react-native";
 
 export default function AuthLayout() {
   const { session, isLoading } = useSession();
@@ -13,7 +13,21 @@ export default function AuthLayout() {
       screenOptions={{
         gestureEnabled: true,
         headerShown: false,
+        presentation: "card",
+        gestureDirection: "horizontal",
+        fullScreenGestureEnabled: Platform.OS === "ios",
+        animation: "slide_from_right",
       }}
-    />
+    >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="conversation"
+        options={{
+          gestureEnabled: true,
+          animation: "default",
+          gestureDirection: "horizontal",
+        }}
+      />
+    </Stack>
   );
 }

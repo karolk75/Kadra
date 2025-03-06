@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
 export const BackButton: React.FC = () => {
@@ -9,9 +9,15 @@ export const BackButton: React.FC = () => {
   return (
     <TouchableOpacity
       onPress={onBackPress}
-      style={{ marginBottom: verticalScale(10) }}
+      style={styles.button}
     >
       <Ionicons name="arrow-back" size={scale(24)} color="#000" />
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    marginBottom: verticalScale(10)
+  }
+});
