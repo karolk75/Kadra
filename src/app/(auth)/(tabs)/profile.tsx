@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
-import { Button, View, Text } from "react-native";
-import { useSession } from "@/src/context";
+import { useSession } from "@/context";
+import React from "react";
+import { Button, Text, View } from "react-native";
 
 export default function ProfileScreen() {
   const { signOut } = useSession();

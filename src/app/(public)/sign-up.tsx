@@ -1,17 +1,17 @@
 import { router, useGlobalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 
-import { BackButton } from "@/src/components/auth/BackButton";
-import { ErrorMessage } from "@/src/components/auth/ErrorMessage";
-import { KeyboardAwareContainer } from "@/src/components/KeyboardAwareContainer";
-import { Background } from "@/src/components/Background";
-import { AuthButton } from "@/src/components/auth/AuthButton";
-import { AuthInput } from "@/src/components/auth/AuthInput";
-import { AuthTitle } from "@/src/components/auth/AuthTitle";
-import { useSession } from "@/src/context";
-import LoginBackground from "@/src/svg/background";
+import { AuthButton } from "@/components/auth/AuthButton";
+import { AuthInput } from "@/components/auth/AuthInput";
+import { AuthTitle } from "@/components/auth/AuthTitle";
+import { BackButton } from "@/components/auth/BackButton";
+import { ErrorMessage } from "@/components/auth/ErrorMessage";
+import { Background } from "@/components/Background";
+import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
+import { useSession } from "@/context";
+import LoginBackground from "@/svg/background";
 
 export default function CustomSignUp() {
   const [firstName, setFirstName] = useState("");

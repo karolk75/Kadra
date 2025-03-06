@@ -4,6 +4,7 @@ import {
   TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
+  StyleSheet,
 } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
@@ -26,29 +27,28 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
 }) => (
   <TouchableOpacity
     onPress={onPress}
-    style={[
-      {
-        paddingVertical: verticalScale(14),
-        borderRadius: scale(25),
-        marginVertical: verticalScale(8),
-      },
-      style,
-    ]}
+    style={[styles.button, style]}
     className={className}
   >
     <Text
-      style={[
-        {
-          fontSize: scale(14),
-          textAlign: "center",
-          fontWeight: "bold",
-          color: "white",
-        },
-        titleStyle,
-      ]}
+      style={[styles.buttonText, titleStyle]}
       className={titleClassName}
     >
       {title}
     </Text>
   </TouchableOpacity>
 );
+
+const styles = StyleSheet.create({
+  button: {
+    paddingVertical: verticalScale(14),
+    borderRadius: scale(25),
+    marginVertical: verticalScale(8),
+  },
+  buttonText: {
+    fontSize: scale(14),
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "white",
+  }
+});

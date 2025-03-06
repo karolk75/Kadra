@@ -1,46 +1,48 @@
-import React from "react";
 import { Tabs } from "expo-router";
-import { useColorScheme } from "@/src/hooks/useColorScheme";
-import Colors from "@/src/constants/Colors";
-import { View, Text, Dimensions } from "react-native";
+import React from "react";
+import { Dimensions, Platform } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
 // Import custom SVG icons
-import MainIcon from "@/src/svg/tabs/main";
-import CalendarIcon from "@/src/svg/tabs/calendar";
-import MessagesIcon from "@/src/svg/tabs/messages";
-import ProfileIcon from "@/src/svg/tabs/profile";
-import TabBarIcon from "@/src/components/TabBarIcon";
+import TabBarIcon from "@/components/TabBarIcon";
+import CalendarIcon from "@/svg/tabs/calendar";
+import MainIcon from "@/svg/tabs/main";
+import MessagesIcon from "@/svg/tabs/messages";
+import ProfileIcon from "@/svg/tabs/profile";
 
 export const unstable_settings = {
-  initialRouteName: 'index',
+  initialRouteName: "index",
 };
 
-// Get screen width to calculate tab width
-const screenWidth = Dimensions.get('window').width;
-// Calculate tab width based on available space
+const screenWidth = Dimensions.get("window").width;
 const tabWidth = screenWidth / 4;
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#D4B97B",
         tabBarInactiveTintColor: "#9E9E9E",
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopWidth: scale(1),
-          borderTopColor: '#F0F0F0',
-          height: verticalScale(65),
-          paddingBottom: verticalScale(10),
-          paddingHorizontal: scale(15),
-          justifyContent: 'center',
+          backgroundColor: "#FFFFFF",
+          borderTopWidth: 1,
+          borderTopColor: "rgba(0, 0, 0, 0.1)",
+          height: verticalScale(62),
+          paddingBottom: Platform.OS === 'ios' ? verticalScale(20) : verticalScale(5),
+          paddingTop: verticalScale(2),
+          paddingHorizontal: scale(5),
+          justifyContent: "center",
+          alignItems: "center",
+          elevation: 8,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -3 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
         tabBarItemStyle: {
-          width: tabWidth,
-          maxWidth: tabWidth,
+          height: verticalScale(55),
+          marginHorizontal: scale(2),
+          paddingVertical: verticalScale(5),
         },
         tabBarShowLabel: false,
         headerShown: false,
@@ -51,11 +53,11 @@ export default function TabLayout() {
         options={{
           title: "Strona Główna",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon 
-              icon={MainIcon} 
-              color={color} 
-              focused={focused} 
-              label="Strona Główna" 
+            <TabBarIcon
+              icon={MainIcon}
+              color={color}
+              focused={focused}
+              label="Strona Główna"
             />
           ),
         }}
@@ -65,11 +67,11 @@ export default function TabLayout() {
         options={{
           title: "Kalendarz",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon 
-              icon={CalendarIcon} 
-              color={color} 
-              focused={focused} 
-              label="Kalendarz" 
+            <TabBarIcon
+              icon={CalendarIcon}
+              color={color}
+              focused={focused}
+              label="Kalendarz"
             />
           ),
         }}
@@ -79,11 +81,11 @@ export default function TabLayout() {
         options={{
           title: "Wiadomości",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon 
-              icon={MessagesIcon} 
-              color={color} 
-              focused={focused} 
-              label="Wiadomości" 
+            <TabBarIcon
+              icon={MessagesIcon}
+              color={color}
+              focused={focused}
+              label="Wiadomości"
             />
           ),
         }}
@@ -93,11 +95,11 @@ export default function TabLayout() {
         options={{
           title: "Moje konto",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon 
-              icon={ProfileIcon} 
-              color={color} 
-              focused={focused} 
-              label="Moje konto" 
+            <TabBarIcon
+              icon={ProfileIcon}
+              color={color}
+              focused={focused}
+              label="Moje konto"
             />
           ),
         }}

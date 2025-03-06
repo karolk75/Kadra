@@ -1,13 +1,13 @@
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
-import { RecommendedItem, RecommendedItemData } from "./RecommendedItem";
+import { THEME_COLORS_HEX } from "@/constants/ThemeColors";
+import { RecommendedItemData } from "@/types/RecommendedItemData";
+import { RecommendedItem } from "./RecommendedItem";
 
 type RecommendedSectionProps = {
   title?: string;
   items: RecommendedItemData[];
-  colors: string[];
   screenWidth: number;
   onItemPress?: (item: RecommendedItemData) => void;
 };
@@ -15,20 +15,14 @@ type RecommendedSectionProps = {
 export const RecommendedSection = ({
   title = "Rekomendowane dla Ciebie",
   items,
-  colors,
   screenWidth,
-  onItemPress
+  onItemPress,
 }: RecommendedSectionProps) => {
   return (
     <View className="mb-6">
       <Text
         className="font-bold"
-        style={{
-          fontSize: scale(18),
-          marginLeft: scale(10),
-          marginTop: verticalScale(20),
-          marginBottom: verticalScale(5),
-        }}
+        style={styles.sectionTitle}
         numberOfLines={1}
       >
         {title}
@@ -37,24 +31,31 @@ export const RecommendedSection = ({
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: scale(10),
-          paddingVertical: verticalScale(15),
-        }}
+        contentContainerStyle={styles.scrollContent}
       >
-        {items.map((item, index) => {
-          const color = colors[index % colors.length];
-          return (
-            <RecommendedItem
-              key={item.id}
-              item={item}
-              color={color}
-              screenWidth={screenWidth}
-              onPress={onItemPress}
-            />
-          );
-        })}
+        {items.map((item, index) => (
+          <RecommendedItem
+            key={item.id}
+            item={item}
+            color={THEME_COLORS_HEX[index % items.length]}
+            screenWidth={screenWidth}
+            onPress={onItemPress}
+          />
+        ))}
       </ScrollView>
     </View>
   );
-}; 
+};
+
+const styles = StyleSheet.create({
+  sectionTitle: {
+    fontSize: scale(18),
+    marginLeft: scale(10),
+    marginTop: verticalScale(20),
+    marginBottom: verticalScale(5),
+  },
+  scrollContent: {
+    paddingHorizontal: scale(10),
+    paddingVertical: verticalScale(15),
+  },
+});

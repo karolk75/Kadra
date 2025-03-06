@@ -3,21 +3,21 @@ import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
-import { BackButton } from "@/src/components/auth/BackButton";
-import { BottomLink } from "@/src/components/auth/BottomLink";
-import { ErrorMessage } from "@/src/components/auth/ErrorMessage";
-import { KeyboardAwareContainer } from "@/src/components/KeyboardAwareContainer";
-import { SeparatorText } from "@/src/components/auth/SeparatorText";
-import { Background } from "@/src/components/Background";
-import { AuthButton } from "@/src/components/auth/AuthButton";
-import { AuthInput } from "@/src/components/auth/AuthInput";
+import { AuthButton } from "@/components/auth/AuthButton";
+import { AuthInput } from "@/components/auth/AuthInput";
 import {
   AuthSocialButton,
   Social,
-} from "@/src/components/auth/AuthSocialButton";
-import { AuthTitle } from "@/src/components/auth/AuthTitle";
-import { useSession } from "@/src/context";
-import LoginBackground from "@/src/svg/background";
+} from "@/components/auth/AuthSocialButton";
+import { AuthTitle } from "@/components/auth/AuthTitle";
+import { BackButton } from "@/components/auth/BackButton";
+import { BottomLink } from "@/components/auth/BottomLink";
+import { ErrorMessage } from "@/components/auth/ErrorMessage";
+import { SeparatorText } from "@/components/auth/SeparatorText";
+import { Background } from "@/components/Background";
+import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
+import { useSession } from "@/context";
+import LoginBackground from "@/svg/background";
 
 export default function CustomSignIn() {
   const [username, setUsername] = useState("");
