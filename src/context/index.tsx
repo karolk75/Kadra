@@ -1,6 +1,7 @@
 import {
   confirmSignUp,
   fetchAuthSession,
+  fetchUserAttributes,
   getCurrentUser,
   JWT,
   resendSignUpCode,
@@ -18,6 +19,14 @@ interface UserData {
   username?: string;
   email?: string;
   preferredName?: string;
+}
+
+export interface UserAttributes {
+  id: string;
+  email?: string;
+  preferredName?: string;
+  familyName?: string;
+  phoneNumber?: string;
 }
 
 interface SessionData {
@@ -67,13 +76,14 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const [session, setSession, sessionLoading] =
     useStorageState<SessionData>("session");
   const [user, setUser, userLoading] = useStorageState<UserData>("user");
+  const [attributes, setAttributes] = useStorageState<UserAttributes>("attributes");
   const [error, setError] = React.useState<AuthError | null>(null);
 
   const isLoading = sessionLoading || userLoading;
 
   if (session && user) fetchAuthSession({ forceRefresh: true });
 
-  const handleAuthError = (error: unknown) => {
+  const handleAuthError = (error: unknown): AuthError => {
     const parsedError = parseAuthError(error);
     setError(parsedError);
     console.error(parsedError);
@@ -91,20 +101,37 @@ export function SessionProvider(props: React.PropsWithChildren) {
             email: userData.signInDetails?.loginId,
             username: userData.username,
           };
+
           const { accessToken, idToken } =
             (await fetchAuthSession()).tokens ?? {};
           const sessionObj = {
             accessToken,
             idToken,
           };
+
+          const userAttributes = await fetchUserAttributes();
+          const attributesObj = {
+            id: userData.userId,
+            email: userData.signInDetails?.loginId,
+            username: userData.username,
+            preferredName: userAttributes.preferred_username,
+            familyName: userAttributes.family_name,
+            phoneNumber: userAttributes.phone_number,
+          };
+
           setSession(sessionObj);
           setUser(userObj);
+          setAttributes(attributesObj);
           return true;
         }
         return false;
       } catch (error) {
         handleAuthError(error);
-        throw error;
+        // if (parsedError.name === "UserAlreadyAuthenticatedException") {
+        //   console.log("User already authenticated");
+        //   await signOut();
+        // }
+        return false;
       }
     },
     signUp: async (
