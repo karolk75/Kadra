@@ -1,14 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-<<<<<<< HEAD
-import { DAYS } from "../constants/Days";
-import { MONTHS_IN_POLISH } from "../constants/Months";
-
-=======
 import { DAYS, SHORT_DAYS } from "../constants/Days";
 import { MONTHS_IN_POLISH } from "../constants/Months";
 import moment from "moment";
->>>>>>> feature/messages-tab
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -28,13 +22,6 @@ export const formatMessageTime = (date: Date) => {
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-<<<<<<< HEAD
-  if (date.getTime() === new Date().getTime()) {
-    return "Czwartek";
-  }
-
-=======
->>>>>>> feature/messages-tab
   if (diffDays === 0) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   } else if (diffDays === 1) {
@@ -45,8 +32,6 @@ export const formatMessageTime = (date: Date) => {
     return date.toLocaleDateString();
   }
 };
-<<<<<<< HEAD
-=======
 
 export const formatDay = (date: moment.Moment) => {
   const now = moment();
@@ -55,4 +40,3 @@ export const formatDay = (date: moment.Moment) => {
   }
   return SHORT_DAYS[date.day()];
 };
->>>>>>> feature/messages-tab

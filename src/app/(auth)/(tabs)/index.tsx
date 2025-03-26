@@ -11,10 +11,7 @@ import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { CalendarView } from "@/components/main/CalendarView";
 import { NavigationBox } from "@/components/main/NavigationBox";
-<<<<<<< HEAD
-=======
 import NotificationButton from "@/components/main/NotificationButton";
->>>>>>> feature/messages-tab
 import { RecommendedSection } from "@/components/main/RecommendedSection";
 import { SearchBar } from "@/components/main/SearchBar";
 import { StarRating } from "@/components/main/StarRating";
@@ -84,24 +81,6 @@ export default function MainScreen() {
           <View
             style={{
               marginBottom: verticalScale(20),
-<<<<<<< HEAD
-            }}
-          >
-            <Text
-              className="font-poppins-bold text-lightblue"
-              style={{ fontSize: scale(24) }}
-              numberOfLines={1}
-            >
-              Witaj, {attributes?.preferredName}
-            </Text>
-            <Text
-              className="font-poppins-light text-[#A1A4B2]"
-              style={{ fontSize: scale(16) }}
-              numberOfLines={1}
-            >
-              Miłego dnia
-            </Text>
-=======
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center"
@@ -124,7 +103,6 @@ export default function MainScreen() {
               </Text>
             </View>
             <NotificationButton />
->>>>>>> feature/messages-tab
           </View>
 
           {/* Grid of boxes */}

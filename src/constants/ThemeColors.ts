@@ -1,8 +1,6 @@
 export const THEME_COLORS = ["yellow", "darkblue", "red", "beige"];
 export const THEME_COLORS_HEX = ["#DAC081", "#89A8B2", "#A64F3C", "#E5E1DA"];
 
-<<<<<<< HEAD
-=======
 export const ThemeColors = {
   GOLD: '#DAC081',
   BLUE_GRAY: '#89A8B2',
@@ -17,4 +15,3 @@ export const ScrollPickerColors = [
   ThemeColors.CREAM,
 ];
 
->>>>>>> feature/messages-tab

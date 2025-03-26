@@ -351,22 +351,16 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
               <Text
                 className="font-poppins-bold text-white"
                 style={styles.teacherName}
-<<<<<<< HEAD
-=======
                 numberOfLines={1}
                 ellipsizeMode="tail"
->>>>>>> feature/messages-tab
               >
                 {teacher.name}
               </Text>
               <Text
                 className="font-poppins-light text-white"
                 style={styles.teacherSubject}
-<<<<<<< HEAD
-=======
                 numberOfLines={1}
                 ellipsizeMode="tail"
->>>>>>> feature/messages-tab
               >
                 {teacher.subject}
               </Text>
@@ -546,17 +540,11 @@ const styles = StyleSheet.create({
   },
   teacherName: {
     fontSize: scale(18),
-<<<<<<< HEAD
-  },
-  teacherSubject: {
-    fontSize: scale(14),
-=======
     width: '100%',
   },
   teacherSubject: {
     fontSize: scale(14),
     width: '100%',
->>>>>>> feature/messages-tab
   },
   messageList: {
     paddingVertical: verticalScale(16),
