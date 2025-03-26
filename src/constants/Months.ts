@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 import moment from "moment";
 
->>>>>>> feature/messages-tab
 export const MONTHS_IN_POLISH = [
   "stycznia",
   "lutego",
@@ -17,8 +14,6 @@ export const MONTHS_IN_POLISH = [
   "listopada",
   "grudnia",
 ];
-<<<<<<< HEAD
-=======
 
 export const MONTHS_ENGLISH_TO_POLISH = {
   "January": "Styczeń",
@@ -72,4 +67,3 @@ export const getMonthNumber = (monthName: string): number | undefined => {
   
   return index !== -1 ? index + 1 : undefined;
 };
->>>>>>> feature/messages-tab

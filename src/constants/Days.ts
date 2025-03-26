@@ -7,8 +7,6 @@ export const DAYS = [
   "Piątek",
   "Sobota",
 ];
-<<<<<<< HEAD
-=======
 
 export const SHORT_DAYS = [
   "Nd",
@@ -44,4 +42,3 @@ export const getDayIndex = (day: string | number): number => {
 export const getShortDayName = (dayOfWeek: number): string => {
   return SHORT_DAYS[dayOfWeek] || SHORT_DAYS[0];
 };
->>>>>>> feature/messages-tab

@@ -10,23 +10,6 @@ export const getMockAppointments = (
   BoyAvatar: React.ReactNode,
   GirlAvatar: React.ReactNode
 ): AppointmentData[] => [
-<<<<<<< HEAD
-  {
-    name: "Karol Kowalski",
-    time: "13:00-13:45",
-    location: "Szkoła Muzyki",
-    activity: "Fortepian",
-    avatar: GirlAvatar,
-  },
-  {
-    name: "Jan Kowalski",
-    time: "18:15-19:15",
-    location: "Ninja Club",
-    activity: "Karate",
-    avatar: BoyAvatar,
-  },
-=======
->>>>>>> feature/messages-tab
   {
     name: "Anna Nowak-Długie-Nazwisko",
     time: "10:00-11:30",
@@ -34,8 +17,6 @@ export const getMockAppointments = (
     activity: "Angielski dla zaawansowanych z native speakerem",
     avatar: GirlAvatar,
   },
-<<<<<<< HEAD
-=======
   {
     name: "Karol Kowalski",
     time: "18:30-19:15",
@@ -50,7 +31,6 @@ export const getMockAppointments = (
     activity: "Karate",
     avatar: BoyAvatar,
   }
->>>>>>> feature/messages-tab
 ];
 
 export const MOCK_RECOMMENDED_ITEMS: Omit<
@@ -197,8 +177,6 @@ export const MOCK_CONVERSATIONS: Record<string, Message[]> = {
     },
   ],
 };
-<<<<<<< HEAD
-=======
 
 export interface Notification {
   id: string;
@@ -301,4 +279,3 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     type: 'info'
   }
 ];
->>>>>>> feature/messages-tab
