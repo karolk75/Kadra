@@ -22,6 +22,19 @@ expo-env.d.ts
 *.ipa
 *.app-bundle
 
+# iOS build outputs
+ios/build/
+ios/Pods/
+ios/DerivedData/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+# Android build outputs
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+
 # Metro
 .metro-health-check*
 
