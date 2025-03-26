@@ -170,8 +170,6 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
   const handleAppointmentPress = (appointment: AppointmentData) => {
     if (onAppointmentPress) {
       onAppointmentPress(appointment);
-    } else {
-      console.log(`Appointment pressed: ${appointment.name}`);
     }
   };
 
@@ -220,6 +218,7 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
                   color={item.color}
                   onPress={() => handleAppointmentPress(item.appointment)}
                   containerStyle={styles.cardContainerStyle}
+                  avatarOnly={item.columnCount !== undefined && item.columnCount > 2}
                 />
               </View>
             ))}
