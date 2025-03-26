@@ -52,10 +52,9 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Strona Główna",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({focused }) => (
             <TabBarIcon
               icon={MainIcon}
-              color={color}
               focused={focused}
               label="Strona Główna"
             />
@@ -66,10 +65,9 @@ export default function TabLayout() {
         name="calendar"
         options={{
           title: "Kalendarz",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <TabBarIcon
               icon={CalendarIcon}
-              color={color}
               focused={focused}
               label="Kalendarz"
             />
@@ -80,10 +78,9 @@ export default function TabLayout() {
         name="messages"
         options={{
           title: "Wiadomości",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <TabBarIcon
               icon={MessagesIcon}
-              color={color}
               focused={focused}
               label="Wiadomości"
             />
@@ -94,10 +91,9 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Moje konto",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <TabBarIcon
               icon={ProfileIcon}
-              color={color}
               focused={focused}
               label="Moje konto"
             />
