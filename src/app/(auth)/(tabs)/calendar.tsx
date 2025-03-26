@@ -1,7 +1,7 @@
 import { Background } from "@/components/Background";
 import moment, { Moment } from "moment";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
 
 import DatePicker from "@/components/calendar/DatePicker";
@@ -22,6 +22,12 @@ import HorizontalScrollPicker, {
   HorizontalScrollPickerRef,
 } from "@/components/calendar/HorizontalScrollPicker";
 import { Item } from "@/types/ScrollPicker";
+import TimeCalendar from "@/components/calendar/TimeCalendar";
+import { AppointmentData } from "@/types/AppointmentData";
+import { getMockAppointments } from "@/data/mockData";
+import BoyAvatar from "@/svg/avatars/boyAvatar";
+import GirlAvatar from "@/svg/avatars/girlAvatar";
+
 
 interface DayItem {
   label: string;
@@ -37,6 +43,17 @@ export default function CalendarScreen() {
   const yearItems = getYears();
   const scrollPickerRef = useRef<HorizontalScrollPickerRef>(null);
 
+  // Use appointments from mockData
+  const [appointments, setAppointments] = useState<AppointmentData[]>([]);
+
+  // Initialize appointments with avatars components
+  useEffect(() => {
+    const boyAvatar = <BoyAvatar />;
+    const girlAvatar = <GirlAvatar />;
+    const mockAppointments = getMockAppointments(boyAvatar, girlAvatar);
+    setAppointments(mockAppointments);
+  }, []);
+
   const [selectedDay, setSelectedDay] = useState<Moment | null>(null);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
@@ -48,6 +65,9 @@ export default function CalendarScreen() {
 
   // Days of the selected month
   const [daysInMonth, setDaysInMonth] = useState<DayItem[]>([]);
+  
+  // Selected date in YYYY-MM-DD format for TimeCalendar
+  const [selectedDate, setSelectedDate] = useState<string>(moment().format("YYYY-MM-DD"));
 
   // Update days when month or year changes or today button is clicked
   useEffect(() => {
@@ -117,8 +137,12 @@ export default function CalendarScreen() {
     if (isSameMonthYear) {
       const todayIndex = today.date() - 1; // Convert from 1-based to 0-based index
       handleMoveTo(todayIndex);
+      setSelectedDate(today.format("YYYY-MM-DD"));
     } else if (!selectToday) {
       handleMoveTo(0);
+      if (days.length > 0) {
+        setSelectedDate(days[0].fullDate);
+      }
     }
   };
 
@@ -131,6 +155,7 @@ export default function CalendarScreen() {
     setSelectedMonth(todayMonth);
     setSelectedYear(todayYear);
     setTodayButtonClicked(true);
+    setSelectedDate(today.format("YYYY-MM-DD"));
 
     setIsMonthPickerOpen(false);
     setIsYearPickerOpen(false);
@@ -160,11 +185,10 @@ export default function CalendarScreen() {
 
   // Handler for day selection
   const handleDaySelected = (day: number) => {
-    console.log("day", day);
-    const selectedDay = daysInMonth.find((d) => d.value === day);
-    console.log("selectedDay", selectedDay);
-    if (selectedDay) {
-      setSelectedDay(moment(selectedDay.fullDate));
+    const selectedDayItem = daysInMonth.find((d) => d.value === day);
+    if (selectedDayItem) {
+      setSelectedDay(moment(selectedDayItem.fullDate));
+      setSelectedDate(selectedDayItem.fullDate);
     } else {
       setSelectedDay(null);
     }
@@ -172,6 +196,15 @@ export default function CalendarScreen() {
 
   const handleMoveTo = (index: number) => {
     scrollPickerRef.current?.moveTo(index);
+  };
+
+  // Handler for appointment selections
+  const handleAppointmentPress = (appointment: AppointmentData) => {
+    Alert.alert(
+      "Appointment Details",
+      `Name: ${appointment.name}\nTime: ${appointment.time}\nLocation: ${appointment.location}\nActivity: ${appointment.activity}`,
+      [{ text: "OK" }]
+    );
   };
 
   return (
@@ -256,6 +289,17 @@ export default function CalendarScreen() {
               />
             )}
           </View>
+          
+          {/* Time Calendar Component */}
+          <View style={styles.timeCalendarContainer}>
+            <TimeCalendar 
+              selectedDate={selectedDate}
+              appointments={appointments}
+              // startHour={8}
+              // endHour={20}
+              onAppointmentPress={handleAppointmentPress}
+            />
+          </View>
         </View>
       </SafeAreaContainer>
     </View>
@@ -274,6 +318,11 @@ const styles = StyleSheet.create({
   scrollPickerContainer: {
     marginTop: verticalScale(8),
     height: verticalScale(100),
+  },
+  timeCalendarContainer: {
+    flex: 1,
+    marginTop: verticalScale(-6),
+    marginBottom: verticalScale(-28),
   },
   dayItem: {
     borderRadius: 20,

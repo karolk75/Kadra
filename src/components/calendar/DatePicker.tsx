@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     marginLeft: scale(3),
   },
   expandedPicker: {
-    backgroundColor: "#E5E1DA",
+    backgroundColor: "#f5f5f5",
     borderRadius: scale(15),
     width: scale(150),
     overflow: "hidden",
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   pickerHeaderText: {
     fontSize: scale(14),
     fontFamily: "Poppins-Medium",
-    color: "#333",
+    color: "#89A8B2",
   },
   closeButton: {
     padding: scale(3),
@@ -206,5 +206,6 @@ const styles = StyleSheet.create({
   pickerItem: {
     fontSize: scale(14),
     fontFamily: "Poppins-Medium",
+    color: "#89A8B2",
   },
 });
