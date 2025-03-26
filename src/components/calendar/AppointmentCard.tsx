@@ -15,6 +15,7 @@ type AppointmentCardProps = {
   color: string;
   onPress?: () => void;
   containerStyle?: ViewStyle;
+  avatarOnly?: boolean;
 };
 
 export const AppointmentCard = ({
@@ -22,6 +23,7 @@ export const AppointmentCard = ({
   color,
   onPress,
   containerStyle,
+  avatarOnly = false,
 }: AppointmentCardProps) => {
   const { width: screenWidth } = useWindowDimensions();
 
@@ -39,66 +41,70 @@ export const AppointmentCard = ({
         style={{
           borderWidth: scale(3),
           borderColor: color,
+          justifyContent: avatarOnly ? 'center' : 'flex-start',
+          paddingVertical: avatarOnly ? scale(4) : 0
         }}
       >
         <TouchableOpacity 
-          className="flex-row items-center" 
+          className={avatarOnly ? "justify-center items-center" : "flex-row items-center"}
           onPress={onPress}
           style={styles.touchableContent}
         >
           <View
             className={`rounded-lg`}
             style={{
-              width: scale(32),
-              height: scale(32),
-              marginRight: scale(8),
-              marginLeft: scale(8),
+              width: avatarOnly ? scale(46) : scale(32),
+              height: avatarOnly ? scale(46) : scale(32),
+              marginLeft: avatarOnly ? 0 : scale(8),
+              marginRight: avatarOnly ? 0 : scale(8),
               backgroundColor: color,
             }}
           >
             {appointment.avatar}
           </View>
-          <View
-            style={{
-              maxWidth: textContainerMaxWidth,
-              flex: 1,
-              paddingRight: scale(8),
-              paddingVertical: scale(4), // Add vertical padding for better text alignment
-            }}
-          >
-            <Text
-              className="font-poppins-light text-black"
-              style={styles.nameText}
-              numberOfLines={1}
-              ellipsizeMode="tail"
+          {!avatarOnly && (
+            <View
+              style={{
+                maxWidth: textContainerMaxWidth,
+                flex: 1,
+                paddingRight: scale(8),
+                paddingVertical: scale(4), // Add vertical padding for better text alignment
+              }}
             >
-              {appointment.name}
-            </Text>
-            <Text
-              className="font-poppins-medium text-black"
-              style={styles.timeText}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {appointment.time}
-            </Text>
-            <Text
-              className="font-poppins-medium text-black"
-              style={styles.locationText}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {appointment.location}
-            </Text>
-            <Text
-              className="font-poppins-italic text-black"
-              style={styles.activityText}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {appointment.activity}
-            </Text>
-          </View>
+              <Text
+                className="font-poppins-light text-black"
+                style={styles.nameText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {appointment.name}
+              </Text>
+              <Text
+                className="font-poppins-medium text-black"
+                style={styles.timeText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {appointment.time}
+              </Text>
+              <Text
+                className="font-poppins-medium text-black"
+                style={styles.locationText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {appointment.location}
+              </Text>
+              <Text
+                className="font-poppins-italic text-black"
+                style={styles.activityText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {appointment.activity}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>
