@@ -1,7 +1,7 @@
 {
   "name": "kadra",
   "version": "1.0.0",
-  "author": "Kim Chouard",
+  "author": "Karol Kępa",
   "main": "node_modules/expo-router/entry.js",
   "scripts": {
     "start": "expo start",
