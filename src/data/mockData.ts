@@ -10,6 +10,7 @@ export const getMockAppointments = (
   BoyAvatar: React.ReactNode,
   GirlAvatar: React.ReactNode
 ): AppointmentData[] => [
+<<<<<<< HEAD
   {
     name: "Karol Kowalski",
     time: "13:00-13:45",
@@ -24,6 +25,8 @@ export const getMockAppointments = (
     activity: "Karate",
     avatar: BoyAvatar,
   },
+=======
+>>>>>>> feature/messages-tab
   {
     name: "Anna Nowak-Długie-Nazwisko",
     time: "10:00-11:30",
@@ -31,6 +34,23 @@ export const getMockAppointments = (
     activity: "Angielski dla zaawansowanych z native speakerem",
     avatar: GirlAvatar,
   },
+<<<<<<< HEAD
+=======
+  {
+    name: "Karol Kowalski",
+    time: "18:30-19:15",
+    location: "Szkoła Muzyki",
+    activity: "Fortepian",
+    avatar: GirlAvatar,
+  },
+  {
+    name: "Jan Kowalski",
+    time: "18:30-19:15",
+    location: "Ninja Club",
+    activity: "Karate",
+    avatar: BoyAvatar,
+  }
+>>>>>>> feature/messages-tab
 ];
 
 export const MOCK_RECOMMENDED_ITEMS: Omit<
@@ -177,3 +197,108 @@ export const MOCK_CONVERSATIONS: Record<string, Message[]> = {
     },
   ],
 };
+<<<<<<< HEAD
+=======
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  type: 'message' | 'appointment' | 'info';
+}
+
+export const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: '1',
+    title: 'Nowa wiadomość',
+    message: 'Anna Kowalska wysłała nową wiadomość',
+    timestamp: new Date(new Date().getTime() - 15 * 60 * 1000), // 15 minutes ago
+    read: false,
+    type: 'message'
+  },
+  {
+    id: '2',
+    title: 'Odwołane zajęcia',
+    message: 'Zajęcia z angielskiego zostały odwołane',
+    timestamp: new Date(new Date().getTime() - 2 * 60 * 60 * 1000), // 2 hours ago
+    read: false,
+    type: 'appointment'
+  },
+  {
+    id: '3',
+    title: 'Zmiana harmonogramu',
+    message: 'Zajęcia z matematyki zostały przesunięte na 15:30',
+    timestamp: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+    read: true,
+    type: 'appointment'
+  },
+  {
+    id: '4',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  },
+  {
+    id: '5',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  }
+  ,
+  {
+    id: '6',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  }
+  ,
+  {
+    id: '7',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  },
+  {
+    id: '8',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  },
+  {
+    id: '9',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  },
+  {
+    id: '10',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  },
+  {
+    id: '11',
+    title: 'Przypomnienie',
+    message: 'Jutro o 10:00 zajęcia z karate',
+    timestamp: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    read: true,
+    type: 'info'
+  }
+];
+>>>>>>> feature/messages-tab
