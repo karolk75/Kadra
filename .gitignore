@@ -8,6 +8,7 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+.expo-shared/
 
 # Native
 *.orig.*
@@ -16,6 +17,10 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+*.apk
+*.aab
+*.ipa
+*.app-bundle
 
 # Metro
 .metro-health-check*
@@ -24,6 +29,8 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+.log/
+logs/
 
 # macOS
 .DS_Store
@@ -31,6 +38,8 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+.env.*
 
 # typescript
 *.tsbuildinfo
@@ -38,6 +47,31 @@ yarn-error.*
 app-example
 
 # amplify
-.amplify
+.amplify/
+amplify/.config/
+amplify/backend/amplify-meta.json
+amplify/backend/awscloudformation/
+amplify/backend/backend-config.json
+amplify/backend/tags.json
+amplify/team-provider-info.json
+amplify/#current-cloud-backend
 amplify_outputs*
 amplifyconfiguration*
+aws-exports.js
+aws-exports.*
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.c9/
+*.launch
+.settings/
