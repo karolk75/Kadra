@@ -91,7 +91,7 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
           <Ionicons
             name={iconName}
             size={scale(20)}
-            color={ThemeColors.BLUE_GRAY}
+            color={ThemeColors.GOLD}
             style={styles.icon}
           />
           <View className="flex-1">

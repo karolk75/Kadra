@@ -19,14 +19,14 @@ export const getMockAppointments = (
   },
   {
     name: "Karol Kowalski",
-    time: "18:30-19:15",
+    time: "16:30-19:15",
     location: "Szkoła Muzyki",
     activity: "Fortepian",
     avatar: GirlAvatar,
   },
   {
     name: "Jan Kowalski",
-    time: "18:30-19:15",
+    time: "15:15-18:15",
     location: "Ninja Club",
     activity: "Karate",
     avatar: BoyAvatar,
