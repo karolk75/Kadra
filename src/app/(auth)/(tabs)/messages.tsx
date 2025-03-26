@@ -99,7 +99,7 @@ export default function MessagesScreen() {
                 onPress={() => handleOpenChat(teacher.id)}
                 activeOpacity={0.7}
               >
-                {/* Avatar with online indicator */}
+                {/* Avatar */}
                 <View className="relative">
                   <View className="h-12 w-12 bg-lightblue rounded-full overflow-hidden justify-center items-center">
                     {teacher.avatar}
@@ -112,7 +112,7 @@ export default function MessagesScreen() {
                     <Text
                       className="font-poppins-bold text-lightblue"
                       style={{
-                        fontSize: scale(15),
+                        fontSize: scale(14),
                         flex: 1,
                         marginRight: scale(8),
                       }}

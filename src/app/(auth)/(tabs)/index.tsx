@@ -11,6 +11,7 @@ import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { CalendarView } from "@/components/main/CalendarView";
 import { NavigationBox } from "@/components/main/NavigationBox";
+import NotificationButton from "@/components/main/NotificationButton";
 import { RecommendedSection } from "@/components/main/RecommendedSection";
 import { SearchBar } from "@/components/main/SearchBar";
 import { StarRating } from "@/components/main/StarRating";
@@ -80,22 +81,28 @@ export default function MainScreen() {
           <View
             style={{
               marginBottom: verticalScale(20),
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center"
             }}
           >
-            <Text
-              className="font-poppins-bold text-lightblue"
-              style={{ fontSize: scale(24) }}
-              numberOfLines={1}
-            >
-              Witaj, {attributes?.preferredName}
-            </Text>
-            <Text
-              className="font-poppins-light text-[#A1A4B2]"
-              style={{ fontSize: scale(16) }}
-              numberOfLines={1}
-            >
-              Miłego dnia
-            </Text>
+            <View>
+              <Text
+                className="font-poppins-bold text-lightblue"
+                style={{ fontSize: scale(24) }}
+                numberOfLines={1}
+              >
+                Witaj, {attributes?.preferredName}
+              </Text>
+              <Text
+                className="font-poppins-light text-[#A1A4B2]"
+                style={{ fontSize: scale(16) }}
+                numberOfLines={1}
+              >
+                Miłego dnia
+              </Text>
+            </View>
+            <NotificationButton />
           </View>
 
           {/* Grid of boxes */}
