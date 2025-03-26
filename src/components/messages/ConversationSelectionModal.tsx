@@ -1,4 +1,5 @@
 import { SearchBar } from "@/components/main/SearchBar";
+import { ThemeColors } from "@/constants/ThemeColors";
 import { TeacherContact } from "@/types/TeacherContact";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
@@ -198,7 +199,7 @@ export const ConversationSelectionModal: React.FC<
               style={styles.closeButton}
               className="items-center"
             >
-              <Ionicons name="close" size={scale(24)} color="#0B3954" />
+              <Ionicons name="close" size={scale(24)} color={ThemeColors.BRICK_RED} />
             </TouchableOpacity>
           </View>
 

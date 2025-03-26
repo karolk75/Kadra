@@ -61,6 +61,7 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
     setModalVisible(true);
     
     if (unreadCount > 0) {
+      // Save read notifications
       const updatedNotifications = notifications.map(notification => ({
         ...notification,
         read: true
@@ -81,7 +82,11 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
     }
 
     return (
-      <View style={styles.item} className="flex-row items-center justify-between border-b border-[#E8E8E8]">
+      <TouchableOpacity 
+        onPress={() => console.log('Notification clicked:', item)}
+        style={styles.item} 
+        className="flex-row items-center justify-between border-b border-[#E8E8E8]"
+      >
         <View className="flex-row items-center flex-1">
           <Ionicons
             name={iconName}
@@ -112,7 +117,7 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
             </Text>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -152,7 +157,7 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
               <View style={styles.backButton} className="items-center" />
               <Text
                 style={styles.title}
-                className="flex-1 text-center font-poppins-bold text-darkblue"
+                className="flex-1 text-center font-poppins-bold"
               >
                 Powiadomienia
               </Text>
@@ -161,12 +166,12 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
                 style={styles.closeButton}
                 className="items-center"
               >
-                <Ionicons name="close" size={scale(24)} color={ThemeColors.BLUE_GRAY} />
+                <Ionicons name="close" size={scale(24)} color={ThemeColors.BRICK_RED} />
               </TouchableOpacity>
             </View>
 
             {/* List container */}
-            <View style={styles.listWrapper} className="flex-1">
+            <View className="flex-1">
               {notifications.length > 0 ? (
                 <FlatList
                   data={notifications}
@@ -212,7 +217,7 @@ const styles = StyleSheet.create({
   },
   notificationCount: {
     color: "#FFFFFF",
-    fontSize: 10,
+    fontSize: scale(10),
     fontWeight: "bold",
   },
   modalView: {
@@ -241,9 +246,6 @@ const styles = StyleSheet.create({
     padding: scale(4),
     width: scale(32),
   },
-  listWrapper: {
-    marginBottom: verticalScale(16),
-  },
   listContent: {
     paddingHorizontal: scale(16),
     paddingTop: verticalScale(8),
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: verticalScale(3),
   },
   notificationTitle: {
     fontSize: scale(14),
