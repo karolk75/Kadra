@@ -12,10 +12,7 @@ import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { AuthButton } from "@/components/auth/AuthButton";
 import { AuthInput } from "@/components/auth/AuthInput";
-import {
-  AuthSocialButton,
-  Social,
-} from "@/components/auth/AuthSocialButton";
+import { AuthSocialButton, Social } from "@/components/auth/AuthSocialButton";
 import { AuthTitle } from "@/components/auth/AuthTitle";
 import { BackButton } from "@/components/auth/BackButton";
 import { BottomLink } from "@/components/auth/BottomLink";

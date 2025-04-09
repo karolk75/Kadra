@@ -41,7 +41,7 @@ interface AuthContextType {
     password: string,
     firstName: string,
     lastName: string,
-    phoneNumber: string
+    phoneNumber: string,
   ) => Promise<boolean>;
   confirmSignUp: (email: string, code: string) => Promise<boolean>;
   resendCode: (username: string) => Promise<void>;
@@ -57,7 +57,7 @@ const AuthContext = React.createContext<AuthContextType>({} as AuthContextType);
 const parseAuthError = (error: unknown): AuthError => {
   if (error instanceof Error) return error;
   return new Error(
-    typeof error === "object" ? JSON.stringify(error) : String(error)
+    typeof error === "object" ? JSON.stringify(error) : String(error),
   );
 };
 
@@ -76,7 +76,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const [session, setSession, sessionLoading] =
     useStorageState<SessionData>("session");
   const [user, setUser, userLoading] = useStorageState<UserData>("user");
-  const [attributes, setAttributes] = useStorageState<UserAttributes>("attributes");
+  const [attributes, setAttributes] =
+    useStorageState<UserAttributes>("attributes");
   const [error, setError] = React.useState<AuthError | null>(null);
 
   const isLoading = sessionLoading || userLoading;
@@ -139,7 +140,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
       password: string,
       firstName: string,
       lastName: string,
-      phoneNumber: string
+      phoneNumber: string,
     ) => {
       try {
         await signUp({

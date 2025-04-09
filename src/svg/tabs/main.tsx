@@ -1,5 +1,5 @@
-import * as React from "react"
-import Svg, { Path } from "react-native-svg"
+import * as React from "react";
+import Svg, { Path } from "react-native-svg";
 
 function SvgComponent(props) {
   return (
@@ -19,7 +19,7 @@ function SvgComponent(props) {
       />
       <Path fill="#DAC081" d="M11.8182 24.5454H19.09093V33.5454H11.8182z" />
     </Svg>
-  )
+  );
 }
 
-export default SvgComponent
+export default SvgComponent;

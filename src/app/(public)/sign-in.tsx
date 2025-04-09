@@ -5,10 +5,7 @@ import { scale, verticalScale } from "react-native-size-matters";
 
 import { AuthButton } from "@/components/auth/AuthButton";
 import { AuthInput } from "@/components/auth/AuthInput";
-import {
-  AuthSocialButton,
-  Social,
-} from "@/components/auth/AuthSocialButton";
+import { AuthSocialButton, Social } from "@/components/auth/AuthSocialButton";
 import { AuthTitle } from "@/components/auth/AuthTitle";
 import { BackButton } from "@/components/auth/BackButton";
 import { BottomLink } from "@/components/auth/BottomLink";

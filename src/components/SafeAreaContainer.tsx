@@ -9,8 +9,4 @@ type SafeAreaContainerProps = {
 
 export const SafeAreaContainer: React.FC<SafeAreaContainerProps> = ({
   children,
-}) => (
-  <SafeAreaView className="flex-1">
-    {children}
-  </SafeAreaView>
-);
+}) => <SafeAreaView className="flex-1">{children}</SafeAreaView>;

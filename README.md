@@ -7,6 +7,7 @@ Kadra is a comprehensive platform connecting specialized educational institution
 ## 🌟 Features
 
 ### For Students & Parents
+
 - **School Discovery**: Browse and search for specialized schools and programs
 - **Streamlined Application**: Apply for classes with a few taps
 - **Lesson Management**: Track appointments, view calendars, and manage schedules
@@ -15,6 +16,7 @@ Kadra is a comprehensive platform connecting specialized educational institution
 - **Progress Tracking**: View attendance, assignments, and progress reports
 
 ### For Educational Institutions
+
 - **School Profile Management**: Create and maintain detailed school profiles
 - **Student Management**: Process applications and manage student information
 - **Schedule Administration**: Create and adjust class schedules
@@ -73,12 +75,14 @@ kadra/
 ### Installation
 
 1. Clone the repository
+
    ```bash
    git clone https://github.com/your-username/kadra.git
    cd kadra
    ```
 
 2. Install dependencies
+
    ```bash
    npm install
    # or
@@ -86,6 +90,7 @@ kadra/
    ```
 
 3. Configure AWS Amplify
+
    ```bash
    npm install -g @aws-amplify/cli
    amplify configure
@@ -93,6 +98,7 @@ kadra/
    ```
 
 4. Start the development server
+
    ```bash
    npm start
    # or
@@ -114,6 +120,7 @@ kadra/
 ### Authentication Flow
 
 Kadra implements a comprehensive authentication system using AWS Amplify with:
+
 - Email-based registration and verification
 - Profile creation with required user attributes
 - Secure session management
@@ -122,6 +129,7 @@ Kadra implements a comprehensive authentication system using AWS Amplify with:
 ### Data Management
 
 Data is managed through AWS Amplify's data services with:
+
 - GraphQL API for data operations
 - Real-time data synchronization
 - Secure data access with fine-grained permissions
@@ -137,6 +145,7 @@ Data is managed through AWS Amplify's data services with:
 ## 🧪 Testing
 
 Run tests using:
+
 ```bash
 npm test
 # or
@@ -146,11 +155,13 @@ yarn test
 ## 📱 Deployment
 
 ### iOS
+
 ```bash
 eas build --platform ios
 ```
 
 ### Android
+
 ```bash
 eas build --platform android
 ```
@@ -172,8 +183,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 Kadra operates on a freemium model with tiered subscriptions:
 
 ### For Educational Institutions
+
 - **Standard Tier**: Enhanced profile features, full student management, and basic analytics
 - **Premium Tier**: Advanced analytics, marketing tools, and priority support
 
 ### For Students/Parents
+
 - **Free**: School discovery, application management, and communication

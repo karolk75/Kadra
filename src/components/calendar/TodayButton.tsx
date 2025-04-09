@@ -1,7 +1,7 @@
 import { DAYS } from "@/constants/Days";
 import { Text, TouchableOpacity } from "react-native";
 import Animated, {
-    runOnJS,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -51,14 +51,14 @@ export default function TodayButton({ onSelect }: TodayButtonProps) {
     todayScale.value = withSequence(
       withTiming(0.9, { duration: 60 }),
       withSpring(1.1, { damping: 12, stiffness: 180, mass: 0.6 }),
-      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 })
+      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 }),
     );
 
     // Add a very slight wobble effect
     todayRotate.value = withSequence(
       withTiming(2, { duration: 120 }),
       withTiming(-2, { duration: 140 }),
-      withTiming(0, { duration: 120 })
+      withTiming(0, { duration: 120 }),
     );
   };
 

@@ -26,10 +26,7 @@ export const AppointmentCard = ({
   const textContainerMaxWidth = screenWidth * 0.5; // Limit to approximately half screen width
 
   return (
-    <View
-      className={`rounded-lg shadow-sm`}
-      style={styles.cardContainer}
-    >
+    <View className={`rounded-lg shadow-sm`} style={styles.cardContainer}>
       <View
         className={`bg-white rounded-md`}
         style={{
@@ -110,15 +107,15 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   nameText: {
-    fontSize: scale(12)
+    fontSize: scale(12),
   },
   timeText: {
-    fontSize: scale(12)
+    fontSize: scale(12),
   },
   locationText: {
-    fontSize: scale(11)
+    fontSize: scale(11),
   },
   activityText: {
-    fontSize: scale(10)
-  }
+    fontSize: scale(10),
+  },
 });

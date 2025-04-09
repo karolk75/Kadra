@@ -34,4 +34,4 @@ const BellIcon = ({
   );
 };
 
-export default BellIcon; 
+export default BellIcon;

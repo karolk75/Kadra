@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Modal, Text, TouchableOpacity, View, FlatList, StyleSheet } from "react-native";
+import {
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  StyleSheet,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -10,22 +17,25 @@ import Animated, {
 import { scale, verticalScale } from "react-native-size-matters";
 import { Ionicons } from "@expo/vector-icons";
 import BellIcon from "@/svg/main/bell";
-import { MOCK_NOTIFICATIONS, Notification } from "@/data/mockData";
+import { MOCK_NOTIFICATIONS } from "@/data/mockData";
 import { formatDistanceToNow } from "date-fns";
 import { pl } from "date-fns/locale";
 import { ThemeColors } from "@/constants/ThemeColors";
+import { Notification } from "@/types/Notification";
 
 interface NotificationButtonProps {
   initialUnreadCount?: number;
 }
 
-export default function NotificationButton({ initialUnreadCount = 0 }: NotificationButtonProps) {
+export default function NotificationButton({
+  initialUnreadCount = 0,
+}: NotificationButtonProps) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [unreadCount, setUnreadCount] = useState(
-    initialUnreadCount || MOCK_NOTIFICATIONS.filter(n => !n.read).length
+    initialUnreadCount || MOCK_NOTIFICATIONS.filter((n) => !n.isRead).length,
   );
-  
+
   const bellScale = useSharedValue(1);
   const bellRotate = useSharedValue(0);
 
@@ -47,24 +57,26 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
     bellScale.value = withSequence(
       withTiming(0.9, { duration: 60 }),
       withSpring(1.1, { damping: 12, stiffness: 180, mass: 0.6 }),
-      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 })
+      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 }),
     );
 
     // Add a very slight wobble effect
     bellRotate.value = withSequence(
       withTiming(2, { duration: 120 }),
       withTiming(-2, { duration: 140 }),
-      withTiming(0, { duration: 120 })
+      withTiming(0, { duration: 120 }),
     );
 
     // Open modal and mark notifications as read
     setModalVisible(true);
-    
+
     if (unreadCount > 0) {
+      // TODO: Save read notifications to database
       // Save read notifications
-      const updatedNotifications = notifications.map(notification => ({
+      const updatedNotifications = notifications.map((notification) => ({
         ...notification,
-        read: true
+        isRead: true,
+        readAt: notification.readAt || new Date().toISOString(),
       }));
       setNotifications(updatedNotifications);
       setUnreadCount(0);
@@ -73,8 +85,11 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
 
   const renderNotificationItem = ({ item }: { item: Notification }) => {
     // Choose icon based on notification type
-    let iconName: "information-circle-outline" | "chatbubble-outline" | "calendar-outline" = "information-circle-outline";
-    
+    let iconName:
+      | "information-circle-outline"
+      | "chatbubble-outline"
+      | "calendar-outline" = "information-circle-outline";
+
     if (item.type === "message") {
       iconName = "chatbubble-outline";
     } else if (item.type === "appointment") {
@@ -82,9 +97,9 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
     }
 
     return (
-      <TouchableOpacity 
-        onPress={() => console.log('Notification clicked:', item)}
-        style={styles.item} 
+      <TouchableOpacity
+        onPress={() => console.log("Notification clicked:", item)}
+        style={styles.item}
         className="flex-row items-center justify-between border-b border-[#E8E8E8]"
       >
         <View className="flex-row items-center flex-1">
@@ -106,7 +121,10 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
                 style={styles.notificationTime}
                 className="font-poppins-regular"
               >
-                {formatDistanceToNow(item.timestamp, { locale: pl, addSuffix: true })}
+                {formatDistanceToNow(new Date(item.createdAt), {
+                  locale: pl,
+                  addSuffix: true,
+                })}
               </Text>
             </View>
             <Text
@@ -166,7 +184,11 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
                 style={styles.closeButton}
                 className="items-center"
               >
-                <Ionicons name="close" size={scale(24)} color={ThemeColors.BRICK_RED} />
+                <Ionicons
+                  name="close"
+                  size={scale(24)}
+                  color={ThemeColors.BRICK_RED}
+                />
               </TouchableOpacity>
             </View>
 
@@ -176,7 +198,7 @@ export default function NotificationButton({ initialUnreadCount = 0 }: Notificat
                 <FlatList
                   data={notifications}
                   renderItem={renderNotificationItem}
-                  keyExtractor={item => item.id}
+                  keyExtractor={(item) => item.id}
                   contentContainerStyle={styles.listContent}
                   showsVerticalScrollIndicator={true}
                 />
@@ -283,4 +305,4 @@ const styles = StyleSheet.create({
     color: ThemeColors.BLUE_GRAY,
     marginVertical: verticalScale(20),
   },
-}); 
+});

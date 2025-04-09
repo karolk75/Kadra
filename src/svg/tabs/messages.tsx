@@ -1,5 +1,5 @@
-import * as React from "react"
-import Svg, { Mask, Path } from "react-native-svg"
+import * as React from "react";
+import Svg, { Mask, Path } from "react-native-svg";
 
 function SvgComponent(props) {
   return (
@@ -30,7 +30,7 @@ function SvgComponent(props) {
         mask="url(#a)"
       />
     </Svg>
-  )
+  );
 }
 
-export default SvgComponent
+export default SvgComponent;

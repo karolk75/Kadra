@@ -35,7 +35,7 @@ export const formatMessageTime = (date: Date) => {
 
 export const formatDay = (date: moment.Moment) => {
   const now = moment();
-  if (date.isSame(now, 'day')) {
+  if (date.isSame(now, "day")) {
     return "Dziś";
   }
   return SHORT_DAYS[date.day()];

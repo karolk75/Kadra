@@ -7,7 +7,9 @@ import { useCallback } from "react";
  * Utility function to save attachment files locally
  * Returns the updated attachment with local URI
  */
-export const saveAttachmentLocally = async (attachment: Attachment): Promise<Attachment> => {
+export const saveAttachmentLocally = async (
+  attachment: Attachment,
+): Promise<Attachment> => {
   try {
     if (!FileSystem.documentDirectory) {
       return attachment;
@@ -16,26 +18,28 @@ export const saveAttachmentLocally = async (attachment: Attachment): Promise<Att
     // Create attachments directory if it doesn't exist
     const attachmentsDir = `${FileSystem.documentDirectory}attachments/`;
     const dirInfo = await FileSystem.getInfoAsync(attachmentsDir);
-    
+
     if (!dirInfo.exists) {
-      await FileSystem.makeDirectoryAsync(attachmentsDir, { intermediates: true });
+      await FileSystem.makeDirectoryAsync(attachmentsDir, {
+        intermediates: true,
+      });
     }
 
     // Generate unique filename
-    const fileExtension = attachment.name.split('.').pop() || '';
+    const fileExtension = attachment.name.split(".").pop() || "";
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
     const localUri = `${attachmentsDir}${fileName}`;
 
     // Copy file to local storage
     await FileSystem.copyAsync({
       from: attachment.uri,
-      to: localUri
+      to: localUri,
     });
 
     // Return updated attachment with local URI
     return {
       ...attachment,
-      uri: localUri
+      uri: localUri,
     };
   } catch (error) {
     console.error("Error saving attachment locally:", error);
@@ -48,7 +52,8 @@ export const saveAttachmentLocally = async (attachment: Attachment): Promise<Att
  */
 export const useMessagesWithAttachments = (teacherId: string) => {
   const storageKey = `messages_${teacherId}`;
-  const [messages, setMessages, loading] = useStorageState<Message[]>(storageKey);
+  const [messages, setMessages, loading] =
+    useStorageState<Message[]>(storageKey);
 
   const sendMessage = useCallback(
     async (text: string, attachments?: Attachment[]) => {
@@ -58,7 +63,7 @@ export const useMessagesWithAttachments = (teacherId: string) => {
         if (attachments && attachments.length > 0) {
           // Save attachments to local storage
           processedAttachments = await Promise.all(
-            attachments.map(saveAttachmentLocally)
+            attachments.map(saveAttachmentLocally),
           );
         }
 
@@ -80,7 +85,7 @@ export const useMessagesWithAttachments = (teacherId: string) => {
         throw error;
       }
     },
-    [messages, setMessages]
+    [messages, setMessages],
   );
 
   return {
@@ -88,4 +93,4 @@ export const useMessagesWithAttachments = (teacherId: string) => {
     sendMessage,
     loading,
   };
-}; 
+};

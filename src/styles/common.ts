@@ -14,4 +14,4 @@ export const createShadowStyle = (elevation = 8, opacity = 0.3) => ({
 export const commonStyles = StyleSheet.create({
   shadow: createShadowStyle(),
   lightShadow: createShadowStyle(4, 0.2),
-}); 
+});

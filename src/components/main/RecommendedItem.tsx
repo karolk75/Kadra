@@ -1,11 +1,5 @@
 import { RecommendedItemData } from "@/types/RecommendedItemData";
-import {
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet
-} from "react-native";
+import { Image, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
 type RecommendedItemProps = {
@@ -21,11 +15,19 @@ export const RecommendedItem = ({
   screenWidth,
   onPress,
 }: RecommendedItemProps) => {
+  // TODO: Remove this once we have the real data
+  // images will be stored in bucket
+  // data will point to the bucket
+  const backgroundSource = item.backgroundImage || 
+    (item.id === "rec1" ? require("assets/images/school-background.png") : 
+    require("assets/images/ballet-background1.png"));
+  
+  const logoSource = item.logoImage || 
+    (item.id === "rec1" ? require("assets/images/school-logo.png") : 
+    require("assets/images/ballet-logo.png"));
+
   return (
-    <View
-      className="flex-1 rounded-sm"
-      style={styles.container}
-    >
+    <View className="flex-1 rounded-sm" style={styles.container}>
       <TouchableOpacity
         className="rounded-2xl overflow-hidden"
         style={{
@@ -40,20 +42,18 @@ export const RecommendedItem = ({
         <View className="flex-1 relative">
           <View className="w-full h-full absolute">
             <Image
-              source={item.backgroundImage}
+              source={backgroundSource}
               className="w-full h-full"
               resizeMode="cover"
             />
           </View>
 
           {/* Semi-transparent overlay */}
-          <View
-            className="absolute bottom-0 left-0 right-0 bg-white opacity-50 h-1/3"
-          />
+          <View className="absolute bottom-0 left-0 right-0 bg-white opacity-50 h-1/3" />
 
           {/* Logo */}
           <Image
-            source={item.logoImage}
+            source={logoSource}
             className="absolute rounded-full z-10"
             style={{
               width: scale(screenWidth * 0.12),

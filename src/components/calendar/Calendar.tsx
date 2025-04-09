@@ -54,15 +54,15 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
       selected,
       numberOfDays = 30, // Default to 30 days
     },
-    ref
+    ref,
   ) => {
     const [dates, setDates] = useState<moment.Moment[]>([]);
     const [scrollPosition, setScrollPosition] = useState(0);
     const [currentMonth, setCurrentMonth] = useState<string>(
-      moment().format("MMMM")
+      moment().format("MMMM"),
     );
     const [currentYear, setCurrentYear] = useState<string>(
-      moment().format("YYYY")
+      moment().format("YYYY"),
     );
     const [visibleMonths, setVisibleMonths] = useState<string[]>([]);
     const [visibleYears, setVisibleYears] = useState<string[]>([]);
@@ -149,7 +149,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
             if (finished) {
               runOnJS(safeSetShowMonthPicker)(false);
             }
-          }
+          },
         );
       }
     };
@@ -198,7 +198,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
             if (finished) {
               runOnJS(safeSetShowYearPicker)(false);
             }
-          }
+          },
         );
       }
     };
@@ -208,10 +208,10 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
       if (month !== currentMonth) {
         isManualSelection.current = true;
         setCurrentMonth(month);
-        
+
         // Clear the selected date when changing month
         if (onSelectDate) {
-          onSelectDate('');
+          onSelectDate("");
         }
       }
 
@@ -230,7 +230,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
           if (finished) {
             runOnJS(safeSetShowMonthPicker)(false);
           }
-        }
+        },
       );
     };
 
@@ -239,10 +239,10 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
       if (year !== currentYear) {
         isManualSelection.current = true;
         setCurrentYear(year);
-        
+
         // Clear the selected date when changing year
         if (onSelectDate) {
-          onSelectDate('');
+          onSelectDate("");
         }
       }
 
@@ -261,7 +261,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
           if (finished) {
             runOnJS(safeSetShowYearPicker)(false);
           }
-        }
+        },
       );
     };
 
@@ -327,7 +327,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
         // Find today's index in this array
         const todayStr = today.format("YYYY-MM-DD");
         const todayIndex = tempDates.findIndex(
-          (date) => date.format("YYYY-MM-DD") === todayStr
+          (date) => date.format("YYYY-MM-DD") === todayStr,
         );
 
         if (todayIndex >= 0 && scrollViewRef.current) {
@@ -335,8 +335,11 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
           const dateCardWidth = scale(58); // width + margins
 
           // Use same calculation as the selected date scroll
-          const screenWidth = Dimensions.get('window').width;
-          const centerOffset = Math.max(0, dateCardWidth * todayIndex - screenWidth / 2 + dateCardWidth / 2);
+          const screenWidth = Dimensions.get("window").width;
+          const centerOffset = Math.max(
+            0,
+            dateCardWidth * todayIndex - screenWidth / 2 + dateCardWidth / 2,
+          );
 
           scrollViewRef.current.scrollTo({
             x: centerOffset,
@@ -350,12 +353,12 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
     const selectToday = () => {
       const today = moment();
       const todayStr = today.format("YYYY-MM-DD");
-      
+
       // Call the selection handler to update the parent component's state
       if (onSelectDate) {
         onSelectDate(todayStr);
       }
-      
+
       // Then scroll to today
       scrollToToday();
     };
@@ -382,7 +385,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
     //       // Calculate the exact width of a date card including margins
     //       const dateCardWidth = scale(57); // width + margins
     //       const offset = scale(170);
-          
+
     //       // Get the content offset
     //       const screenWidth = Dimensions.get('window').width;
     //       const centerOffset = dateCardWidth * selectedIndex - offset;
@@ -430,8 +433,8 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
         opacity: monthOpacity.value,
         overflow: "hidden",
         zIndex: monthOpacity.value > 0 ? 9999 : 0,
-        position: 'absolute',
-        top: '100%',
+        position: "absolute",
+        top: "100%",
         left: 0,
         right: 0,
       };
@@ -443,18 +446,18 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
         opacity: yearOpacity.value,
         overflow: "hidden",
         zIndex: yearOpacity.value > 0 ? 9999 : 0,
-        position: 'absolute',
-        top: '100%',
+        position: "absolute",
+        top: "100%",
         left: 0,
         right: 0,
       };
     });
 
     return (
-      <View style={{zIndex: 1000}}>
-        <View style={[styles.headerContainer, {zIndex: 1000}]}>
-          <View style={[styles.monthYearContainer, {zIndex: 1000}]}>
-            <View style={[styles.pickerContainer, {zIndex: 1000}]}>
+      <View style={{ zIndex: 1000 }}>
+        <View style={[styles.headerContainer, { zIndex: 1000 }]}>
+          <View style={[styles.monthYearContainer, { zIndex: 1000 }]}>
+            <View style={[styles.pickerContainer, { zIndex: 1000 }]}>
               <TouchableOpacity
                 style={styles.pickerTrigger}
                 onPress={toggleMonthPicker}
@@ -491,7 +494,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
               </Animated.View>
             </View>
 
-            <View style={[styles.pickerContainer, {zIndex: 1000}]}>
+            <View style={[styles.pickerContainer, { zIndex: 1000 }]}>
               <TouchableOpacity
                 style={styles.pickerTrigger}
                 onPress={toggleYearPicker}
@@ -557,7 +560,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
         </View>
       </View>
     );
-  }
+  },
 );
 
 export default Calendar;
@@ -602,7 +605,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     marginTop: verticalScale(5),
     zIndex: 20,
-    position: 'absolute',
+    position: "absolute",
   },
   pickerHeader: {
     flexDirection: "row",

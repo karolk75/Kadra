@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import Svg, {
   Circle,
   ClipPath,
@@ -8,8 +8,8 @@ import Svg, {
   Line,
   Mask,
   Path,
-  Rect
-} from "react-native-svg"
+  Rect,
+} from "react-native-svg";
 /* SVGR has dropped some elements not supported by react-native-svg: filter */
 
 function SvgComponent(props) {
@@ -515,7 +515,7 @@ function SvgComponent(props) {
         <Mask
           id="mask0_415_778"
           style={{
-            maskType: "alpha"
+            maskType: "alpha",
           }}
           maskUnits="userSpaceOnUse"
           x={163}
@@ -636,7 +636,7 @@ function SvgComponent(props) {
         </ClipPath>
       </Defs>
     </Svg>
-  )
+  );
 }
 
-export default SvgComponent
+export default SvgComponent;
