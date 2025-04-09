@@ -76,4 +76,4 @@ const defineConfig = (): ExpoConfig => {
   };
 };
 
-export default defineConfig(); 
+export default defineConfig();

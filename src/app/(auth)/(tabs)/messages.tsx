@@ -19,7 +19,7 @@ import { ConversationSelectionModal } from "@/components/messages/ConversationSe
 
 const MOCK_TEACHERS: TeacherContact[] = getMockTeachers(
   <BoyAvatar />,
-  <GirlAvatar />
+  <GirlAvatar />,
 );
 
 export default function MessagesScreen() {
@@ -27,20 +27,20 @@ export default function MessagesScreen() {
   const [contacts, setContacts] = useState(MOCK_TEACHERS);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-  
+
   // State for conversation modal
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   // Get unique schools from teachers
-  const schools = [...new Set(MOCK_TEACHERS.map(teacher => teacher.school))];
+  const schools = [...new Set(MOCK_TEACHERS.map((teacher) => teacher.school))];
 
   // Handle opening a chat with a teacher
   const handleOpenChat = (teacherId: string) => {
     // Mark all messages from this teacher as read
     setContacts((prev) =>
       prev.map((contact) =>
-        contact.id === teacherId ? { ...contact, unreadCount: 0 } : contact
-      )
+        contact.id === teacherId ? { ...contact, unreadCount: 0 } : contact,
+      ),
     );
 
     // Navigate to the teacher conversation screen
@@ -186,11 +186,15 @@ export default function MessagesScreen() {
         onPress={handleNewConversation}
         activeOpacity={0.8}
       >
-        <Ionicons name="chatbubble-ellipses-outline" size={scale(24)} color="white" />
+        <Ionicons
+          name="chatbubble-ellipses-outline"
+          size={scale(24)}
+          color="white"
+        />
       </TouchableOpacity>
 
       {/* Conversation Selection Modal */}
-      <ConversationSelectionModal 
+      <ConversationSelectionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         schools={schools}

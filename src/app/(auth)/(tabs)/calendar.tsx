@@ -28,7 +28,6 @@ import { getMockAppointments } from "@/data/mockData";
 import BoyAvatar from "@/svg/avatars/boyAvatar";
 import GirlAvatar from "@/svg/avatars/girlAvatar";
 
-
 interface DayItem {
   label: string;
   value: number;
@@ -58,16 +57,18 @@ export default function CalendarScreen() {
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(
-    getMonthInPolish(moment().format("MMMM"))
+    getMonthInPolish(moment().format("MMMM")),
   );
   const [selectedYear, setSelectedYear] = useState(moment().format("YYYY"));
   const [todayButtonClicked, setTodayButtonClicked] = useState(false);
 
   // Days of the selected month
   const [daysInMonth, setDaysInMonth] = useState<DayItem[]>([]);
-  
+
   // Selected date in YYYY-MM-DD format for TimeCalendar
-  const [selectedDate, setSelectedDate] = useState<string>(moment().format("YYYY-MM-DD"));
+  const [selectedDate, setSelectedDate] = useState<string>(
+    moment().format("YYYY-MM-DD"),
+  );
 
   // Update days when month or year changes or today button is clicked
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function CalendarScreen() {
   const generateDaysForMonth = (
     month: string,
     year: string,
-    selectToday = false
+    selectToday = false,
   ) => {
     // Convert Polish month name to month index (0-11)
     // This assumes the month provided is the Polish name of the month
@@ -203,7 +204,7 @@ export default function CalendarScreen() {
     Alert.alert(
       "Appointment Details",
       `Name: ${appointment.name}\nTime: ${appointment.time}\nLocation: ${appointment.location}\nActivity: ${appointment.activity}`,
-      [{ text: "OK" }]
+      [{ text: "OK" }],
     );
   };
 
@@ -263,7 +264,7 @@ export default function CalendarScreen() {
                   index: number,
                   isSelected: boolean,
                   relativePosition: number,
-                  animatedStyle: AnimatedStyle<any>
+                  animatedStyle: AnimatedStyle<any>,
                 ) => {
                   const dayItem = item as unknown as DayItem;
 
@@ -289,10 +290,10 @@ export default function CalendarScreen() {
               />
             )}
           </View>
-          
+
           {/* Time Calendar Component */}
           <View style={styles.timeCalendarContainer}>
-            <TimeCalendar 
+            <TimeCalendar
               selectedDate={selectedDate}
               appointments={appointments}
               // startHour={8}

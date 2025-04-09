@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import Svg, {
   Rect,
   Path,
@@ -6,13 +6,13 @@ import Svg, {
   Defs,
   Pattern,
   Use,
-  Image
-} from "react-native-svg"
-import { View, Dimensions } from "react-native"
+  Image,
+} from "react-native-svg";
+import { View, Dimensions } from "react-native";
 
 function SvgComponent(props) {
   return (
-    <View style={{ width: '100%', height: '100%' }}>
+    <View style={{ width: "100%", height: "100%" }}>
       <Svg
         width="100%"
         height="100%"
@@ -126,7 +126,7 @@ function SvgComponent(props) {
         </Defs>
       </Svg>
     </View>
-  )
+  );
 }
 
-export default SvgComponent
+export default SvgComponent;

@@ -29,7 +29,7 @@ export const ConversationSelectionModal: React.FC<
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredSchools, setFilteredSchools] = useState<string[]>([]);
   const [filteredTeachers, setFilteredTeachers] = useState<TeacherContact[]>(
-    []
+    [],
   );
 
   // Reset state when modal opens
@@ -51,7 +51,7 @@ export const ConversationSelectionModal: React.FC<
       } else {
         const query = searchQuery.toLowerCase();
         setFilteredSchools(
-          schools.filter((school) => school.toLowerCase().includes(query))
+          schools.filter((school) => school.toLowerCase().includes(query)),
         );
       }
     }
@@ -61,7 +61,7 @@ export const ConversationSelectionModal: React.FC<
   useEffect(() => {
     if (step === "teachers" && selectedSchool) {
       const schoolTeachers = teachers.filter(
-        (teacher) => teacher.school === selectedSchool
+        (teacher) => teacher.school === selectedSchool,
       );
 
       if (!searchQuery) {
@@ -72,8 +72,8 @@ export const ConversationSelectionModal: React.FC<
           schoolTeachers.filter(
             (teacher) =>
               teacher.name.toLowerCase().includes(query) ||
-              teacher.subject.toLowerCase().includes(query)
-          )
+              teacher.subject.toLowerCase().includes(query),
+          ),
         );
       }
     }
@@ -85,7 +85,7 @@ export const ConversationSelectionModal: React.FC<
     setSearchQuery("");
 
     const schoolTeachers = teachers.filter(
-      (teacher) => teacher.school === school
+      (teacher) => teacher.school === school,
     );
     setFilteredTeachers(schoolTeachers);
   };
@@ -199,7 +199,11 @@ export const ConversationSelectionModal: React.FC<
               style={styles.closeButton}
               className="items-center"
             >
-              <Ionicons name="close" size={scale(24)} color={ThemeColors.BRICK_RED} />
+              <Ionicons
+                name="close"
+                size={scale(24)}
+                color={ThemeColors.BRICK_RED}
+              />
             </TouchableOpacity>
           </View>
 

@@ -16,14 +16,14 @@ module.exports = {
         beige: "#E5E1DA",
         gold: "#D4B97B",
         gray: {
-          DEFAULT: "#9E9E9E",  
-          light: "#CCCCCC"
-        }
+          DEFAULT: "#9E9E9E",
+          light: "#CCCCCC",
+        },
       },
       screens: {
-        sm: { max: '809px' }, // Mobile (iPhone 3 - iPhone XS Max).
-        md: { min: '810px', max: '1000px' }, // Mobile (matches max: iPhone 11 Pro Max landscape @ 896px).
-        lg: { min: '1001px' }, 
+        sm: { max: "809px" }, // Mobile (iPhone 3 - iPhone XS Max).
+        md: { min: "810px", max: "1000px" }, // Mobile (matches max: iPhone 11 Pro Max landscape @ 896px).
+        lg: { min: "1001px" },
       },
       fontFamily: {
         "poppins-black": ["PoppinsBlack"],
@@ -36,9 +36,8 @@ module.exports = {
         "poppins-semibold": ["PoppinsSemiBold"],
         "poppins-thin": ["PoppinsThin"],
         "poppins-italic": ["PoppinsItalic"],
-      }
+      },
     },
   },
   plugins: [],
-}
-
+};

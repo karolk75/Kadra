@@ -7,7 +7,7 @@ module.exports = function (api) {
     ],
     plugins: [
       // React Native Reanimated plugin is needed for animations
-      'react-native-reanimated/plugin',
+      "react-native-reanimated/plugin",
     ],
   };
 };

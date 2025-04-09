@@ -67,13 +67,10 @@ export default function DatePicker({
         duration: 150, // Faster animation
         easing: Easing.bezier(0.4, 0, 0.2, 1),
       });
-      pickerOpacity.value = withTiming(
-        0,
-        {
-          duration: 100, // Faster animation
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-        }
-      );
+      pickerOpacity.value = withTiming(0, {
+        duration: 100, // Faster animation
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
     }
   }, [isOpen]);
 
@@ -96,7 +93,6 @@ export default function DatePicker({
       right: 0,
     };
   });
-
 
   return (
     <View style={styles.pickerContainer}>

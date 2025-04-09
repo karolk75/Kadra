@@ -26,5 +26,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(20),
     paddingTop: verticalScale(20),
     paddingBottom: verticalScale(20),
-  }
+  },
 });

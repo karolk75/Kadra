@@ -23,11 +23,15 @@ export const CalendarView = ({
   // Calculate optimal width for date container and appointments container
   const dateContainerWidth = screenWidth * 0.2; // ~18% of screen width for date
 
+  // TODO: Implement from and to times
+  const filteredAppointments = appointments.sort((a, b) => {
+    const dateA = new Date(a.time);
+    const dateB = new Date(b.time);
+    return dateA.getTime() - dateB.getTime();
+  });
+
   return (
-    <View
-      className="w-full bg-beige rounded-lg"
-      style={styles.container}
-    >
+    <View className="w-full bg-beige rounded-lg" style={styles.container}>
       <View className="flex-row justify-between items-start">
         <View
           className="justify-center items-center"
@@ -50,7 +54,7 @@ export const CalendarView = ({
         </View>
 
         <View className="flex-1" style={styles.appointmentsContainer}>
-          {appointments.map((appointment, index) => (
+          {filteredAppointments.map((appointment, index) => (
             <AppointmentCard
               key={index}
               appointment={appointment}
@@ -78,12 +82,12 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   dayText: {
-    fontSize: scale(52)
+    fontSize: scale(52),
   },
   monthText: {
-    fontSize: scale(16)
+    fontSize: scale(16),
   },
   appointmentsContainer: {
-    marginLeft: scale(8)
-  }
+    marginLeft: scale(8),
+  },
 });

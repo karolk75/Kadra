@@ -42,7 +42,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         await FileSystem.StorageAccessFramework.createFileAsync(
           permissions.directoryUri,
           filename,
-          "image/jpeg"
+          "image/jpeg",
         );
 
       // Download and save the file
@@ -112,5 +112,5 @@ const styles = StyleSheet.create({
     top: verticalScale(50),
     left: scale(10),
     padding: scale(5),
-  }
-}); 
+  },
+});

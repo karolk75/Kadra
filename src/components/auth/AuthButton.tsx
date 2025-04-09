@@ -30,10 +30,7 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
     style={[styles.button, style]}
     className={className}
   >
-    <Text
-      style={[styles.buttonText, titleStyle]}
-      className={titleClassName}
-    >
+    <Text style={[styles.buttonText, titleStyle]} className={titleClassName}>
       {title}
     </Text>
   </TouchableOpacity>
@@ -50,5 +47,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     color: "white",
-  }
+  },
 });

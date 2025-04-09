@@ -20,11 +20,7 @@ export const RecommendedSection = ({
 }: RecommendedSectionProps) => {
   return (
     <View className="mb-6">
-      <Text
-        className="font-bold"
-        style={styles.sectionTitle}
-        numberOfLines={1}
-      >
+      <Text className="font-bold" style={styles.sectionTitle} numberOfLines={1}>
         {title}
       </Text>
 

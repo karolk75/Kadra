@@ -39,7 +39,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
 }) => {
   const [message, setMessage] = useState("");
   const [pendingAttachments, setPendingAttachments] = useState<Attachment[]>(
-    []
+    [],
   );
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -61,7 +61,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
     // Send message with attachments
     onSendMessage(
       messageText,
-      pendingAttachments.length > 0 ? pendingAttachments : undefined
+      pendingAttachments.length > 0 ? pendingAttachments : undefined,
     );
 
     // Clear attachments after sending
@@ -102,7 +102,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
             size: fileSize,
             mimeType: doc.mimeType,
           };
-        })
+        }),
       );
 
       setPendingAttachments((prev) => [...prev, ...newAttachments]);
@@ -125,7 +125,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
           } else if (buttonIndex === 2) {
             pickImage();
           }
-        }
+        },
       );
     } else {
       Alert.alert("Wybierz opcję", "", [
@@ -144,7 +144,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
       if (status !== "granted") {
         Alert.alert(
           "Brak dostępu",
-          "Proszę o udzielenie dostępu do biblioteki zdjęć w celu wybrania zdjęć"
+          "Proszę o udzielenie dostępu do biblioteki zdjęć w celu wybrania zdjęć",
         );
         return;
       }
@@ -179,7 +179,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
       if (status !== "granted") {
         Alert.alert(
           "Brak dostępu",
-          "Proszę o udzielenie dostępu do kamery w celu zrobienia zdjęć"
+          "Proszę o udzielenie dostępu do kamery w celu zrobienia zdjęć",
         );
         return;
       }
@@ -208,7 +208,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
 
   const removeAttachment = (id: string) => {
     setPendingAttachments((prev) =>
-      prev.filter((attachment) => attachment.id !== id)
+      prev.filter((attachment) => attachment.id !== id),
     );
   };
 
@@ -223,7 +223,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
       "keyboardDidShow",
       () => {
         scrollToBottom(true);
-      }
+      },
     );
     return () => {
       keyboardDidShowListener.remove();
@@ -235,14 +235,18 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
   // Function to render file or image thumbnail
   const renderAttachment = (
     attachment: Attachment,
-    inMessage: boolean = false
+    inMessage: boolean = false,
   ) => {
     if (attachment.type === "image") {
       return (
         <View
           key={attachment.id}
           className="rounded-sm overflow-hidden border border-[#E5E5E5] relative"
-          style={inMessage ? styles.inMessageImageContainer : styles.previewImageContainer}
+          style={
+            inMessage
+              ? styles.inMessageImageContainer
+              : styles.previewImageContainer
+          }
         >
           <Image
             source={{ uri: attachment.uri }}
@@ -266,7 +270,11 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
         <View
           key={attachment.id}
           className="rounded-sm overflow-hidden border border-[#E5E5E5] relative bg-[#F5F5F5] justify-center items-center"
-          style={inMessage ? styles.inMessageFileContainer : styles.previewFileContainer}
+          style={
+            inMessage
+              ? styles.inMessageFileContainer
+              : styles.previewFileContainer
+          }
         >
           <Ionicons
             name="document-outline"
@@ -277,7 +285,9 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
           <Text
             numberOfLines={1}
             className="font-poppins-regular mt-1 text-[#717171]"
-            style={inMessage ? styles.inMessageFileName : styles.previewFileName}
+            style={
+              inMessage ? styles.inMessageFileName : styles.previewFileName
+            }
           >
             {attachment.name.length > 15
               ? attachment.name.substring(0, 12) + "..."
@@ -330,7 +340,10 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
         {/* Chat header */}
         <View
           className="flex-col justify-end bg-lightblue z-10"
-          style={[styles.header, { height: insets.top + scale(60), paddingTop: headerPaddingTop }]}
+          style={[
+            styles.header,
+            { height: insets.top + scale(60), paddingTop: headerPaddingTop },
+          ]}
         >
           <View
             className="flex-row items-center w-full"
@@ -464,7 +477,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
               }}
             >
               {pendingAttachments.map((attachment) =>
-                renderAttachment(attachment)
+                renderAttachment(attachment),
               )}
             </ScrollView>
           </View>
@@ -475,7 +488,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
           className="flex-row items-center bg-white border-t border-[#EEEEEE]"
           style={[
             styles.inputContainer,
-            { paddingBottom: Math.max(insets.bottom, scale(10)) }
+            { paddingBottom: Math.max(insets.bottom, scale(10)) },
           ]}
         >
           <TouchableOpacity className="mr-2" onPress={pickDocument}>
@@ -540,11 +553,11 @@ const styles = StyleSheet.create({
   },
   teacherName: {
     fontSize: scale(18),
-    width: '100%',
+    width: "100%",
   },
   teacherSubject: {
     fontSize: scale(14),
-    width: '100%',
+    width: "100%",
   },
   messageList: {
     paddingVertical: verticalScale(16),

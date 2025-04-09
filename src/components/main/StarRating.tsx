@@ -17,10 +17,7 @@ export const StarRating = ({
   onRatingChange,
 }: StarRatingProps) => {
   return (
-    <View
-      className="items-center"
-      style={styles.container}
-    >
+    <View className="items-center" style={styles.container}>
       <Text
         className="text-darkblue font-poppins-bold"
         style={styles.title}
@@ -42,7 +39,7 @@ export const StarRating = ({
                 color={star <= rating ? "#FFD700" : "#D3D3D3"}
               />
             </TouchableOpacity>
-          )
+          ),
         )}
       </View>
     </View>
@@ -59,5 +56,5 @@ const styles = StyleSheet.create({
   },
   starButton: {
     marginHorizontal: scale(4),
-  }
+  },
 });

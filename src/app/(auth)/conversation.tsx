@@ -18,7 +18,7 @@ export const unstable_settings = {
 // Mock teachers data
 const teachersData: TeacherContact[] = getMockTeachers(
   <BoyAvatar />,
-  <GirlAvatar />
+  <GirlAvatar />,
 );
 
 export default function TeacherConversationScreen() {
@@ -28,7 +28,7 @@ export default function TeacherConversationScreen() {
 
   const teacher = teachersData.find((t) => t.id === teacherId);
   const [messages, setMessages] = useState<Message[]>(
-    MOCK_CONVERSATIONS[teacherId as string] || []
+    MOCK_CONVERSATIONS[teacherId as string] || [],
   );
 
   // Handle sending message with attachments

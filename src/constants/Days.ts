@@ -8,15 +8,7 @@ export const DAYS = [
   "Sobota",
 ];
 
-export const SHORT_DAYS = [
-  "Nd",
-  "Pn",
-  "Wt",
-  "Śr",
-  "Cz",
-  "Pt",
-  "Sb",
-];
+export const SHORT_DAYS = ["Nd", "Pn", "Wt", "Śr", "Cz", "Pt", "Sb"];
 
 /**
  * Get the index of a day in the week (0-6)
@@ -27,10 +19,8 @@ export const getDayIndex = (day: string | number): number => {
   if (typeof day === "number") {
     return day >= 0 && day <= 6 ? day : 0;
   }
-  
-  const index = DAYS.findIndex(
-    (d) => d.toLowerCase() === day.toLowerCase()
-  );
+
+  const index = DAYS.findIndex((d) => d.toLowerCase() === day.toLowerCase());
   return index !== -1 ? index : 0;
 };
 

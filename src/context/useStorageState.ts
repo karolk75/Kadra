@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 type UseStorageState<T> = [
   T | null,
   (value: T | null) => Promise<void>,
-  boolean
+  boolean,
 ];
 
 export const useStorageState = <T>(key: string): UseStorageState<T> => {
@@ -50,7 +50,7 @@ export const useStorageState = <T>(key: string): UseStorageState<T> => {
         setLoading(false);
       }
     },
-    [key]
+    [key],
   );
 
   return [state, setValue, loading];

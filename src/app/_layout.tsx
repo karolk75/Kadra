@@ -3,7 +3,7 @@ import { Amplify } from "aws-amplify";
 import { useFonts } from "expo-font";
 import { Slot, SplashScreen } from "expo-router";
 import { useEffect } from "react";
-import { EventProvider } from 'react-native-outside-press';
+import { EventProvider } from "react-native-outside-press";
 import outputs from "../../amplify_outputs.json";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";

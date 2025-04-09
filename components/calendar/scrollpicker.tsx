@@ -1,8 +1,15 @@
-import React, { useRef, useState, useEffect, ReactNode } from 'react';
-import { View, Text, Dimensions, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useRef, useState, useEffect, ReactNode } from "react";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const DEFAULT_ROW_ITEMS = 5;
 
 interface Item {
@@ -20,7 +27,11 @@ interface HorizontalScrollPickerProps {
   items: Item[];
   onSelect: (value: any) => void;
   initialIdx: number;
-  renderCustomItem?: (item: Item, index: number, isSelected: boolean) => ReactNode;
+  renderCustomItem?: (
+    item: Item,
+    index: number,
+    isSelected: boolean,
+  ) => ReactNode;
 }
 
 const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
@@ -40,18 +51,26 @@ const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollOffset = useRef(0);
   const isParking = useRef(false);
-  
+
   useEffect(() => {
     // Set initial scroll position when component mounts
     const timeout = setTimeout(() => {
-      scrollViewRef.current?.scrollTo({ x: initialIdx * size, y: 0, animated: false });
+      scrollViewRef.current?.scrollTo({
+        x: initialIdx * size,
+        y: 0,
+        animated: false,
+      });
     }, 100);
-    
+
     return () => clearTimeout(timeout);
   }, []);
 
   const calculateLayout = () => {
-    scrollViewRef.current?.scrollTo({ x: initialIdx * size, y: 0, animated: false });
+    scrollViewRef.current?.scrollTo({
+      x: initialIdx * size,
+      y: 0,
+      animated: false,
+    });
   };
 
   const renderItem = (item: Item, idx: number) => {
@@ -66,7 +85,7 @@ const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
             {
               width: size,
             },
-            itemStyle
+            itemStyle,
           ]}
         >
           {renderCustomItem(item, idx, isSelected)}
@@ -82,14 +101,10 @@ const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
           {
             width: size,
           },
-          itemStyle
+          itemStyle,
         ]}
       >
-        <Text style={[
-          styles.item, 
-          textStyle,
-          isSelected && selectedTextStyle
-        ]}>
+        <Text style={[styles.item, textStyle, isSelected && selectedTextStyle]}>
           {item.label}
         </Text>
       </View>
@@ -107,7 +122,11 @@ const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
       if (isParking.current) {
         const selectedIndex = selectItem();
         isParking.current = false;
-        scrollViewRef.current?.scrollTo({ y: 0, x: size * selectedIndex, animated: true });
+        scrollViewRef.current?.scrollTo({
+          y: 0,
+          x: size * selectedIndex,
+          animated: true,
+        });
       }
     }, 150);
   };
@@ -128,7 +147,13 @@ const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
   const sideItems = (rowItems - 1) / 2;
 
   return (
-    <View style={[styles.timelineContainer, { width: rowItems * size }, containerStyle]}>
+    <View
+      style={[
+        styles.timelineContainer,
+        { width: rowItems * size },
+        containerStyle,
+      ]}
+    >
       <View
         style={[
           styles.selectedItem,
@@ -136,7 +161,7 @@ const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
             left: sideItems * size,
             width: size,
           },
-          selectorStyle
+          selectorStyle,
         ]}
       />
       <ScrollView
@@ -166,27 +191,27 @@ const HorizontalScrollPicker: React.FC<HorizontalScrollPickerProps> = ({
 const styles = StyleSheet.create({
   timelineContainer: {
     flexGrow: 0,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   itemContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     flexGrow: 0,
   },
   item: {
-    textAlign: 'center',
-    color: '#000',
+    textAlign: "center",
+    color: "#000",
     fontSize: 18,
   },
   selectedItem: {
     flex: 1,
-    position: 'absolute',
+    position: "absolute",
     top: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: "#000",
     borderRadius: 12,
   },
 });
 
-export default HorizontalScrollPicker; 
+export default HorizontalScrollPicker;

@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View
-} from "react-native";
+import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
 import { Background } from "@/components/Background";
@@ -17,10 +12,7 @@ import { SearchBar } from "@/components/main/SearchBar";
 import { StarRating } from "@/components/main/StarRating";
 import { UserAttributes } from "@/context";
 import { useStorageState } from "@/context/useStorageState";
-import {
-  getMockAppointments,
-  MOCK_RECOMMENDED_ITEMS,
-} from "@/data/mockData";
+import { getMockAppointments, MOCK_RECOMMENDED_ITEMS_NEW } from "@/data/mockData";
 import BoyAvatar from "@/svg/avatars/boyAvatar";
 import GirlAvatar from "@/svg/avatars/girlAvatar";
 import ScreenBackground from "@/svg/background";
@@ -40,19 +32,6 @@ export default function MainScreen() {
 
   // Mock appointments with avatar components
   const appointments = getMockAppointments(<BoyAvatar />, <GirlAvatar />);
-
-  // Mock recommended items with images
-  const recommendedItems = MOCK_RECOMMENDED_ITEMS.map((item) => ({
-    ...item,
-    backgroundImage:
-      item.id === 1
-        ? require("assets/images/school-background.png")
-        : require("assets/images/ballet-background1.png"),
-    logoImage:
-      item.id === 1
-        ? require("assets/images/school-logo.png")
-        : require("assets/images/ballet-logo.png"),
-  }));
 
   const handleRatingChange = (newRating: number) => {
     setRating(newRating);
@@ -83,7 +62,7 @@ export default function MainScreen() {
               marginBottom: verticalScale(20),
               flexDirection: "row",
               justifyContent: "space-between",
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <View>
@@ -102,6 +81,7 @@ export default function MainScreen() {
                 Miłego dnia
               </Text>
             </View>
+            {/* Notification Button */}
             <NotificationButton />
           </View>
 
@@ -143,10 +123,10 @@ export default function MainScreen() {
             onIconPress={handleSearchIconPress}
           />
 
-          {/* Recommended Section - positioned to extend edge to edge */}
-          <View style={{ marginHorizontal: -scale(8) }}>
+          {/* Recommended Section  */}
+          <View style={{ marginHorizontal: scale(-8) }}>
             <RecommendedSection
-              items={recommendedItems}
+              items={MOCK_RECOMMENDED_ITEMS_NEW}
               screenWidth={screenWidth}
               onItemPress={(item) => console.log("Item pressed:", item.title)}
             />

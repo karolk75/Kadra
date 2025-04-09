@@ -7,10 +7,7 @@ import { scale, verticalScale } from "react-native-size-matters";
 export const BackButton: React.FC = () => {
   const onBackPress = () => router.back();
   return (
-    <TouchableOpacity
-      onPress={onBackPress}
-      style={styles.button}
-    >
+    <TouchableOpacity onPress={onBackPress} style={styles.button}>
       <Ionicons name="arrow-back" size={scale(24)} color="#000" />
     </TouchableOpacity>
   );
@@ -18,6 +15,6 @@ export const BackButton: React.FC = () => {
 
 const styles = StyleSheet.create({
   button: {
-    marginBottom: verticalScale(10)
-  }
+    marginBottom: verticalScale(10),
+  },
 });

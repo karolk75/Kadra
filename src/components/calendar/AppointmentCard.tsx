@@ -29,7 +29,7 @@ export const AppointmentCard = ({
 
   // Calculate text container width - adjust based on parent container and avatar size
   // Increased the width to prevent text cutting
-  const textContainerMaxWidth = screenWidth * 0.7; 
+  const textContainerMaxWidth = screenWidth * 0.7;
 
   return (
     <View
@@ -41,12 +41,14 @@ export const AppointmentCard = ({
         style={{
           borderWidth: scale(3),
           borderColor: color,
-          justifyContent: avatarOnly ? 'center' : 'flex-start',
-          paddingVertical: avatarOnly ? scale(4) : 0
+          justifyContent: avatarOnly ? "center" : "flex-start",
+          paddingVertical: avatarOnly ? scale(4) : 0,
         }}
       >
-        <TouchableOpacity 
-          className={avatarOnly ? "justify-center items-center" : "flex-row items-center"}
+        <TouchableOpacity
+          className={
+            avatarOnly ? "justify-center items-center" : "flex-row items-center"
+          }
           onPress={onPress}
           style={styles.touchableContent}
         >
@@ -123,26 +125,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
     elevation: 8,
-    height: '100%',
+    height: "100%",
   },
   touchableContent: {
-    height: '100%',
-    alignItems: 'center',
+    height: "100%",
+    alignItems: "center",
   },
   nameText: {
     fontSize: scale(12),
-    width: '100%', // Ensure text takes full width of container
+    width: "100%", // Ensure text takes full width of container
   },
   timeText: {
     fontSize: scale(12),
-    width: '100%', // Ensure text takes full width of container
+    width: "100%", // Ensure text takes full width of container
   },
   locationText: {
     fontSize: scale(11),
-    width: '100%', // Ensure text takes full width of container
+    width: "100%", // Ensure text takes full width of container
   },
   activityText: {
     fontSize: scale(10),
-    width: '100%', // Ensure text takes full width of container
-  }
+    width: "100%", // Ensure text takes full width of container
+  },
 });

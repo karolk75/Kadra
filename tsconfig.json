@@ -25,9 +25,5 @@
     "nativewind-env.d.ts",
     "src/svg/**/*.jsx"
   ],
-  "exclude": [
-    "node_modules",
-    "babel.config.js",
-    "metro.config.js"
-  ]
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js"]
 }

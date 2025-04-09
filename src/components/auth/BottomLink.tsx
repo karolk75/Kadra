@@ -21,10 +21,7 @@ export const BottomLink: React.FC<BottomLinkProps> = ({
       {question}
     </Text>
     <TouchableOpacity onPress={onPress}>
-      <Text
-        style={styles.linkText}
-        className="text-darkblue font-poppins-bold"
-      >
+      <Text style={styles.linkText} className="text-darkblue font-poppins-bold">
         {linkText}
       </Text>
     </TouchableOpacity>
@@ -33,9 +30,9 @@ export const BottomLink: React.FC<BottomLinkProps> = ({
 
 const styles = StyleSheet.create({
   questionText: {
-    fontSize: scale(14)
+    fontSize: scale(14),
   },
   linkText: {
-    fontSize: scale(14)
-  }
+    fontSize: scale(14),
+  },
 });

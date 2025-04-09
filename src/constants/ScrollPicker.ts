@@ -39,4 +39,4 @@ export const MEDIUM_DISTANT_ITEM_HEIGHT = verticalScale(55);
 /**
  * Height of items at the furthest visible distance from the center
  */
-export const DISTANT_ITEM_HEIGHT = verticalScale(45); 
+export const DISTANT_ITEM_HEIGHT = verticalScale(45);

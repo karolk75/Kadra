@@ -28,7 +28,8 @@ export default function TabLayout() {
           borderTopWidth: 1,
           borderTopColor: "rgba(0, 0, 0, 0.1)",
           height: verticalScale(62),
-          paddingBottom: Platform.OS === 'ios' ? verticalScale(20) : verticalScale(5),
+          paddingBottom:
+            Platform.OS === "ios" ? verticalScale(20) : verticalScale(5),
           paddingTop: verticalScale(2),
           paddingHorizontal: scale(5),
           justifyContent: "center",
@@ -52,7 +53,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Strona Główna",
-          tabBarIcon: ({focused }) => (
+          tabBarIcon: ({ focused }) => (
             <TabBarIcon
               icon={MainIcon}
               focused={focused}
