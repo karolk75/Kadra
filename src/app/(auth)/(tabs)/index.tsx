@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
+import { router } from "expo-router";
 
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
@@ -40,6 +41,10 @@ export default function MainScreen() {
 
   const handleSearchIconPress = () => {
     console.log("Search icon pressed");
+  };
+
+  const navigateToPeople = () => {
+    router.push("/(auth)/people");
   };
 
   return (
@@ -103,7 +108,7 @@ export default function MainScreen() {
                 "osoby lub sprawdzić",
                 "plan zajęć",
               ]}
-              onPress={() => console.log("Persons pressed")}
+              onPress={navigateToPeople}
             />
 
             {/* Calendar Box */}
