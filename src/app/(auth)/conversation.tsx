@@ -1,6 +1,6 @@
 import { Background } from "@/components/Background";
 import { ConversationView } from "@/components/messages/ConversationView";
-import { getMockTeachers, MOCK_CONVERSATIONS } from "@/data/mockData";
+import { getMockTeachers, MOCK_CONVERSATIONS_LEGACY } from "@/data/mockData";
 import BoyAvatar from "@/svg/avatars/boyAvatar";
 import GirlAvatar from "@/svg/avatars/girlAvatar";
 import ScreenBackground from "@/svg/background";
@@ -28,7 +28,7 @@ export default function TeacherConversationScreen() {
 
   const teacher = teachersData.find((t) => t.id === teacherId);
   const [messages, setMessages] = useState<Message[]>(
-    MOCK_CONVERSATIONS[teacherId as string] || [],
+    MOCK_CONVERSATIONS_LEGACY[teacherId as string] || [],
   );
 
   // Handle sending message with attachments

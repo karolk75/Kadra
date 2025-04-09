@@ -9,7 +9,7 @@ import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { SearchBar } from "@/components/main/SearchBar";
 import { UserAttributes } from "@/context";
 import { useStorageState } from "@/context/useStorageState";
-import { getMockTeachers } from "@/data/mockData";
+import { getEnrichedTeachers } from "@/data/mockData";
 import BoyAvatar from "@/svg/avatars/boyAvatar";
 import GirlAvatar from "@/svg/avatars/girlAvatar";
 import ScreenBackground from "@/svg/background";
@@ -17,7 +17,7 @@ import { TeacherContact } from "@/types/TeacherContact";
 import { formatMessageTime } from "@/utils/utils";
 import { ConversationSelectionModal } from "@/components/messages/ConversationSelectionModal";
 
-const MOCK_TEACHERS: TeacherContact[] = getMockTeachers(
+const MOCK_TEACHERS: TeacherContact[] = getEnrichedTeachers(
   <BoyAvatar />,
   <GirlAvatar />,
 );
