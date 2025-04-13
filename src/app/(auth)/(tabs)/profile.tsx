@@ -1,11 +1,9 @@
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
-import { SafeAreaContainer } from "@/components/SafeAreaContainer";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileMenuItem } from "@/components/profile/ProfileMenuItem";
 import { useSession } from "@/context";
 import ScreenBackground from "@/svg/background";
-import GirlAvatar from "@/svg/avatars/girlAvatar";
 import UserDataIcon from "@/svg/profile/data-icon";
 import HomeworkIcon from "@/svg/profile/homework-icon";
 import MoneyIcon from "@/svg/profile/money-icon";
@@ -14,11 +12,12 @@ import { ScrollView, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { useMemo } from "react";
 import { UserAttributes } from "@/context";
-import { useStorageState } from "@/context/useStorageState";
+import { selectAttributes } from "@/store/slices/authSlice";
+import { useSelector } from "react-redux";  
 
 export default function ProfileScreen() {
   const { signOut } = useSession();
-  const [attributes] = useStorageState<UserAttributes>("attributes");
+  const attributes = useSelector(selectAttributes);
 
   // Format the user's name in uppercase or use placeholder if not available
   const displayName = useMemo(() => {
@@ -74,7 +73,7 @@ export default function ProfileScreen() {
           }}
           showsVerticalScrollIndicator={false}
         >
-          <ProfileHeader name={displayName} avatarComponent={<GirlAvatar />} />
+          {/* <ProfileHeader name={displayName} avatar={attributes?.avatar} /> */}
 
           {menuItems.map((item) => (
             <ProfileMenuItem

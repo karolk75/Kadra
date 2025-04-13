@@ -1,22 +1,39 @@
-import { AppointmentData } from "@/types/AppointmentData";
-import React, { ReactNode } from "react";
 import {
+  Image,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
   useWindowDimensions,
-  StyleSheet,
 } from "react-native";
 import { scale } from "react-native-size-matters";
+import { Schema } from "amplify/data/resource";
+import { SelectionSet } from "aws-amplify/api";
+import { EnrollmentWithDetails } from "@/hooks/useEnrollments";
+
+const childSelectionSet = [
+  "id",
+  "firstName",
+  "lastName",
+  "profileImageUrl"
+] as const;
+type Child = SelectionSet<Schema["Child"]["type"], typeof childSelectionSet>;
+
+const scheduleSelectionSet = [
+  "id",
+  "startTime",
+  "endTime",
+] as const;
+type Schedule = SelectionSet<Schema["Schedule"]["type"], typeof scheduleSelectionSet>;
 
 type AppointmentCardProps = {
-  appointment: AppointmentData;
+  enrollment: EnrollmentWithDetails;
   color: string;
-  onPress?: () => void;
+  onPress: (enrollmentId: string) => void;
 };
 
 export const AppointmentCard = ({
-  appointment,
+  enrollment,
   color,
   onPress,
 }: AppointmentCardProps) => {
@@ -24,6 +41,22 @@ export const AppointmentCard = ({
 
   // Calculate text container width - adjust based on parent container and avatar size
   const textContainerMaxWidth = screenWidth * 0.5; // Limit to approximately half screen width
+
+  const childAvatar = enrollment.child.profileImageUrl;
+
+  const enrollmentTime = () => {
+    const startTimeString = enrollment.schedule.startTime;
+    const endTimeString = enrollment.schedule.endTime;
+    
+    // Extract hour and minute directly from ISO strings
+    const startHour = startTimeString.split('T')[1].split(':')[0];
+    const startMinute = startTimeString.split('T')[1].split(':')[1];
+    
+    const endHour = endTimeString.split('T')[1].split(':')[0];
+    const endMinute = endTimeString.split('T')[1].split(':')[1];
+    
+    return `${startHour}:${startMinute} - ${endHour}:${endMinute}`;
+  };
 
   return (
     <View className={`rounded-lg shadow-sm`} style={styles.cardContainer}>
@@ -34,18 +67,23 @@ export const AppointmentCard = ({
           borderColor: color,
         }}
       >
-        <TouchableOpacity className="flex-row items-center" onPress={onPress}>
+        <TouchableOpacity className="flex-row items-center" onPress={() => onPress(enrollment.id)}>
           <View
-            className={`rounded-lg`}
+            className={`rounded-full`}
             style={{
-              width: scale(32),
-              height: scale(32),
+              width: scale(34),
+              height: scale(34),
               marginRight: scale(8),
               marginLeft: scale(8),
               backgroundColor: color,
             }}
           >
-            {appointment.avatar}
+            {childAvatar && (
+              <Image
+                source={{ uri: childAvatar }}
+                style={styles.avatarImage}
+              />
+            )}
           </View>
           <View
             style={{
@@ -60,7 +98,7 @@ export const AppointmentCard = ({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {appointment.name}
+              {`${enrollment.child.firstName} ${enrollment.child.lastName}`}
             </Text>
             <Text
               className="font-poppins-medium text-black"
@@ -68,7 +106,7 @@ export const AppointmentCard = ({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {appointment.time}
+              {enrollmentTime()}
             </Text>
             <Text
               className="font-poppins-medium text-black"
@@ -76,7 +114,7 @@ export const AppointmentCard = ({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {appointment.location}
+              {enrollment.schedule.class.facility.name}
             </Text>
             <Text
               className="font-poppins-italic text-black"
@@ -84,7 +122,7 @@ export const AppointmentCard = ({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {appointment.activity}
+              {enrollment.schedule.class.name}
             </Text>
           </View>
         </TouchableOpacity>
@@ -107,15 +145,22 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   nameText: {
-    fontSize: scale(12),
+    fontSize: scale(10),
   },
   timeText: {
-    fontSize: scale(12),
+    fontSize: scale(10),
   },
   locationText: {
-    fontSize: scale(11),
+    fontSize: scale(9),
   },
   activityText: {
-    fontSize: scale(10),
+    fontSize: scale(8),
+  },
+  avatarImage: {
+    resizeMode: "cover",
+    top: scale(1),
+    left: scale(1),
+    width: scale(32),
+    height: scale(32),
   },
 });

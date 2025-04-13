@@ -1,4 +1,4 @@
-import { AppointmentData } from "@/types/AppointmentData";
+import { EnrollmentWithDetails } from "@/types/EnrollmentsWithDetails";
 import React, { ReactNode } from "react";
 import {
   Text,
@@ -7,11 +7,12 @@ import {
   useWindowDimensions,
   StyleSheet,
   ViewStyle,
+  Image,
 } from "react-native";
 import { scale } from "react-native-size-matters";
 
 type AppointmentCardProps = {
-  appointment: AppointmentData;
+  enrollment: EnrollmentWithDetails;
   color: string;
   onPress?: () => void;
   containerStyle?: ViewStyle;
@@ -19,7 +20,7 @@ type AppointmentCardProps = {
 };
 
 export const AppointmentCard = ({
-  appointment,
+  enrollment,
   color,
   onPress,
   containerStyle,
@@ -53,7 +54,7 @@ export const AppointmentCard = ({
           style={styles.touchableContent}
         >
           <View
-            className={`rounded-lg`}
+            className={`rounded-full`}
             style={{
               width: avatarOnly ? scale(46) : scale(32),
               height: avatarOnly ? scale(46) : scale(32),
@@ -62,7 +63,18 @@ export const AppointmentCard = ({
               backgroundColor: color,
             }}
           >
-            {appointment.avatar}
+            {enrollment!.child!.profileImageUrl && (
+              <Image
+                source={{ uri: enrollment!.child!.profileImageUrl }}
+              style={{
+                resizeMode: "cover",
+                top: scale(1),
+                left: scale(1),
+                width: avatarOnly ? scale(44) : scale(30),
+                height: avatarOnly ? scale(44) : scale(30),
+                }}
+              />
+            )}
           </View>
           {!avatarOnly && (
             <View
@@ -79,7 +91,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {appointment.name}
+                {enrollment.schedule?.class?.name}
               </Text>
               <Text
                 className="font-poppins-medium text-black"
@@ -87,7 +99,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {appointment.time}
+                {enrollment.schedule?.startTime}
               </Text>
               <Text
                 className="font-poppins-medium text-black"
@@ -95,7 +107,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {appointment.location}
+                {enrollment.schedule?.location}
               </Text>
               <Text
                 className="font-poppins-italic text-black"
@@ -103,7 +115,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {appointment.activity}
+                {enrollment.schedule?.class?.description}
               </Text>
             </View>
           )}
@@ -146,5 +158,10 @@ const styles = StyleSheet.create({
   activityText: {
     fontSize: scale(10),
     width: "100%", // Ensure text takes full width of container
+  },
+  avatarImage: {
+    resizeMode: "cover",
+    width: scale(32),
+    height: scale(32),
   },
 });

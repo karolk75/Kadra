@@ -1,52 +1,47 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { SearchBar } from "@/components/main/SearchBar";
-import { UserAttributes } from "@/context";
-import { useStorageState } from "@/context/useStorageState";
-import { getEnrichedTeachers } from "@/data/mockData";
-import BoyAvatar from "@/svg/avatars/boyAvatar";
-import GirlAvatar from "@/svg/avatars/girlAvatar";
+import { useSession } from "@/context";
 import ScreenBackground from "@/svg/background";
-import { TeacherContact } from "@/types/TeacherContact";
 import { formatMessageTime } from "@/utils/utils";
-import { ConversationSelectionModal } from "@/components/messages/ConversationSelectionModal";
+import { ConversationWithDetails, useConversations } from "@/hooks/useConversations";
 
-const MOCK_TEACHERS: TeacherContact[] = getEnrichedTeachers(
-  <BoyAvatar />,
-  <GirlAvatar />,
-);
 
 export default function MessagesScreen() {
-  const [attributes] = useStorageState<UserAttributes>("attributes");
-  const [contacts, setContacts] = useState(MOCK_TEACHERS);
+  const { user } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+
+  const { 
+    conversations, 
+    loading, 
+    error, 
+    fetchConversations, 
+    markAsRead, 
+    createConversation 
+  } = useConversations();
 
   // State for conversation modal
   const [modalVisible, setModalVisible] = useState(false);
 
   // Get unique schools from teachers
-  const schools = [...new Set(MOCK_TEACHERS.map((teacher) => teacher.school))];
+  // const schools = [...new Set(MOCK_TEACHERS.map((teacher) => teacher.school))];
 
   // Handle opening a chat with a teacher
-  const handleOpenChat = (teacherId: string) => {
-    // Mark all messages from this teacher as read
-    setContacts((prev) =>
-      prev.map((contact) =>
-        contact.id === teacherId ? { ...contact, unreadCount: 0 } : contact,
-      ),
-    );
+  const handleOpenChat = (conversationId: string) => {
+    // Mark conversation as read
+    markAsRead(conversationId);
 
-    // Navigate to the teacher conversation screen
+    // Navigate to the conversation screen
     router.push({
-      pathname: "/(auth)/conversation",
-      params: { id: teacherId },
+      pathname: "/(auth)/messages/conversation",
+      params: { id: conversationId },
     });
   };
 
@@ -56,27 +51,49 @@ export default function MessagesScreen() {
   };
 
   // Filter contacts based on search query
-  const filteredContacts = contacts.filter((teacher) => {
+  const filteredConversations = conversations.filter((conv) => {
     if (!searchQuery) return true;
 
     const query = searchQuery.toLowerCase();
-    return (
-      teacher.name.toLowerCase().includes(query) ||
-      teacher.subject.toLowerCase().includes(query)
-    );
+    
+    // Search through participant names
+    return conv.participants?.some(p => 
+      p.user?.firstName?.toLowerCase().includes(query) || 
+      p.user?.lastName?.toLowerCase().includes(query)
+    ) || false;
   });
+
+  const getConversationName = (conv: ConversationWithDetails) => {
+    if (conv.title) return conv.title;
+    
+    const otherParticipants = conv.participants?.filter(p => p.userId !== user?.id) || [];
+    if (otherParticipants.length === 0) return "No participants";
+    
+    return otherParticipants
+      .map(p => p.user?.firstName && p.user?.lastName ? `${p.user.firstName} ${p.user.lastName}` : "Unknown")
+      .join(", ");
+  };
+
+  // Get subject for a teacher if available
+  // const getTeacherSubject = (conv: ConversationWithDetails) => {
+  //   const teacherParticipant = conv.participants?.find(p => 
+  //     p.user?.userType === 'TEACHER' && p.userId !== user?.id
+  //   );
+    
+  //   return teacherParticipant?.user?.teacher?.specialization || "";
+  // };
 
   return (
     <View className="flex-1 bg-white relative">
       <Background BackgroundComponent={ScreenBackground} />
 
       <KeyboardAwareContainer>
-        <ScrollView className="flex-1" style={{ paddingHorizontal: scale(8) }}>
+        <ScrollView className="flex-1" style={styles.scrollView}>
           {/* Header */}
-          <View style={{ marginBottom: verticalScale(5) }}>
+          <View style={styles.header}>
             <Text
               className="font-poppins-bold text-lightblue"
-              style={{ fontSize: scale(24) }}
+              style={styles.headerText}
               numberOfLines={1}
             >
               Wiadomości
@@ -90,76 +107,101 @@ export default function MessagesScreen() {
             onIconPress={() => console.log("Search pressed")}
           />
 
+          {/* Loading state */}
+          {loading && (
+            <View className="py-10 items-center">
+              <Text className="font-poppins-regular text-gray-500">Ładowanie konwersacji...</Text>
+            </View>
+          )}
+
+          {/* Error state */}
+          {error && (
+            <View className="py-10 items-center">
+              <Text className="font-poppins-regular text-red-500">Wystąpił błąd podczas ładowania konwersacji</Text>
+            </View>
+          )}
+
+          {/* Empty state */}
+          {!loading && !error && filteredConversations.length === 0 && (
+            <View className="py-10 items-center">
+              <Text className="font-poppins-regular text-gray-500">
+                {searchQuery ? "Brak wyników wyszukiwania" : "Brak konwersacji"}
+              </Text>
+            </View>
+          )}
+
           {/* Contact List */}
           <View className="flex-1">
-            {filteredContacts.map((teacher) => (
+            {filteredConversations.map((conversation) => (
               <TouchableOpacity
-                key={teacher.id}
+                key={conversation.id}
                 className="flex-row items-center py-3 border-b border-gray-100"
-                onPress={() => handleOpenChat(teacher.id)}
+                onPress={() => handleOpenChat(conversation.id)}
                 activeOpacity={0.7}
               >
                 {/* Avatar */}
                 <View className="relative">
-                  <View className="h-12 w-12 bg-lightblue rounded-full overflow-hidden justify-center items-center">
-                    {teacher.avatar}
+                  <View className="bg-lightblue rounded-full overflow-hidden justify-center items-center"
+                    style={styles.avatarContainer}
+                  >
+                    {/* <Image
+                      source={conversation.participants?.[0]?.user?.profileImageUrl}
+                      style={styles.avatar}
+                    /> */}
                   </View>
                 </View>
 
                 {/* Message preview */}
-                <View className="flex-1 ml-3" style={{ maxWidth: "75%" }}>
+                <View className="flex-1 ml-3" style={styles.messagePreview}>
                   <View className="flex-row justify-between items-center w-full">
                     <Text
                       className="font-poppins-bold text-lightblue"
-                      style={{
-                        fontSize: scale(14),
-                        flex: 1,
-                        marginRight: scale(8),
-                      }}
+                      style={styles.contactName}
                       numberOfLines={1}
                     >
-                      {teacher.name}
+                      {getConversationName(conversation)}
                     </Text>
-                    {teacher.lastMessageTime && (
+                    {conversation.updatedAt && (
                       <Text
                         className="text-gray-400 font-poppins-regular shrink-0"
-                        style={{ fontSize: scale(12) }}
+                        style={styles.messageTime}
                       >
-                        {formatMessageTime(teacher.lastMessageTime)}
+                        {formatMessageTime(new Date(conversation.updatedAt))}
                       </Text>
                     )}
                   </View>
 
-                  <Text
+                  {/* Subject */}
+                  {/* <Text
                     className="text-gray-500 font-poppins-regular"
-                    style={{ fontSize: scale(12) }}
+                    style={styles.subjectText}
                   >
-                    {teacher.subject}
-                  </Text>
+                    {conversation.subject}
+                  </Text> */}
 
-                  {teacher.lastMessage && (
+                  {conversation.lastMessage && (
                     <Text
                       className={`${
-                        teacher.unreadCount > 0
+                        conversation.unread
                           ? "font-poppins-bold text-gray-800"
                           : "font-poppins-regular text-gray-500"
                       }`}
-                      style={{ fontSize: scale(13) }}
+                      style={styles.lastMessage}
                       numberOfLines={1}
                     >
-                      {teacher.lastMessage}
+                      {conversation.lastMessage}
                     </Text>
                   )}
                 </View>
 
                 {/* Unread badge */}
-                {teacher.unreadCount > 0 && (
+                {conversation.unread && (
                   <View className="bg-lightblue rounded-full h-6 w-6 justify-center items-center ml-2">
                     <Text
                       className="text-white font-poppins-bold"
-                      style={{ fontSize: scale(12) }}
+                      style={styles.unreadBadgeText}
                     >
-                      {teacher.unreadCount}
+                      {/* {teacher.unreadCount} */}
                     </Text>
                   </View>
                 )}
@@ -172,17 +214,7 @@ export default function MessagesScreen() {
       {/* New Conversation Button */}
       <TouchableOpacity
         className="absolute bg-lightblue rounded-full justify-center items-center shadow-md"
-        style={{
-          width: scale(56),
-          height: scale(56),
-          bottom: verticalScale(20),
-          right: scale(20),
-          elevation: 4,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-        }}
+        style={styles.newConversationButton}
         onPress={handleNewConversation}
         activeOpacity={0.8}
       >
@@ -194,13 +226,64 @@ export default function MessagesScreen() {
       </TouchableOpacity>
 
       {/* Conversation Selection Modal */}
-      <ConversationSelectionModal
+      {/* <ConversationSelectionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         schools={schools}
         teachers={MOCK_TEACHERS}
         onSelectTeacher={handleOpenChat}
-      />
+      /> */}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollView: {
+    paddingHorizontal: scale(8),
+  },
+  header: {
+    marginBottom: verticalScale(5),
+  },
+  headerText: {
+    fontSize: scale(24),
+  },
+  avatarContainer: {
+    width: scale(34),
+    height: scale(34),
+  },
+  avatar: {
+    width: scale(32),
+    height: scale(32),
+  },
+  messagePreview: {
+    maxWidth: "75%",
+  },
+  contactName: {
+    fontSize: scale(14),
+    flex: 1,
+    marginRight: scale(8),
+  },
+  messageTime: {
+    fontSize: scale(12),
+  },
+  subjectText: {
+    fontSize: scale(12),
+  },
+  lastMessage: {
+    fontSize: scale(13),
+  },
+  unreadBadgeText: {
+    fontSize: scale(12),
+  },
+  newConversationButton: {
+    width: scale(56),
+    height: scale(56),
+    bottom: verticalScale(20),
+    right: scale(20),
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+});
