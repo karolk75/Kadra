@@ -20,14 +20,6 @@ export default function AuthLayout() {
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="conversation"
-        options={{
-          gestureEnabled: true,
-          animation: "default",
-          gestureDirection: "horizontal",
-        }}
-      />
     </Stack>
   );
 }

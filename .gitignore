@@ -78,3 +78,15 @@ aws-exports.*
 .c9/
 *.launch
 .settings/
+
+# Sensitive data
+scripts/
+config/
+secrets/
+credentials/
+*credentials*
+*secret*
+*token*
+*password*
+*apikey*
+*api_key*

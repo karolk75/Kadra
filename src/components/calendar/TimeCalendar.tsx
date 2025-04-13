@@ -1,28 +1,21 @@
-import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
-import moment from "moment";
-import { AppointmentData } from "@/types/AppointmentData";
 import { AppointmentCard } from "@/components/calendar/AppointmentCard";
-import { THEME_COLORS_HEX, ThemeColors } from "@/constants/ThemeColors";
-
+import { THEME_COLORS_HEX } from "@/constants/ThemeColors";
+import { EnrollmentWithDetails } from "@/types/EnrollmentsWithDetails";
+import { Class, Schedule } from "@/types/schema";
+import moment from "moment";
+import React from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
+import { scale, verticalScale } from "react-native-size-matters";
 interface TimeCalendarProps {
   selectedDate: string; // Format: 'YYYY-MM-DD'
-  appointments: AppointmentData[];
+  enrollments: EnrollmentWithDetails[];
   startHour?: number; // Starting hour (24-hour format)
   endHour?: number; // Ending hour (24-hour format)
-  onAppointmentPress?: (appointment: AppointmentData) => void;
+  onAppointmentPress?: (schedule: Schedule) => void;
 }
 
 interface AppointmentWithTimes {
-  appointment: AppointmentData;
+  enrollment: EnrollmentWithDetails;
   startTime: moment.Moment;
   endTime: moment.Moment;
   top: number;
@@ -41,7 +34,7 @@ const APPOINTMENT_WIDTH = SCREEN_WIDTH - TIME_COLUMN_WIDTH - scale(20); // Width
 
 export const TimeCalendar: React.FC<TimeCalendarProps> = ({
   selectedDate,
-  appointments,
+  enrollments,
   startHour = 7,
   endHour = 22,
   onAppointmentPress,
@@ -49,13 +42,13 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
   // Generate array of hours to display
   const hours = Array.from(
     { length: endHour - startHour + 1 },
-    (_, i) => startHour + i,
+    (_, i) => startHour + i
   );
 
   // Check if two appointments overlap
   const doOverlap = (
     a: AppointmentWithTimes,
-    b: AppointmentWithTimes,
+    b: AppointmentWithTimes
   ): boolean => {
     return a.startTime < b.endTime && b.startTime < a.endTime;
   };
@@ -63,22 +56,15 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
   // Process appointments to calculate their position and height
   const processAppointments = (): AppointmentWithTimes[] => {
     // First, process basic properties for each appointment
-    const processed = appointments
-      .filter((appointment) => {
+    const processed = enrollments
+      .filter((enrollment) => {
         // Assuming appointments have a date field or we're filtering elsewhere
         return true; // For now, show all appointments
       })
-      .map((appointment, index) => {
+      .map((enrollment, index) => {
         // Parse appointment time (format: "HH:MM-HH:MM")
-        const [timeStart, timeEnd] = appointment.time.split("-");
-        const startTime = moment(
-          `${selectedDate} ${timeStart}`,
-          "YYYY-MM-DD HH:mm",
-        );
-        const endTime = moment(
-          `${selectedDate} ${timeEnd}`,
-          "YYYY-MM-DD HH:mm",
-        );
+        const startTime = moment(enrollment!.schedule!.startTime);
+        const endTime = moment(enrollment!.schedule!.endTime);
 
         // Calculate top position based on start time
         const startHourDecimal = startTime.hour() + startTime.minutes() / 60;
@@ -92,7 +78,7 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
         const color = THEME_COLORS_HEX[index % THEME_COLORS_HEX.length];
 
         return {
-          appointment,
+          enrollment,
           startTime,
           endTime,
           top,
@@ -154,7 +140,7 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
         for (let i = 0; i < columns.length; i++) {
           const column = columns[i];
           const overlapsWithColumn = column.some((colApp) =>
-            doOverlap(colApp, app),
+            doOverlap(colApp, app)
           );
 
           if (!overlapsWithColumn) {
@@ -189,9 +175,12 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
   const processedAppointments = processAppointments();
 
   // Handle appointment press
-  const handleAppointmentPress = (appointment: AppointmentData) => {
+  const handleAppointmentPress = (enrollment: EnrollmentWithDetails) => {
     if (onAppointmentPress) {
-      onAppointmentPress(appointment);
+      enrollment.schedule &&
+        onAppointmentPress?.(
+          enrollment.schedule as Schedule & { class?: Class }
+        );
     }
   };
 
@@ -239,9 +228,9 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
                 ]}
               >
                 <AppointmentCard
-                  appointment={item.appointment}
+                  enrollment={item.enrollment}
                   color={item.color}
-                  onPress={() => handleAppointmentPress(item.appointment)}
+                  onPress={() => handleAppointmentPress(item.enrollment)}
                   containerStyle={styles.cardContainerStyle}
                   avatarOnly={
                     item.columnCount !== undefined && item.columnCount > 2

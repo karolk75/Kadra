@@ -12,7 +12,9 @@ import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../global.css";
 import { SessionProvider } from "../context";
+import { DataProvider } from "../context/DataContext";
 import { useColorScheme } from "../lib/useColorScheme";
+import { ReduxProvider } from "@/store/provider";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -81,11 +83,15 @@ export default function Root() {
 
   return (
     <GestureHandlerRootView className="flex-1">
-      <SessionProvider>
-        <EventProvider>
-          <Slot />
-        </EventProvider>
-      </SessionProvider>
+      <DataProvider>
+        <ReduxProvider>
+          <SessionProvider>
+            <EventProvider>
+              <Slot />
+            </EventProvider>
+          </SessionProvider>
+        </ReduxProvider>
+      </DataProvider>
     </GestureHandlerRootView>
   );
 }

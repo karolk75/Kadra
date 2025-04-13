@@ -1,6 +1,6 @@
 import { Attachment, Message } from "@/types/Message";
 import * as FileSystem from "expo-file-system";
-import { useStorageState } from "@/context/useStorageState";
+import { useStorageState } from "@/hooks/useStorageState";
 import { useCallback } from "react";
 
 /**

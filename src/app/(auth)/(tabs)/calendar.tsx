@@ -1,6 +1,6 @@
 import { Background } from "@/components/Background";
 import moment, { Moment } from "moment";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
 
@@ -23,11 +23,9 @@ import HorizontalScrollPicker, {
 } from "@/components/calendar/HorizontalScrollPicker";
 import { Item } from "@/types/ScrollPicker";
 import TimeCalendar from "@/components/calendar/TimeCalendar";
-import { AppointmentData } from "@/types/AppointmentData";
-import { getMockAppointments } from "@/data/mockData";
-import BoyAvatar from "@/svg/avatars/boyAvatar";
-import GirlAvatar from "@/svg/avatars/girlAvatar";
-
+import { useEnrollments } from "@/hooks/useEnrollments";
+import { Schedule } from "@/types/schema";
+import { useFocusEffect } from "@react-navigation/native";
 interface DayItem {
   label: string;
   value: number;
@@ -42,16 +40,18 @@ export default function CalendarScreen() {
   const yearItems = getYears();
   const scrollPickerRef = useRef<HorizontalScrollPickerRef>(null);
 
-  // Use appointments from mockData
-  const [appointments, setAppointments] = useState<AppointmentData[]>([]);
+  const { enrollments, fetchEnrollmentsByDay } = useEnrollments();
 
   // Initialize appointments with avatars components
-  useEffect(() => {
-    const boyAvatar = <BoyAvatar />;
-    const girlAvatar = <GirlAvatar />;
-    const mockAppointments = getMockAppointments(boyAvatar, girlAvatar);
-    setAppointments(mockAppointments);
-  }, []);
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // When tab is focused (user clicks on the tab)
+  //     fetchEnrollmentsByDay(new Date());
+  //     return () => {
+  //       // Cleanup when tab loses focus (optional)
+  //     };
+  //   }, [fetchEnrollmentsByDay])
+  // );
 
   const [selectedDay, setSelectedDay] = useState<Moment | null>(null);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
@@ -200,12 +200,13 @@ export default function CalendarScreen() {
   };
 
   // Handler for appointment selections
-  const handleAppointmentPress = (appointment: AppointmentData) => {
-    Alert.alert(
-      "Appointment Details",
-      `Name: ${appointment.name}\nTime: ${appointment.time}\nLocation: ${appointment.location}\nActivity: ${appointment.activity}`,
-      [{ text: "OK" }],
-    );
+  const handleAppointmentPress = (schedule: Schedule) => {
+    // Alert.alert(
+    //   "Appointment Details",
+    //   `Name: ${schedule.name}\nTime: ${schedule.time}\nLocation: ${schedule.location}\nActivity: ${schedule.activity}`,
+    //   [{ text: "OK" }],
+    // );
+    console.log("Appointment pressed:", schedule);
   };
 
   return (
@@ -295,7 +296,7 @@ export default function CalendarScreen() {
           <View style={styles.timeCalendarContainer}>
             <TimeCalendar
               selectedDate={selectedDate}
-              appointments={appointments}
+              enrollments={enrollments}
               // startHour={8}
               // endHour={20}
               onAppointmentPress={handleAppointmentPress}

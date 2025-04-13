@@ -1,7 +1,7 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import { router } from "expo-router";
 
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
@@ -11,28 +11,17 @@ import NotificationButton from "@/components/main/NotificationButton";
 import { RecommendedSection } from "@/components/main/RecommendedSection";
 import { SearchBar } from "@/components/main/SearchBar";
 import { StarRating } from "@/components/main/StarRating";
-import { UserAttributes } from "@/context";
-import { useStorageState } from "@/context/useStorageState";
-import { getMockAppointments, MOCK_RECOMMENDED_ITEMS_NEW } from "@/data/mockData";
-import BoyAvatar from "@/svg/avatars/boyAvatar";
-import GirlAvatar from "@/svg/avatars/girlAvatar";
+import { selectAttributes } from "@/store/slices/authSlice";
 import ScreenBackground from "@/svg/background";
 import Offers from "@/svg/main/offers";
 import Persons from "@/svg/main/persons";
 import KadraLogo from "@/svg/pre-login/kadra-logo";
-import { getCurrentDateInPolish } from "@/utils/utils";
+import { useSelector } from "react-redux";
 
 export default function MainScreen() {
-  const [attributes] = useStorageState<UserAttributes>("attributes");
+  const attributes = useSelector(selectAttributes);
   const [rating, setRating] = useState(0);
   const { width: screenWidth } = useWindowDimensions();
-
-  const { day, month } = getCurrentDateInPolish();
-  // Format day as double digit
-  const formattedDay = day.toString().padStart(2, "0");
-
-  // Mock appointments with avatar components
-  const appointments = getMockAppointments(<BoyAvatar />, <GirlAvatar />);
 
   const handleRatingChange = (newRating: number) => {
     setRating(newRating);
@@ -44,7 +33,7 @@ export default function MainScreen() {
   };
 
   const navigateToPeople = () => {
-    router.push("/(auth)/people");
+    router.push("/(auth)/people/people");
   };
 
   return (
@@ -113,11 +102,8 @@ export default function MainScreen() {
 
             {/* Calendar Box */}
             <CalendarView
-              day={formattedDay}
-              month={month}
-              appointments={appointments}
-              onAppointmentPress={(appointment) =>
-                console.log("Appointment pressed:", appointment.name)
+              onEnrollmentPress={(enrollmentId) =>
+                console.log("Appointment pressed:", enrollmentId)
               }
             />
           </View>
@@ -131,7 +117,8 @@ export default function MainScreen() {
           {/* Recommended Section  */}
           <View style={{ marginHorizontal: scale(-8) }}>
             <RecommendedSection
-              items={MOCK_RECOMMENDED_ITEMS_NEW}
+              // TODO: Add recommended items
+              items={[]}
               screenWidth={screenWidth}
               onItemPress={(item) => console.log("Item pressed:", item.title)}
             />

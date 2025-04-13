@@ -17,7 +17,10 @@
     "fix-dependencies": "npx expo install --check",
     "dev": "npx expo start --dev-client",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:populate": "chmod +x ./scripts/runPopulateTestData.sh && ./scripts/runPopulateTestData.sh",
+    "db:clear": "chmod +x ./scripts/runClearTestData.sh && ./scripts/runClearTestData.sh",
+    "db:reset": "npm run db:clear && npm run db:populate"
   },
   "jest": {
     "preset": "jest-expo"
@@ -26,10 +29,12 @@
     "@aws-amplify/react-native": "^1.1.7",
     "@aws-amplify/ui-react-native": "^2.4.1",
     "@expo/vector-icons": "^14.0.2",
+    "@faker-js/faker": "^9.6.0",
     "@react-native-async-storage/async-storage": "~1.23.1",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-picker/picker": "2.9.0",
     "@react-navigation/native": "^7.0.14",
+    "@reduxjs/toolkit": "^2.6.1",
     "aws-amplify": "^6.13.0",
     "clsx": "^2.1.0",
     "date-fns": "^4.1.0",
@@ -37,7 +42,7 @@
     "expo-camera": "~16.0.18",
     "expo-constants": "~17.0.7",
     "expo-document-picker": "~13.0.3",
-    "expo-file-system": "~18.0.11",
+    "expo-file-system": "~18.0.12",
     "expo-font": "~13.0.4",
     "expo-image-picker": "~16.0.6",
     "expo-linking": "~7.0.5",
@@ -64,8 +69,12 @@
     "react-native-svg": "15.8.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.13",
+    "react-redux": "^9.2.0",
+    "redux-persist": "^6.0.0",
+    "redux-persist-expo-file-system-storage": "^1.1.6",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.14.1",

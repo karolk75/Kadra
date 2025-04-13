@@ -1,38 +1,22 @@
 import {
-  confirmSignUp,
   fetchAuthSession,
-  fetchUserAttributes,
-  getCurrentUser,
-  JWT,
-  resendSignUpCode,
-  signIn,
-  signOut,
-  signUp,
 } from "aws-amplify/auth";
-import React from "react";
-import { useStorageState } from "./useStorageState";
-
-type AuthError = Error & { code?: string };
-
-interface UserData {
-  id: string;
-  username?: string;
-  email?: string;
-  preferredName?: string;
-}
-
-export interface UserAttributes {
-  id: string;
-  email?: string;
-  preferredName?: string;
-  familyName?: string;
-  phoneNumber?: string;
-}
-
-interface SessionData {
-  accessToken?: JWT;
-  idToken?: JWT;
-}
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../store";
+import {
+  confirmSignUpUser,
+  refreshSession,
+  resendSignUpCode,
+  selectAttributes,
+  selectError,
+  selectIsLoading,
+  selectSession,
+  selectUser,
+  signInUser,
+  signOutUser,
+  signUpUser,
+} from "../store/slices/authSlice";
+import { AuthError, SessionData, UserData } from "@/types/Auth";
 
 interface AuthContextType {
   signIn: (email: string, password: string) => Promise<boolean>;
@@ -41,25 +25,19 @@ interface AuthContextType {
     password: string,
     firstName: string,
     lastName: string,
-    phoneNumber: string,
+    phoneNumber: string
   ) => Promise<boolean>;
   confirmSignUp: (email: string, code: string) => Promise<boolean>;
   resendCode: (username: string) => Promise<void>;
   signOut: () => Promise<void>;
   session?: SessionData | null;
   user?: UserData | null;
+  attributes?: UserData | null;
   isLoading: boolean;
   error?: AuthError | null;
 }
 
 const AuthContext = React.createContext<AuthContextType>({} as AuthContextType);
-
-const parseAuthError = (error: unknown): AuthError => {
-  if (error instanceof Error) return error;
-  return new Error(
-    typeof error === "object" ? JSON.stringify(error) : String(error),
-  );
-};
 
 export function useSession() {
   const value = React.useContext(AuthContext);
@@ -73,122 +51,56 @@ export function useSession() {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
-  const [session, setSession, sessionLoading] =
-    useStorageState<SessionData>("session");
-  const [user, setUser, userLoading] = useStorageState<UserData>("user");
-  const [attributes, setAttributes] =
-    useStorageState<UserAttributes>("attributes");
-  const [error, setError] = React.useState<AuthError | null>(null);
+  // Use Redux selectors for state management
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const attributes = useAppSelector(selectAttributes);
+  const session = useAppSelector(selectSession);
+  const isLoading = useAppSelector(selectIsLoading);
+  const reduxError = useAppSelector(selectError);
 
-  const isLoading = sessionLoading || userLoading;
+  // Convert Redux error to AuthError if present
+  const error = reduxError ? (reduxError as AuthError) : null;
 
-  if (session && user) fetchAuthSession({ forceRefresh: true });
-
-  const handleAuthError = (error: unknown): AuthError => {
-    const parsedError = parseAuthError(error);
-    setError(parsedError);
-    console.error(parsedError);
-    return parsedError;
-  };
+  // Refresh the session only when the component mounts (app starts)
+  useEffect(() => {
+    if (session && user) {
+      dispatch(refreshSession());
+    }
+  }, [dispatch]); // Only depends on dispatch, which is stable
 
   const value = {
     signIn: async (email: string, password: string) => {
-      try {
-        const { isSignedIn } = await signIn({ username: email, password });
-        if (isSignedIn) {
-          const userData = await getCurrentUser();
-          const userObj = {
-            id: userData.userId,
-            email: userData.signInDetails?.loginId,
-            username: userData.username,
-          };
-
-          const { accessToken, idToken } =
-            (await fetchAuthSession()).tokens ?? {};
-          const sessionObj = {
-            accessToken,
-            idToken,
-          };
-
-          const userAttributes = await fetchUserAttributes();
-          const attributesObj = {
-            id: userData.userId,
-            email: userData.signInDetails?.loginId,
-            username: userData.username,
-            preferredName: userAttributes.preferred_username,
-            familyName: userAttributes.family_name,
-            phoneNumber: userAttributes.phone_number,
-          };
-
-          setSession(sessionObj);
-          setUser(userObj);
-          setAttributes(attributesObj);
-          return true;
-        }
-        return false;
-      } catch (error) {
-        handleAuthError(error);
-        // if (parsedError.name === "UserAlreadyAuthenticatedException") {
-        //   console.log("User already authenticated");
-        //   await signOut();
-        // }
-        return false;
-      }
+      const resultAction = await dispatch(signInUser({ email, password }));
+      return !signInUser.rejected.match(resultAction);
     },
     signUp: async (
       email: string,
       password: string,
       firstName: string,
       lastName: string,
-      phoneNumber: string,
+      phoneNumber: string
     ) => {
-      try {
-        await signUp({
-          username: email,
-          password,
-          options: {
-            userAttributes: {
-              email,
-              preferred_username: firstName,
-              family_name: lastName,
-              phone_number: phoneNumber,
-            },
-          },
-        });
-        return true;
-      } catch (error) {
-        handleAuthError(error);
-        return false;
-      }
+      const resultAction = await dispatch(
+        signUpUser({ email, password, firstName, lastName, phoneNumber })
+      );
+      return !signUpUser.rejected.match(resultAction);
     },
     confirmSignUp: async (email: string, code: string) => {
-      try {
-        await confirmSignUp({ username: email, confirmationCode: code });
-        return true;
-      } catch (error) {
-        handleAuthError(error);
-        return false;
-      }
+      const resultAction = await dispatch(confirmSignUpUser({ email, code }));
+      return !confirmSignUpUser.rejected.match(resultAction);
     },
     resendCode: async (username: string) => {
-      try {
-        await resendSignUpCode({ username });
-      } catch (error) {
-        handleAuthError(error);
-      }
+      await dispatch(resendSignUpCode(username));
     },
     signOut: async () => {
-      try {
-        await signOut({ global: true });
-      } catch (error) {
-        handleAuthError(error);
-      } finally {
-        setSession(null);
-        setUser(null);
-      }
+      await dispatch(signOutUser());
     },
     session,
+    user,
+    attributes,
     isLoading,
+    error,
   };
 
   return (
