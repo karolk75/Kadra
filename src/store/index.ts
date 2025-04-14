@@ -14,13 +14,11 @@ import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
 import ExpoSecureStore from './secureStorage';
 import ExpoFileSystemStorage from './fileSystemStorage';
 import authReducer from './slices/authSlice';
-import profileReducer from './slices/profileSlice';
 import { performanceMiddleware } from './performance';
-
-// Type for the Redux state
+import childrenReducer from './slices/childrenSlice';
+import enrollmentsReducer from './slices/enrollmentsSlice';
 export interface StoreState {
   auth: ReturnType<typeof authReducer>;
-  profile: ReturnType<typeof profileReducer>;
   // Add other slice types as they are created
 }
 
@@ -49,13 +47,8 @@ const createPersistedReducer = <T extends object>(
 const rootReducer = combineReducers({
   // Auth data uses secure storage
   auth: createPersistedReducer<ReturnType<typeof authReducer>>('auth', authReducer, true),
-  
-  // Profile data uses file system storage (non-secure, better performance)
-  profile: createPersistedReducer<ReturnType<typeof profileReducer>>('profile', profileReducer, false),
-  
-  // Add other reducers here with appropriate storage
-  // Example:
-  // settings: createPersistedReducer('settings', settingsReducer, false),
+  children: createPersistedReducer<ReturnType<typeof childrenReducer>>('children', childrenReducer, false),
+  enrollments: createPersistedReducer<ReturnType<typeof enrollmentsReducer>>('enrollments', enrollmentsReducer, false),
 });
 
 // Define the store without immediate initialization

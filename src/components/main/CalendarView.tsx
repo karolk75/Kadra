@@ -14,7 +14,9 @@ import { getCurrentDateInPolish } from "@/utils/utils";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { AppointmentCard } from "./AppointmentCard";
-
+import { useAppSelector } from "@/store";
+import { selectChildren, selectChildrenLoading, selectChildrenError } from "@/store/slices/childrenSlice";
+import { selectEnrollments, selectEnrollmentsLoading, selectEnrollmentsError } from "@/store/slices/enrollmentsSlice";
 type CalendarViewProps = {
   onEnrollmentPress: (enrollmentId: string) => void;
 };
@@ -22,10 +24,19 @@ type CalendarViewProps = {
 export const CalendarView = ({
   onEnrollmentPress: onAppointmentPress,
 }: CalendarViewProps) => {
+  const children = useAppSelector(selectChildren);
+  const childrenLoading = useAppSelector(selectChildrenLoading);
+  const childrenError = useAppSelector(selectChildrenError);
+  const { fetchChildren } = useChildren();
+
+  const enrollments = useAppSelector(selectEnrollments);
+  const enrollmentsLoading = useAppSelector(selectEnrollmentsLoading);
+  const enrollmentsError = useAppSelector(selectEnrollmentsError);
+  const { fetchEnrollmentsForToday } = useEnrollments();
+
   const { day, month } = getCurrentDateInPolish();
   const formattedDoubleDigitDay = day.toString().padStart(2, "0");
-  const { children, loading: childrenLoading, fetchChildren } = useChildren();
-  const { enrollments, loading: enrollmentsLoading, fetchEnrollmentsByDay } = useEnrollments();
+
   const { width: screenWidth } = useWindowDimensions();
 
   // Calculate optimal width for date container and appointments container
@@ -33,10 +44,14 @@ export const CalendarView = ({
 
   useFocusEffect(
     useCallback(() => {
-      fetchChildren().then((children) =>
-        fetchEnrollmentsByDay(children.map((child) => child.id), new Date())
-      );
-    }, [fetchChildren, fetchEnrollmentsByDay])
+      if (!children || children.length === 0) {
+        fetchChildren().then((children) =>
+          fetchEnrollmentsForToday(children.map((child) => child.id))
+        );
+      } else {
+        fetchEnrollmentsForToday(children.map((child) => child.id))
+      }
+    }, [fetchChildren, fetchEnrollmentsForToday, children])
   );
   
 

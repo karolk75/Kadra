@@ -16,7 +16,7 @@ export const NavigationBox = ({
   onPress,
 }: NavigationBoxProps) => {
   return (
-    <View className="w-[48%]" style={styles.container}>
+    <View className="w-[48%] rounded-lg" style={styles.container}>
       <TouchableOpacity
         className="w-full bg-lightblue rounded-lg overflow-hidden relative"
         style={styles.touchableBox}
@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
     elevation: 8,
+    backgroundColor: "white",
   },
   touchableBox: {
     height: moderateScale(170, 0.5),
