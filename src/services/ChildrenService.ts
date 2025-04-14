@@ -3,15 +3,19 @@ import { Child } from "@/types/Child";
 import { generateClient } from "aws-amplify/api";
 import { Schema } from "amplify/data/resource";
 
-const client = generateClient<Schema>();
-
 export class ChildrenService {
+  private client: ReturnType<typeof generateClient<Schema>>;
+
+  constructor(client: ReturnType<typeof generateClient<Schema>>) {
+    this.client = client;
+  }
+
   /**
    * Get all children for a parent
    */
-  static async getChildrenForParent(parentId: string) {
+  public async getChildrenForParent(parentId: string) {
     try {
-      return await client.models.Child.list({
+      return await this.client.models.Child.list({
         filter: { parentId: { eq: parentId } },
       });
     } catch (error) {
@@ -23,9 +27,9 @@ export class ChildrenService {
   /**
    * Create a child
    */
-  static async createChild(child: Child) {
+  public async createChild(child: Child) {
     try {
-      return await client.models.Child.create(child);
+      return await this.client.models.Child.create(child);
     } catch (error) {
       console.error("Error creating child:", error);
       throw error;

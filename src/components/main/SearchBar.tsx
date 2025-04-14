@@ -17,8 +17,8 @@ export const SearchBar = ({
   onIconPress,
 }: SearchBarProps) => {
   return (
-    <View style={styles.container}>
-      <View className="relative bg-white rounded-lg overflow-hidden border border-darkblue">
+    <View style={styles.container} className="bg-white rounded-lg">
+      <View className="relative rounded-lg overflow-hidden border border-darkblue">
         <TextInput
           placeholder={placeholder}
           className="text-darkblue font-poppins-light"

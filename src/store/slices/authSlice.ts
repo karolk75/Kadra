@@ -304,7 +304,6 @@ const authSlice = createSlice({
       
       // Handle refresh session
       .addCase(refreshSession.fulfilled, (state, action) => {
-        console.log("refreshSession", action.payload);
         if (action.payload.tokens) {
           const { accessToken, idToken } = action.payload.tokens;
           state.session = {

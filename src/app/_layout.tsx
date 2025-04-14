@@ -13,6 +13,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../global.css";
 import { SessionProvider } from "../context";
 import { DataProvider } from "../context/DataContext";
+import ErrorProvider from "../context/ErrorContext";
+import ErrorModal from "../components/ErrorModal";
 import { useColorScheme } from "../lib/useColorScheme";
 import { ReduxProvider } from "@/store/provider";
 
@@ -85,11 +87,14 @@ export default function Root() {
     <GestureHandlerRootView className="flex-1">
       <DataProvider>
         <ReduxProvider>
-          <SessionProvider>
-            <EventProvider>
-              <Slot />
-            </EventProvider>
-          </SessionProvider>
+          <ErrorProvider>
+            <SessionProvider>
+              <EventProvider>
+                <Slot />
+                <ErrorModal />
+              </EventProvider>
+            </SessionProvider>
+          </ErrorProvider>
         </ReduxProvider>
       </DataProvider>
     </GestureHandlerRootView>

@@ -1,31 +1,28 @@
 import { Background } from "@/components/Background";
 import moment, { Moment } from "moment";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View, Alert } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
 
 import DatePicker from "@/components/calendar/DatePicker";
+import HorizontalScrollPicker, {
+  HorizontalScrollPickerRef,
+} from "@/components/calendar/HorizontalScrollPicker";
+import TimeCalendar from "@/components/calendar/TimeCalendar";
 import TodayButton from "@/components/calendar/TodayButton";
 import { SafeAreaContainer } from "@/components/SafeAreaContainer";
+import { SHORT_DAYS } from "@/constants/Days";
 import {
   getMonthInPolish,
   getMonthItems,
   getMonthNumber,
 } from "@/constants/Months";
-import { getYears } from "@/constants/Years";
 import { ScrollPickerColors } from "@/constants/ThemeColors";
-import { SHORT_DAYS } from "@/constants/Days";
+import { getYears } from "@/constants/Years";
 import ScreenBackground from "@/svg/background";
+import { Item } from "@/types/ScrollPicker";
 import OutsidePressHandler from "react-native-outside-press";
 import { scale, verticalScale } from "react-native-size-matters";
-import HorizontalScrollPicker, {
-  HorizontalScrollPickerRef,
-} from "@/components/calendar/HorizontalScrollPicker";
-import { Item } from "@/types/ScrollPicker";
-import TimeCalendar from "@/components/calendar/TimeCalendar";
-import { useEnrollments } from "@/hooks/useEnrollments";
-import { Schedule } from "@/types/schema";
-import { useFocusEffect } from "@react-navigation/native";
 interface DayItem {
   label: string;
   value: number;
@@ -39,19 +36,6 @@ export default function CalendarScreen() {
   const monthItems = getMonthItems();
   const yearItems = getYears();
   const scrollPickerRef = useRef<HorizontalScrollPickerRef>(null);
-
-  const { enrollments, fetchEnrollmentsByDay } = useEnrollments();
-
-  // Initialize appointments with avatars components
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     // When tab is focused (user clicks on the tab)
-  //     fetchEnrollmentsByDay(new Date());
-  //     return () => {
-  //       // Cleanup when tab loses focus (optional)
-  //     };
-  //   }, [fetchEnrollmentsByDay])
-  // );
 
   const [selectedDay, setSelectedDay] = useState<Moment | null>(null);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
