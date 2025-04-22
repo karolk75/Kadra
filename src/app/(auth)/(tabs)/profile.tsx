@@ -3,23 +3,21 @@ import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileMenuItem } from "@/components/profile/ProfileMenuItem";
 import { useSession } from "@/context/AuthContext";
+import { selectAttributes } from "@/store/slices/authSlice";
 import ScreenBackground from "@/svg/background";
 import UserDataIcon from "@/svg/profile/data-icon";
 import HomeworkIcon from "@/svg/profile/homework-icon";
 import MoneyIcon from "@/svg/profile/money-icon";
 import SettingsIcon from "@/svg/profile/settings-icon";
+import { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import { useMemo } from "react";
-import { UserAttributes } from "@/context/AuthContext";
-import { selectAttributes } from "@/store/slices/authSlice";
-import { useSelector } from "react-redux";  
+import { useSelector } from "react-redux";
 
 export default function ProfileScreen() {
   const { signOut } = useSession();
   const attributes = useSelector(selectAttributes);
 
-  // Format the user's name in uppercase or use placeholder if not available
   const displayName = useMemo(() => {
     if (attributes?.preferredName && attributes?.familyName) {
       return `${attributes.preferredName.toUpperCase()} ${attributes.familyName.toUpperCase()}`;
@@ -73,7 +71,7 @@ export default function ProfileScreen() {
           }}
           showsVerticalScrollIndicator={false}
         >
-          {/* <ProfileHeader name={displayName} avatar={attributes?.avatar} /> */}
+          <ProfileHeader name={displayName} profileImage={attributes?.profileImageUrl} />
 
           {menuItems.map((item) => (
             <ProfileMenuItem

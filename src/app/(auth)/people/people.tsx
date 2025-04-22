@@ -31,9 +31,8 @@ export default function PeopleScreen() {
   );
 
   const handlePersonClick = (id: string) => {
-    // Navigate to person detail or handle click
-    console.log(`Person clicked: ${id}`);
-    // router.push(`/person/${id}`);
+    // Navigate to person detail page
+    router.push(`/(auth)/people/${id}`);
   };
 
   const handleAddPerson = () => {

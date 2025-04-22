@@ -1,7 +1,7 @@
 import { Background } from "@/components/Background";
 import moment, { Moment } from "moment";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
 
 import DatePicker from "@/components/calendar/DatePicker";
@@ -20,9 +20,11 @@ import {
 import { ScrollPickerColors } from "@/constants/ThemeColors";
 import { getYears } from "@/constants/Years";
 import ScreenBackground from "@/svg/background";
+import { EnrollmentWithDetails } from "@/types/Enrollment";
 import { Item } from "@/types/ScrollPicker";
 import OutsidePressHandler from "react-native-outside-press";
 import { scale, verticalScale } from "react-native-size-matters";
+
 interface DayItem {
   label: string;
   value: number;
@@ -41,7 +43,7 @@ export default function CalendarScreen() {
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(
-    getMonthInPolish(moment().format("MMMM")),
+    getMonthInPolish(moment().format("MMMM"))
   );
   const [selectedYear, setSelectedYear] = useState(moment().format("YYYY"));
   const [todayButtonClicked, setTodayButtonClicked] = useState(false);
@@ -51,7 +53,7 @@ export default function CalendarScreen() {
 
   // Selected date in YYYY-MM-DD format for TimeCalendar
   const [selectedDate, setSelectedDate] = useState<string>(
-    moment().format("YYYY-MM-DD"),
+    moment().format("YYYY-MM-DD")
   );
 
   // Update days when month or year changes or today button is clicked
@@ -67,7 +69,7 @@ export default function CalendarScreen() {
   const generateDaysForMonth = (
     month: string,
     year: string,
-    selectToday = false,
+    selectToday = false
   ) => {
     // Convert Polish month name to month index (0-11)
     // This assumes the month provided is the Polish name of the month
@@ -184,13 +186,12 @@ export default function CalendarScreen() {
   };
 
   // Handler for appointment selections
-  const handleAppointmentPress = (schedule: Schedule) => {
-    // Alert.alert(
-    //   "Appointment Details",
-    //   `Name: ${schedule.name}\nTime: ${schedule.time}\nLocation: ${schedule.location}\nActivity: ${schedule.activity}`,
-    //   [{ text: "OK" }],
-    // );
-    console.log("Appointment pressed:", schedule);
+  const handleAppointmentPress = (enrollment: EnrollmentWithDetails) => {
+    Alert.alert(
+      "Szczegóły zajęć",
+      `Miejsce: ${enrollment.schedule.class.facility.name}\nZajęcia: ${enrollment.schedule.class.name}\nCzas: ${enrollment.schedule.startTime.split("T")[1]}:${enrollment.schedule.endTime.split("T")[1]}`,
+      [{ text: "OK" }]
+    );
   };
 
   return (
@@ -249,7 +250,7 @@ export default function CalendarScreen() {
                   index: number,
                   isSelected: boolean,
                   relativePosition: number,
-                  animatedStyle: AnimatedStyle<any>,
+                  animatedStyle: AnimatedStyle<any>
                 ) => {
                   const dayItem = item as unknown as DayItem;
 
@@ -280,7 +281,6 @@ export default function CalendarScreen() {
           <View style={styles.timeCalendarContainer}>
             <TimeCalendar
               selectedDate={selectedDate}
-              enrollments={enrollments}
               // startHour={8}
               // endHour={20}
               onAppointmentPress={handleAppointmentPress}
@@ -320,6 +320,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     paddingVertical: verticalScale(4),
+    backgroundColor: 'white',
   },
   dayName: {
     fontSize: 12,

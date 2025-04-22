@@ -1,4 +1,4 @@
-import { EnrollmentWithDetails } from "@/types/EnrollmentsWithDetails";
+import { EnrollmentWithDetails } from "@/types/Enrollment";
 import React, { ReactNode } from "react";
 import {
   Text,
@@ -15,7 +15,6 @@ type AppointmentCardProps = {
   enrollment: EnrollmentWithDetails;
   color: string;
   onPress?: () => void;
-  containerStyle?: ViewStyle;
   avatarOnly?: boolean;
 };
 
@@ -23,7 +22,6 @@ export const AppointmentCard = ({
   enrollment,
   color,
   onPress,
-  containerStyle,
   avatarOnly = false,
 }: AppointmentCardProps) => {
   const { width: screenWidth } = useWindowDimensions();
@@ -32,10 +30,24 @@ export const AppointmentCard = ({
   // Increased the width to prevent text cutting
   const textContainerMaxWidth = screenWidth * 0.7;
 
+  const enrollmentTime = () => {
+    const startTimeString = enrollment.schedule.startTime;
+    const endTimeString = enrollment.schedule.endTime;
+
+    // Extract hour and minute directly from ISO strings
+    const startHour = startTimeString.split("T")[1].split(":")[0];
+    const startMinute = startTimeString.split("T")[1].split(":")[1];
+
+    const endHour = endTimeString.split("T")[1].split(":")[0];
+    const endMinute = endTimeString.split("T")[1].split(":")[1];
+
+    return `${startHour}:${startMinute} - ${endHour}:${endMinute}`;
+  };
+
   return (
     <View
       className={`rounded-lg shadow-sm`}
-      style={[styles.cardContainer, containerStyle]}
+      style={styles.cardContainer}
     >
       <View
         className={`bg-white rounded-md`}
@@ -91,7 +103,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {enrollment.schedule?.class?.name}
+                {`${enrollment.child.firstName} ${enrollment.child.lastName}`}
               </Text>
               <Text
                 className="font-poppins-medium text-black"
@@ -99,7 +111,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {enrollment.schedule?.startTime}
+                {enrollmentTime()}
               </Text>
               <Text
                 className="font-poppins-medium text-black"
@@ -107,7 +119,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {enrollment.schedule?.location}
+                {enrollment.schedule.class.facility.name}
               </Text>
               <Text
                 className="font-poppins-italic text-black"
@@ -115,7 +127,7 @@ export const AppointmentCard = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {enrollment.schedule?.class?.description}
+                {enrollment.schedule.class.name}
               </Text>
             </View>
           )}
@@ -127,8 +139,6 @@ export const AppointmentCard = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    padding: scale(4),
-    marginBottom: scale(8),
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -138,6 +148,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 8,
     height: "100%",
+    padding: 0,
+    margin: 0,
+    marginBottom: 0,
+    backgroundColor: "white",
   },
   touchableContent: {
     height: "100%",

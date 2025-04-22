@@ -2,13 +2,15 @@ import { EnrollmentWithDetails } from "@/types/Enrollment";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "..";
 interface EnrollmentsState {
-  enrollments: EnrollmentWithDetails[];
+  todayEnrollments: EnrollmentWithDetails[];
+  selectedEnrollments: EnrollmentWithDetails[];
   error: string | null;
   isLoading: boolean;
 }
 
 const initialState: EnrollmentsState = {
-  enrollments: [],
+  todayEnrollments: [],
+  selectedEnrollments: [],
   error: null,
   isLoading: false,
 };
@@ -18,8 +20,13 @@ const enrollmentsSlice = createSlice({
   initialState,
   reducers: {
     setEnrollments: (state, action) => {
-      if (state.enrollments !== action.payload) {
-        state.enrollments = action.payload;
+      if (state.todayEnrollments !== action.payload) {
+        state.todayEnrollments = action.payload;
+      }
+    },
+    setSelectedEnrollments: (state, action) => {
+      if (state.selectedEnrollments !== action.payload) {
+        state.selectedEnrollments = action.payload;
       }
     },
     setError: (state, action) => {
@@ -34,9 +41,10 @@ const enrollmentsSlice = createSlice({
   },
 });
 
-export const { setEnrollments, setError, setLoading, resetAll } = enrollmentsSlice.actions;
+export const { setEnrollments, setSelectedEnrollments, setError, setLoading, resetAll } = enrollmentsSlice.actions;
 
-export const selectEnrollments = (state: RootState) => state.enrollments.enrollments;
+export const selectTodayEnrollments = (state: RootState) => state.enrollments.todayEnrollments;
+export const selectSelectedEnrollments = (state: RootState) => state.enrollments.selectedEnrollments;
 export const selectEnrollmentsError = (state: RootState) => state.enrollments.error;
 export const selectEnrollmentsLoading = (state: RootState) => state.enrollments.isLoading;
 

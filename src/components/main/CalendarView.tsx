@@ -16,8 +16,8 @@ import {
   selectChildrenLoading,
 } from "@/store/slices/childrenSlice";
 import {
-  selectEnrollments,
   selectEnrollmentsLoading,
+  selectTodayEnrollments,
 } from "@/store/slices/enrollmentsSlice";
 import { getCurrentDateInPolish } from "@/utils/utils";
 import { useFocusEffect } from "@react-navigation/native";
@@ -35,7 +35,7 @@ export const CalendarView = ({
   const childrenLoading = useAppSelector(selectChildrenLoading);
   const { fetchChildren } = useChildren();
 
-  const enrollments = useAppSelector(selectEnrollments);
+  const todayEnrollments = useAppSelector(selectTodayEnrollments);
   const enrollmentsLoading = useAppSelector(selectEnrollmentsLoading);
   const { fetchEnrollmentsForToday } = useEnrollments();
 
@@ -89,16 +89,16 @@ export const CalendarView = ({
               <ActivityIndicator size="large" color={THEME_COLORS_HEX[0]} />
             </View>
           ) : (
-            enrollments.map((enrollment, index) => (
+            todayEnrollments.map((enrollment, index) => (
               <AppointmentCard
                 key={index}
                 enrollment={enrollment}
-                color={THEME_COLORS_HEX[index % enrollments.length]}
+                color={THEME_COLORS_HEX[index % todayEnrollments.length]}
                 onPress={(enrollmentId) => onAppointmentPress(enrollmentId)}
               />
             ))
           )}
-          {enrollments.length === 0 && !enrollmentsLoading && (
+          {todayEnrollments.length === 0 && !enrollmentsLoading && (
             <Text className="text-center text-gray-500">Brak terminów</Text>
           )}
         </View>

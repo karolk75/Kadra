@@ -1,20 +1,14 @@
 import { AppointmentCard } from "@/components/calendar/AppointmentCard";
 import { THEME_COLORS_HEX } from "@/constants/ThemeColors";
-import { useChildren } from "@/hooks/useChildren";
 import { useEnrollments } from "@/hooks/useEnrollments";
 import { useAppSelector } from "@/store";
-import {
-  selectChildren,
-  selectChildrenLoading,
-} from "@/store/slices/childrenSlice";
 import {
   selectEnrollmentsLoading,
   selectSelectedEnrollments,
 } from "@/store/slices/enrollmentsSlice";
 import { EnrollmentWithDetails } from "@/types/Enrollment";
-import { useFocusEffect } from "@react-navigation/native";
 import moment from "moment";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -25,8 +19,9 @@ import {
 } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
-interface TimeCalendarProps {
+interface ChildTimeCalendarProps {
   selectedDate: string; // Format: 'YYYY-MM-DD'
+  childId: string; // ID of the child to display enrollments for
   startHour?: number; // Starting hour (24-hour format)
   endHour?: number; // Ending hour (24-hour format)
   onAppointmentPress?: (enrollment: EnrollmentWithDetails) => void;
@@ -50,31 +45,22 @@ const TIME_COLUMN_WIDTH = scale(50); // Width of the time column
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const APPOINTMENT_WIDTH = SCREEN_WIDTH - TIME_COLUMN_WIDTH - scale(20); // Width for appointments with some padding
 
-export const TimeCalendar: React.FC<TimeCalendarProps> = ({
+export const ChildTimeCalendar: React.FC<ChildTimeCalendarProps> = ({
   selectedDate,
+  childId,
   startHour = 7,
   endHour = 22,
   onAppointmentPress,
 }) => {
-  const children = useAppSelector(selectChildren);
-  const childrenLoading = useAppSelector(selectChildrenLoading);
-  const { fetchChildren } = useChildren();
-
   const selectedEnrollments = useAppSelector(selectSelectedEnrollments);
   const enrollmentsLoading = useAppSelector(selectEnrollmentsLoading);
   const { fetchEnrollmentsForDate } = useEnrollments();
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!children || children.length === 0) {
-        fetchChildren().then((children) =>
-          fetchEnrollmentsForDate(children.map((child) => child.id), selectedDate)
-        );
-      } else {
-        fetchEnrollmentsForDate(children.map((child) => child.id), selectedDate);
-      }
-    }, [fetchChildren, fetchEnrollmentsForDate, children, selectedDate])
-  );
+  useEffect(() => {
+    if (childId) {
+      fetchEnrollmentsForDate([childId], selectedDate);
+    }
+  }, [selectedDate, childId, fetchEnrollmentsForDate]);
 
   // Generate array of hours to display
   const hours = Array.from(
@@ -94,9 +80,9 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
   const processAppointments = (): AppointmentWithTimes[] => {
     // First, process basic properties for each appointment
     const processed = selectedEnrollments.map((enrollment, index) => {
-      // Parse appointment time (format: ISO datetime string)
-      const startTime = moment(enrollment.schedule.startTime).utc(false);
-      const endTime = moment(enrollment.schedule.endTime).utc(false);
+      // Parse appointment time
+      const startTime = moment(enrollment.schedule.startTime);
+      const endTime = moment(enrollment.schedule.endTime);
 
       // Calculate top position based on start time
       const startHourDecimal = startTime.hour() + startTime.minutes() / 60;
@@ -162,7 +148,6 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
       }
 
       // For multiple appointments in a group, we need to determine column layout
-      // This is a simplified algorithm - for each appointment, find the first available column
       const columns: AppointmentWithTimes[][] = [];
 
       for (const app of group) {
@@ -204,9 +189,62 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
     return processed;
   };
 
+  // Function to render appointments or an empty state message
+  const renderContent = () => {
+    const appointments = processAppointments();
+    
+    if (appointments.length === 0) {
+      return (
+        <View className="items-center justify-center py-10">
+          <Text className="font-poppins-medium text-lg text-gray-500 text-center">
+            Brak zajęć do wyświetlenia
+          </Text>
+        </View>
+      );
+    }
+    
+    return (
+      <>
+        {/* Hour grid lines */}
+        {hours.map((hour) => (
+          <View key={`grid-${hour}`} style={styles.gridLine} />
+        ))}
+
+        {/* Extra space at the bottom for scrolling */}
+        <View style={{ height: verticalScale(50) }} />
+
+        {/* Appointments */}
+        {appointments.map((item, index) => (
+          <View
+            key={`appointment-${index}`}
+            style={[
+              styles.appointmentWrapper,
+              {
+                top: item.top,
+                height: item.height,
+                width: item.width || APPOINTMENT_WIDTH,
+                left: scale(10) + (item.left || 0),
+                right: undefined, // Remove right positioning to avoid conflicts
+              },
+            ]}
+          >
+            <AppointmentCard
+              enrollment={item.enrollment}
+              color={item.color}
+              onPress={() => onAppointmentPress?.(item.enrollment)}
+              avatarOnly={
+                item.columnCount !== undefined && item.columnCount > 2
+              }
+            />
+          </View>
+        ))}
+      </>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {enrollmentsLoading || childrenLoading ? (
+      {enrollmentsLoading ? (
         // Loading indicator
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={THEME_COLORS_HEX[0]} />
@@ -230,39 +268,7 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
 
             {/* Appointments container */}
             <View style={styles.appointmentsContainer}>
-              {/* Hour grid lines */}
-              {hours.map((hour) => (
-                <View key={`grid-${hour}`} style={styles.gridLine} />
-              ))}
-
-              {/* Extra space at the bottom for scrolling */}
-              <View style={{ height: verticalScale(50) }} />
-
-              {/* Appointments */}
-              {processAppointments().map((item, index) => (
-                <View
-                  key={`appointment-${index}`}
-                  style={[
-                    styles.appointmentWrapper,
-                    {
-                      top: item.top,
-                      height: item.height,
-                      width: item.width || APPOINTMENT_WIDTH,
-                      left: scale(10) + (item.left || 0),
-                      right: undefined, // Remove right positioning to avoid conflicts
-                    },
-                  ]}
-                >
-                  <AppointmentCard
-                    enrollment={item.enrollment}
-                    color={item.color}
-                    onPress={() => onAppointmentPress?.(item.enrollment)}
-                    avatarOnly={
-                      item.columnCount !== undefined && item.columnCount > 2
-                    }
-                  />
-                </View>
-              ))}
+              {renderContent()}
             </View>
           </View>
         </ScrollView>
@@ -326,4 +332,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TimeCalendar;
+export default ChildTimeCalendar; 

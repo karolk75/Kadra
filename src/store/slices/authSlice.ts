@@ -176,7 +176,7 @@ export const checkAuthState = createAsyncThunk(
           preferredName: userAttributes.preferred_username,
           familyName: userAttributes.family_name,
           phoneNumber: userAttributes.phone_number,
-          profileImageUrl: userAttributes.profile_image_url,
+          profileImageUrl: userAttributes.picture,
         };
   
         return {

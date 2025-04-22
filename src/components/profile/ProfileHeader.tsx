@@ -1,16 +1,15 @@
-import React from "react";
-import { ImageSourcePropType, StyleSheet, Text, View, Image } from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
 import ProfileIconBackground from "@/svg/profile/profile-icon-background";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { scale, verticalScale } from "react-native-size-matters";
 
 type ProfileHeaderProps = {
   name: string;
-  avatar: ImageSourcePropType | null;
+  profileImage: string | undefined;
 };
 
 export const ProfileHeader = ({
   name,
-  avatar,
+  profileImage,
 }: ProfileHeaderProps) => {
   return (
     <View style={styles.container}>
@@ -41,7 +40,7 @@ export const ProfileHeader = ({
             }}
           >
             <Image
-              source={avatar ?? require("assets/images/foto_boy.png")}
+              source={profileImage ? { uri: profileImage } : require("assets/images/foto_boy.png")}
               style={{ width: scale(85), height: scale(85) }}
             />
           </View>
