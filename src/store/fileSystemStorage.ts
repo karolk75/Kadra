@@ -7,7 +7,7 @@ const ExpoFileSystemStorage = createExpoFileSystemStorage({
   storagePath: `${documentDirectory}redux-persist/`,
   encoding: EncodingType.UTF8,
   // Debug only in development
-  debug: __DEV__,
+  debug: false,
 });
 
 export default ExpoFileSystemStorage;

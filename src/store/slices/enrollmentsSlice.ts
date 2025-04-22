@@ -28,10 +28,13 @@ const enrollmentsSlice = createSlice({
     setLoading: (state, action) => {
       state.isLoading = action.payload;
     },
+    resetAll: () => {
+      return { ...initialState };
+    },
   },
 });
 
-export const { setEnrollments, setError, setLoading } = enrollmentsSlice.actions;
+export const { setEnrollments, setError, setLoading, resetAll } = enrollmentsSlice.actions;
 
 export const selectEnrollments = (state: RootState) => state.enrollments.enrollments;
 export const selectEnrollmentsError = (state: RootState) => state.enrollments.error;

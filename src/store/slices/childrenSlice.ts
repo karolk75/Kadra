@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "..";
 
 interface ChildrenState {
-  children: Child[] | null;
+  children: Child[];
   error: string | null;
   isLoading: boolean;
 }
@@ -29,10 +29,13 @@ const childrenSlice = createSlice({
     setLoading: (state, action) => {
       state.isLoading = action.payload;
     },
+    resetAll: () => {
+      return { ...initialState };
+    },
   },
 });
 
-export const { setChildren, setError, setLoading } = childrenSlice.actions;
+export const { setChildren, setError, setLoading, resetAll } = childrenSlice.actions;
 
 export const selectChildren = (state: RootState) => state.children.children;
 export const selectChildrenLoading = (state: RootState) => state.children.isLoading;

@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import { ThemeColors } from "@/constants/ThemeColors";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useAppSelector } from "@/store";
+import { selectNotifications } from "@/store/slices/notificationsSlice";
+import BellIcon from "@/svg/main/bell";
+import { Notification } from "@/types/Notification";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
 import {
+  Animated,
+  FlatList,
   Modal,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  FlatList,
-  StyleSheet,
 } from "react-native";
-import Animated, {
+import {
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -15,27 +24,34 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { scale, verticalScale } from "react-native-size-matters";
-import { Ionicons } from "@expo/vector-icons";
-import BellIcon from "@/svg/main/bell";
 import { formatDistanceToNow } from "date-fns";
 import { pl } from "date-fns/locale";
-import { ThemeColors } from "@/constants/ThemeColors";
 
-interface NotificationButtonProps {
-  initialUnreadCount?: number;
-}
+export default function NotificationButton() {
+  const notifications = useAppSelector(selectNotifications);
+  const { fetchNotifications, updateNotificationsAsRead } = useNotifications();
 
-export default function NotificationButton({
-  initialUnreadCount = 0,
-}: NotificationButtonProps) {
   const [modalVisible, setModalVisible] = useState(false);
-  // const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
-  // const [unreadCount, setUnreadCount] = useState(
-  //   initialUnreadCount || MOCK_NOTIFICATIONS.filter((n) => !n.isRead).length,
-  // );
 
   const bellScale = useSharedValue(1);
   const bellRotate = useSharedValue(0);
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Update unread count whenever notifications change from Redux
+  useEffect(() => {
+    const unreadNotifications = notifications?.filter(
+      (notification) => !notification.isRead
+    ) || [];
+    
+    setUnreadCount(unreadNotifications.length);
+  }, [notifications]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchNotifications();
+    }, [fetchNotifications])
+  );
 
   const bellAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -55,169 +71,163 @@ export default function NotificationButton({
     bellScale.value = withSequence(
       withTiming(0.9, { duration: 60 }),
       withSpring(1.1, { damping: 12, stiffness: 180, mass: 0.6 }),
-      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 }),
+      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 })
     );
 
     // Add a very slight wobble effect
     bellRotate.value = withSequence(
       withTiming(2, { duration: 120 }),
       withTiming(-2, { duration: 140 }),
-      withTiming(0, { duration: 120 }),
+      withTiming(0, { duration: 120 })
     );
 
     // Open modal and mark notifications as read
     setModalVisible(true);
 
-    // if (unreadCount > 0) {
-    //   // TODO: Save read notifications to database
-    //   // Save read notifications
-    //   const updatedNotifications = notifications.map((notification) => ({
-    //     ...notification,
-    //     isRead: true,
-    //     readAt: notification.readAt || new Date().toISOString(),
-    //   }));
-    //   setNotifications(updatedNotifications);
-    //   setUnreadCount(0);
-    // }
+    if (unreadCount > 0) {
+      // Immediately set unread count to 0 as we're marking all as read
+      setUnreadCount(0);
+      
+      updateNotificationsAsRead(
+        notifications.map((notification) => notification.id)
+      );
+    }
   };
 
-  // const renderNotificationItem = ({ item }: { item: Notification }) => {
-  //   // Choose icon based on notification type
-  //   let iconName:
-  //     | "information-circle-outline"
-  //     | "chatbubble-outline"
-  //     | "calendar-outline" = "information-circle-outline";
+  const renderNotificationItem = ({ item }: { item: Notification }) => {
+    // Choose icon based on notification type
+    let iconName:
+      | "information-circle-outline"
+      | "chatbubble-outline"
+      | "calendar-outline" = "information-circle-outline";
 
-  //   if (item.type === "message") {
-  //     iconName = "chatbubble-outline";
-  //   } else if (item.type === "appointment") {
-  //     iconName = "calendar-outline";
-  //   }
+    if (item.type === "MESSAGE") {
+      iconName = "chatbubble-outline";
+    } else if (item.type === "APPOINTMENT") {
+      iconName = "calendar-outline";
+    }
 
-  //   return (
-  //     <TouchableOpacity
-  //       onPress={() => console.log("Notification clicked:", item)}
-  //       style={styles.item}
-  //       className="flex-row items-center justify-between border-b border-[#E8E8E8]"
-  //     >
-  //       <View className="flex-row items-center flex-1">
-  //         <Ionicons
-  //           name={iconName}
-  //           size={scale(20)}
-  //           color={ThemeColors.GOLD}
-  //           style={styles.icon}
-  //         />
-  //         <View className="flex-1">
-  //           <View style={styles.notificationHeader}>
-  //             <Text
-  //               style={styles.notificationTitle}
-  //               className="font-poppins-semibold"
-  //             >
-  //               {item.title}
-  //             </Text>
-  //             <Text
-  //               style={styles.notificationTime}
-  //               className="font-poppins-regular"
-  //             >
-  //               {formatDistanceToNow(new Date(item.createdAt), {
-  //                 locale: pl,
-  //                 addSuffix: true,
-  //               })}
-  //             </Text>
-  //           </View>
-  //           <Text
-  //             style={styles.notificationMessage}
-  //             className="font-poppins-regular"
-  //           >
-  //             {item.message}
-  //           </Text>
-  //         </View>
-  //       </View>
-  //     </TouchableOpacity>
-  //   );
-  // };
+    return (
+      <TouchableOpacity
+        onPress={() => console.log("Notification clicked:", item)}
+        style={styles.item}
+        className="flex-row items-center justify-between border-b border-[#E8E8E8]"
+      >
+        <View className="flex-row items-center flex-1">
+          <Ionicons
+            name={iconName}
+            size={scale(20)}
+            color={ThemeColors.GOLD}
+            style={styles.icon}
+          />
+          <View className="flex-1">
+            <View style={styles.notificationHeader}>
+              <Text
+                style={styles.notificationTitle}
+                className="font-poppins-semibold"
+              >
+                {item.title}
+              </Text>
+              <Text
+                style={styles.notificationTime}
+                className="font-poppins-regular"
+              >
+                {formatDistanceToNow(new Date(item.createdAt), {
+                  locale: pl,
+                  addSuffix: true,
+                })}
+              </Text>
+            </View>
+            <Text
+              style={styles.notificationMessage}
+              className="font-poppins-regular"
+            >
+              {item.content}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    // <>
-    //   <TouchableOpacity onPress={animateBellButton}>
-    //     <Animated.View style={bellAnimatedStyle}>
-    //       <View style={styles.bellContainer}>
-    //         <BellIcon width={28} height={28} />
-    //         {unreadCount > 0 && (
-    //           <View style={styles.notificationDot}>
-    //             {unreadCount > 1 && (
-    //               <Text style={styles.notificationCount}>{unreadCount}</Text>
-    //             )}
-    //           </View>
-    //         )}
-    //       </View>
-    //     </Animated.View>
-    //   </TouchableOpacity>
+    <>
+      <TouchableOpacity onPress={animateBellButton}>
+        <Animated.View style={bellAnimatedStyle}>
+          <View style={styles.bellContainer}>
+            <BellIcon width={28} height={28} />
+            {unreadCount > 0 && (
+              <View style={styles.notificationDot}>
+                {unreadCount > 1 && (
+                  <Text style={styles.notificationCount}>{unreadCount}</Text>
+                )}
+              </View>
+            )}
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
 
-    //   <Modal
-    //     visible={modalVisible}
-    //     transparent={true}
-    //     animationType="fade"
-    //     onRequestClose={() => setModalVisible(false)}
-    //   >
-    //     <View className="flex-1 justify-center items-center bg-black/50">
-    //       <View
-    //         className="w-11/12 h-4/6 bg-white rounded-3xl overflow-hidden"
-    //         style={styles.modalView}
-    //       >
-    //         {/* Header */}
-    //         <View
-    //           style={styles.header}
-    //           className="flex-row items-center justify-between border-b border-[#E8E8E8]"
-    //         >
-    //           <View style={styles.backButton} className="items-center" />
-    //           <Text
-    //             style={styles.title}
-    //             className="flex-1 text-center font-poppins-bold"
-    //           >
-    //             Powiadomienia
-    //           </Text>
-    //           <TouchableOpacity
-    //             onPress={() => setModalVisible(false)}
-    //             style={styles.closeButton}
-    //             className="items-center"
-    //           >
-    //             <Ionicons
-    //               name="close"
-    //               size={scale(24)}
-    //               color={ThemeColors.BRICK_RED}
-    //             />
-    //           </TouchableOpacity>
-    //         </View>
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View
+            className="w-11/12 h-4/6 bg-white rounded-3xl overflow-hidden"
+            style={styles.modalView}
+          >
+            {/* Header */}
+            <View
+              style={styles.header}
+              className="flex-row items-center justify-between border-b border-[#E8E8E8]"
+            >
+              <View style={styles.backButton} className="items-center" />
+              <Text
+                style={styles.title}
+                className="flex-1 text-center font-poppins-bold"
+              >
+                Powiadomienia
+              </Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+                className="items-center"
+              >
+                <Ionicons
+                  name="close"
+                  size={scale(24)}
+                  color={ThemeColors.BRICK_RED}
+                />
+              </TouchableOpacity>
+            </View>
 
-    //         {/* List container */}
-    //         <View className="flex-1">
-    //           {notifications.length > 0 ? (
-    //             <FlatList
-    //               data={notifications}
-    //               renderItem={renderNotificationItem}
-    //               keyExtractor={(item) => item.id}
-    //               contentContainerStyle={styles.listContent}
-    //               showsVerticalScrollIndicator={true}
-    //             />
-    //           ) : (
-    //             <View style={styles.emptyContainer} className="items-center">
-    //               <Text
-    //                 style={styles.emptyText}
-    //                 className="font-poppins-regular"
-    //               >
-    //                 Brak powiadomień
-    //               </Text>
-    //             </View>
-    //           )}
-    //         </View>
-    //       </View>
-    //     </View>
-    //   </Modal>
-    // </>
-    <View>
-      <Text>Notification Button</Text>
-    </View>
+            {/* List container */}
+            <View className="flex-1">
+              {notifications.length > 0 ? (
+                <FlatList
+                  data={notifications}
+                  renderItem={renderNotificationItem}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={styles.listContent}
+                  showsVerticalScrollIndicator={true}
+                />
+              ) : (
+                <View style={styles.emptyContainer} className="items-center">
+                  <Text
+                    style={styles.emptyText}
+                    className="font-poppins-regular"
+                  >
+                    Brak powiadomień
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 

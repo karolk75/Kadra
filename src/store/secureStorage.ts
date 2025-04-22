@@ -24,11 +24,6 @@ const ExpoSecureStore = {
   
   async removeItem(key: string) {
     try {
-      if (Platform.OS === 'web') {
-        localStorage.removeItem(key);
-        return;
-      }
-      
       await SecureStore.deleteItemAsync(key);
     } catch (error) {
       console.error('Error removing from storage:', error);

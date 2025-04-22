@@ -1,48 +1,34 @@
-import { useState } from "react";
-import { View, Text, TouchableOpacity, ImageSourcePropType, StyleSheet } from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
-import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { scale } from "react-native-size-matters";
 
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { PersonCard } from "@/components/people/PersonCard";
-import ScreenBackground from "@/svg/background";
-import KadraLogo from "@/svg/pre-login/kadra-logo";
 import { THEME_COLORS, THEME_COLORS_HEX } from "@/constants/ThemeColors";
-
-type Person = {
-  id: string;
-  name: string;
-  surname: string;
-  relation: string;
-  avatarPath: ImageSourcePropType;
-};
+import { useChildren } from "@/hooks/useChildren";
+import { useAppSelector } from "@/store";
+import { selectChildren, selectChildrenLoading } from "@/store/slices/childrenSlice";
+import ScreenBackground from "@/svg/background";
 
 export default function PeopleScreen() {
-  const [people, setPeople] = useState<Person[]>([
-    {
-      id: "1",
-      name: "Anna",
-      surname: "Kowalska",
-      relation: "Matka",
-      avatarPath: require("assets/images/foto_girl.png"),
-    },
-    {
-      id: "2",
-      name: "Jan",
-      surname: "Nowak",
-      relation: "Ojciec",
-      avatarPath: require("assets/images/foto_boy.png"),
-    },
-    {
-      id: "3",
-      name: "Zofia",
-      surname: "Wiśniewska",
-      relation: "Babcia",
-      avatarPath: require("assets/images/foto_girl.png"),
-    },
-  ]);
+  const children = useAppSelector(selectChildren);
+  const childrenLoading = useAppSelector(selectChildrenLoading);
+  const { fetchChildren } = useChildren();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchChildren();
+    }, [fetchChildren])
+  );
 
   const handlePersonClick = (id: string) => {
     // Navigate to person detail or handle click
@@ -102,23 +88,26 @@ export default function PeopleScreen() {
         </View>
 
         {/* List of People */}
-        {people.map((person, index) => {
-          const colorIndex = index % THEME_COLORS.length;
-          const bgColorHex = THEME_COLORS_HEX[colorIndex];
+        {childrenLoading ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="large" color={THEME_COLORS_HEX[0]} />
+          </View>
+        ) : (
+          children &&
+          children.map((child, index) => {
+            const colorIndex = index % THEME_COLORS.length;
+            const bgColorHex = THEME_COLORS_HEX[colorIndex];
 
-          return (
-            <PersonCard
-              key={person.id}
-              id={person.id}
-              name={person.name}
-              surname={person.surname}
-              relation={person.relation}
-              avatarPath={person.avatarPath}
-              backgroundColor={bgColorHex}
-              onPress={handlePersonClick}
-            />
-          );
-        })}
+            return (
+              <PersonCard
+                key={child.id}
+                child={child}
+                backgroundColor={bgColorHex}
+                onPress={handlePersonClick}
+              />
+            );
+          })
+        )}
 
         {/* Add Person Button */}
         <TouchableOpacity
@@ -127,19 +116,32 @@ export default function PeopleScreen() {
           onPress={handleAddPerson}
         >
           {/* Circle and stripe - same structure as person cards */}
-          <View className="flex-row items-center" style={styles.circleStripeContainer}>
+          <View
+            className="flex-row items-center"
+            style={styles.circleStripeContainer}
+          >
             <View
               className={`rounded-full shadow-md`}
               style={[
                 styles.personCircle,
-                { backgroundColor: THEME_COLORS_HEX[people.length % THEME_COLORS.length] }
+                {
+                  backgroundColor:
+                    THEME_COLORS_HEX[
+                      children ? children.length % THEME_COLORS.length : 0
+                    ],
+                },
               ]}
             />
             <View
               className={`flex-1 rounded-r-lg justify-center`}
               style={[
                 styles.personStripe,
-                { backgroundColor: THEME_COLORS_HEX[people.length % THEME_COLORS.length] }
+                {
+                  backgroundColor:
+                    THEME_COLORS_HEX[
+                      children ? children.length % THEME_COLORS.length : 0
+                    ],
+                },
               ]}
             >
               <Text
@@ -159,7 +161,11 @@ export default function PeopleScreen() {
             <Ionicons
               name="add"
               size={scale(65)}
-              color={THEME_COLORS_HEX[people.length % THEME_COLORS.length]}
+              color={
+                THEME_COLORS_HEX[
+                  children ? children.length % THEME_COLORS.length : 0
+                ]
+              }
             />
           </View>
         </TouchableOpacity>

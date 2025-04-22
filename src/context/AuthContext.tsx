@@ -1,22 +1,20 @@
-import {
-  fetchAuthSession,
-} from "aws-amplify/auth";
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store";
 import {
   confirmSignUpUser,
-  refreshSession,
+  checkAuthState,
   resendSignUpCode,
   selectAttributes,
   selectError,
   selectIsLoading,
-  selectSession,
+  selectIsAuthenticated,
   selectUser,
   signInUser,
   signOutUser,
   signUpUser,
 } from "../store/slices/authSlice";
-import { AuthError, SessionData, UserData } from "@/types/Auth";
+import { AuthError, UserData } from "@/types/Auth";
+import { router } from "expo-router";
 
 interface AuthContextType {
   signIn: (email: string, password: string) => Promise<boolean>;
@@ -30,9 +28,10 @@ interface AuthContextType {
   confirmSignUp: (email: string, code: string) => Promise<boolean>;
   resendCode: (username: string) => Promise<void>;
   signOut: () => Promise<void>;
-  session?: SessionData | null;
+  refreshSession: () => Promise<void>;
   user?: UserData | null;
   attributes?: UserData | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
   error?: AuthError | null;
 }
@@ -55,24 +54,29 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const attributes = useAppSelector(selectAttributes);
-  const session = useAppSelector(selectSession);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const isLoading = useAppSelector(selectIsLoading);
   const reduxError = useAppSelector(selectError);
 
   // Convert Redux error to AuthError if present
   const error = reduxError ? (reduxError as AuthError) : null;
 
-  // Refresh the session only when the component mounts (app starts)
+  // Check authentication state when the component mounts
   useEffect(() => {
-    if (session && user) {
-      dispatch(refreshSession());
-    }
-  }, [dispatch]); // Only depends on dispatch, which is stable
+    dispatch(checkAuthState());
+  }, [dispatch]);
 
   const value = {
     signIn: async (email: string, password: string) => {
       const resultAction = await dispatch(signInUser({ email, password }));
-      return !signInUser.rejected.match(resultAction);
+      const success = !signInUser.rejected.match(resultAction);
+      
+      if (success) {
+        // If sign-in was successful, navigate to authenticated routes
+        router.replace("/(auth)/(tabs)");
+      }
+      
+      return success;
     },
     signUp: async (
       email: string,
@@ -95,8 +99,13 @@ export function SessionProvider(props: React.PropsWithChildren) {
     },
     signOut: async () => {
       await dispatch(signOutUser());
+      // When signing out, navigate to public routes
+      router.replace("/(public)/pre-login");
     },
-    session,
+    refreshSession: async () => {
+      await dispatch(checkAuthState());
+    },
+    isAuthenticated,
     user,
     attributes,
     isLoading,

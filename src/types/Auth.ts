@@ -13,8 +13,7 @@ export interface UserAttributes {
   preferredName?: string;
   familyName?: string;
   phoneNumber?: string;
-  // TODO: change it to url and set to s3 bucket where avatar is stored
-  avatar: ImageSourcePropType;
+  profileImageUrl?: string;
 }
 
 export interface SessionData {

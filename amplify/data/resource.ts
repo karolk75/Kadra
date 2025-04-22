@@ -1,5 +1,9 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
+
+// BIG TODO: ADD SECONDARY INDEXES WHERE YOU LIST THINGS !!!!!!!!!!!!!!!!
+// For retriving lists by id 
+// And for sorting by createdAt
 const schema = a.schema({
   // Enums
   UserType: a.enum(['PARENT', 'FACILITY_ADMIN', 'TEACHER']),
@@ -7,7 +11,7 @@ const schema = a.schema({
   MessageStatus: a.enum(['SENT', 'DELIVERED', 'READ']),
   VerificationType: a.enum(['UNVERIFIED', 'PENDING', 'VERIFIED']),
   AttachmentType: a.enum(['FILE', 'IMAGE', 'AUDIO', 'VIDEO']),
-  NotificationType: a.enum(['MESSAGE', 'INFO', 'APPIONTMENT', 'SYSTEM']),
+  NotificationType: a.enum(['MESSAGE', 'INFO', 'APPOINTMENT', 'SYSTEM']),
   // 1. User
   User: a
     .model({

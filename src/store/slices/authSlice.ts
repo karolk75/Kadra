@@ -8,15 +8,14 @@ import {
   fetchAuthSession,
   fetchUserAttributes,
   getCurrentUser,
-  JWT
 } from 'aws-amplify/auth';
 import { RootState } from '..';
-import { UserAttributes, UserData, SessionData, AuthError } from '@/types/Auth';
+import { UserAttributes, UserData, AuthError } from '@/types/Auth';
 
 interface AuthState {
   user: UserData | null;
   attributes: UserAttributes | null;
-  session: SessionData | null;
+  isAuthenticated: boolean;
   error: AuthError | null;
   isLoading: boolean;
 }
@@ -24,9 +23,9 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   attributes: null,
-  session: null,
+  isAuthenticated: false,
   error: null,
-  isLoading: false,
+  isLoading: true, // Start with true to show loading on initial auth check
 };
 
 // Helper function to parse auth errors
@@ -52,12 +51,6 @@ export const signInUser = createAsyncThunk(
           username: userData.username,
         };
 
-        const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
-        const sessionObj = {
-          accessToken,
-          idToken,
-        };
-
         const userAttributes = await fetchUserAttributes();
         const attributesObj = {
           id: userData.userId,
@@ -66,12 +59,11 @@ export const signInUser = createAsyncThunk(
           preferredName: userAttributes.preferred_username,
           familyName: userAttributes.family_name,
           phoneNumber: userAttributes.phone_number,
-          avatar: require("assets/images/foto_boy.png"),
+          profileImageUrl: userAttributes.profile_image_url,
         };
 
         return {
           user: userObj,
-          session: sessionObj,
           attributes: attributesObj
         };
       }
@@ -154,27 +146,52 @@ export const signOutUser = createAsyncThunk(
   }
 );
 
-export const refreshSession = createAsyncThunk(
-  'auth/refreshSession',
+export const checkAuthState = createAsyncThunk(
+  'auth/checkAuthState',
   async (_, { rejectWithValue }) => {
     try {
-      const authSession = await fetchAuthSession({ forceRefresh: true });
+      // First check if we have a valid session - handle any potential errors
+      const session = await fetchAuthSession().catch(() => ({ tokens: null }));
       
-      return {
-        identityId: authSession.identityId,
-        userSub: authSession.userSub,
-        tokens: authSession.tokens ? {
-          // Extract only serializable parts from JWT objects
-          accessToken: authSession.tokens.accessToken ? {
-            payload: authSession.tokens.accessToken.payload
-          } : undefined,
-          idToken: authSession.tokens.idToken ? {
-            payload: authSession.tokens.idToken.payload
-          } : undefined
-        } : undefined
-      };
+      if (!session.tokens) {
+        // No valid tokens, return quickly
+        return { isAuthenticated: false };
+      }
+      
+      // Try to get user data - if this fails, the session is invalid
+      try {
+        // If we have tokens, fetch the user data
+        const userData = await getCurrentUser();
+        const userObj = {
+          id: userData.userId,
+          email: userData.signInDetails?.loginId,
+          username: userData.username,
+        };
+  
+        const userAttributes = await fetchUserAttributes();
+        const attributesObj = {
+          id: userData.userId,
+          email: userData.signInDetails?.loginId,
+          username: userData.username,
+          preferredName: userAttributes.preferred_username,
+          familyName: userAttributes.family_name,
+          phoneNumber: userAttributes.phone_number,
+          profileImageUrl: userAttributes.profile_image_url,
+        };
+  
+        return {
+          isAuthenticated: true,
+          user: userObj,
+          attributes: attributesObj
+        };
+      } catch (error) {
+        // If user data fetch fails, session is invalid
+        console.log("Failed to get user data:", error);
+        return { isAuthenticated: false };
+      }
     } catch (error) {
-      return rejectWithValue(parseAuthError(error));
+      console.log("Auth check error:", error);
+      return { isAuthenticated: false };
     }
   }
 );
@@ -192,35 +209,33 @@ const authSlice = createSlice({
     setAttributes: (state, action: PayloadAction<UserAttributes | null>) => {
       state.attributes = action.payload;
     },
-    setSession: (state, action: PayloadAction<{accessToken?: JWT; idToken?: JWT} | null>) => {
-      if (action.payload === null) {
-        state.session = null;
-        return;
-      }
-      
-      // Extract only serializable parts from JWT objects
-      state.session = {
-        accessToken: action.payload.accessToken ? {
-          payload: action.payload.accessToken.payload
-        } : undefined,
-        idToken: action.payload.idToken ? {
-          payload: action.payload.idToken.payload
-        } : undefined
-      };
-    },
     setError: (state, action: PayloadAction<AuthError | null>) => {
       state.error = action.payload;
     },
-    resetAuth: (state) => {
-      state.user = null;
-      state.session = null;
-      state.attributes = null;
-      state.error = null;
+    resetAuth: () => {
+      return { ...initialState, isLoading: false };
     },
   },
   extraReducers: (builder) => {
-    // Handle signIn
+    // Handle checkAuthState
     builder
+      .addCase(checkAuthState.pending, (state) => {
+        // if silent auth is true, don't show loading
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(checkAuthState.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = action.payload.isAuthenticated;
+        state.user = action.payload.user || null;
+        state.attributes = action.payload.attributes || null;
+      })
+      .addCase(checkAuthState.rejected, (state) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+      })
+      
+    // Handle signIn
       .addCase(signInUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -228,23 +243,13 @@ const authSlice = createSlice({
       .addCase(signInUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        
-        // Extract only serializable parts from JWT objects
-        const sessionPayload = action.payload.session;
-        state.session = {
-          accessToken: sessionPayload.accessToken ? {
-            payload: sessionPayload.accessToken.payload
-          } : undefined,
-          idToken: sessionPayload.idToken ? {
-            payload: sessionPayload.idToken.payload
-          } : undefined
-        };
-        
         state.attributes = action.payload.attributes;
+        state.isAuthenticated = true;
       })
       .addCase(signInUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as AuthError;
+        state.isAuthenticated = false;
       })
       
       // Handle signUp
@@ -291,27 +296,19 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(signOutUser.fulfilled, (state) => {
-        return initialState; // Reset entire state to initial values
+        state.isLoading = false;
+        state.error = null;
+        state.user = null;
+        state.attributes = null;
+        state.isAuthenticated = false;
       })
       .addCase(signOutUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as AuthError;
         // Still reset auth state even if signing out failed
         state.user = null;
-        state.session = null;
         state.attributes = null;
-      })
-      
-      // Handle refresh session
-      .addCase(refreshSession.fulfilled, (state, action) => {
-        if (action.payload.tokens) {
-          const { accessToken, idToken } = action.payload.tokens;
-          state.session = {
-            accessToken: accessToken || undefined,
-            idToken: idToken || undefined
-          };
-          state.error = null;
-        }
+        state.isAuthenticated = false;
       });
   }
 });
@@ -320,14 +317,13 @@ export const {
   setLoading, 
   setUser, 
   setAttributes, 
-  setSession, 
   setError,
   resetAuth
 } = authSlice.actions;
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectAttributes = (state: RootState) => state.auth.attributes;
-export const selectSession = (state: RootState) => state.auth.session;
+export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
 export const selectError = (state: RootState) => state.auth.error;
 export const selectIsLoading = (state: RootState) => state.auth.isLoading;
 

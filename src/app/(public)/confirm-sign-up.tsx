@@ -1,5 +1,5 @@
 import { router, useGlobalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { scale } from "react-native-size-matters";
 
@@ -12,7 +12,7 @@ import { BackButton } from "@/components/auth/BackButton";
 import { BottomLink } from "@/components/auth/BottomLink";
 import { ErrorMessage } from "@/components/auth/ErrorMessage";
 import { SeparatorText } from "@/components/auth/SeparatorText";
-import { useSession } from "@/context";
+import { useSession } from "@/context/AuthContext";
 import LoginBackground from "@/svg/background";
 
 export default function CustomConfirmSignUp() {
@@ -63,7 +63,7 @@ export default function CustomConfirmSignUp() {
           weryfikacji, wpisz go poniżej
         </SeparatorText>
 
-        {error ? <ErrorMessage message={error} /> : null}
+        <ErrorMessage message={error} />
 
         <AuthInput
           placeholder="6 - cyfrowy kod"

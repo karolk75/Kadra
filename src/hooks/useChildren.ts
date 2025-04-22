@@ -1,8 +1,9 @@
-import { useSession } from "@/context";
+import { useSession } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
 import { ChildrenService } from "@/services/ChildrenService";
-import { useAppDispatch } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store";
 import {
+  selectChildren,
   setChildren,
   setError,
   setLoading,
@@ -10,27 +11,27 @@ import {
 import { useCallback } from "react";
 
 export function useChildren() {
-  const { user } = useSession();
+  const { user, isAuthenticated } = useSession();
   const { client } = useData();
   const dispatch = useAppDispatch();
   const childrenService = new ChildrenService(client);
+  const children = useAppSelector(selectChildren);
 
   const fetchChildren = useCallback(async () => {
-    if (!user?.id) return [];
-
-    dispatch(setLoading(true));
-    dispatch(setError(null));
+    if (!user?.id || !isAuthenticated) return [];
 
     try {
-      const { data, errors } = await childrenService.getChildrenForParent(
-        user.id
-      );
-      if (errors) {
-        throw new Error(errors.map((error) => error.message).join(", "));
+      if (!children || children.length === 0) {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
       }
 
-      dispatch(setChildren(data));
+      const data = await childrenService.getChildrenForParent(
+        user.id
+      );
 
+      dispatch(setChildren(data));
+      dispatch(setError(null));
       return data;
     } catch (err) {
       const errorMessage =

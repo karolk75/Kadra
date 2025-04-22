@@ -7,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { SearchBar } from "@/components/main/SearchBar";
-import { useSession } from "@/context";
+import { useSession } from "@/context/AuthContext";
 import ScreenBackground from "@/svg/background";
 import { formatMessageTime } from "@/utils/utils";
 import { ConversationWithDetails, useConversations } from "@/hooks/useConversations";

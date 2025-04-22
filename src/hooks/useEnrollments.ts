@@ -1,4 +1,4 @@
-import { useSession } from "@/context";
+import { useSession } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
 import { EnrollmentService } from "@/services/EnrollmentService";
 import { useAppDispatch, useAppSelector } from "@/store";
@@ -11,7 +11,7 @@ import {
 import { useCallback } from "react";
 
 export function useEnrollments() {
-  const { user } = useSession();
+  const { user, isAuthenticated } = useSession();
   const { client } = useData();
   const dispatch = useAppDispatch();
   const enrollments = useAppSelector(selectEnrollments);
@@ -20,27 +20,23 @@ export function useEnrollments() {
   // Fetch enrollments for today
   const fetchEnrollmentsForToday = useCallback(
     async (childrenIds: string[]) => {
-      if (!user?.id) return [];
+      if (!user?.id || !isAuthenticated) return [];
 
       try {
         if (!enrollments || enrollments.length === 0) {
           dispatch(setLoading(true));
           dispatch(setError(null));
         }
-        
+
         if (!childrenIds || childrenIds.length === 0) {
           dispatch(setEnrollments([]));
           return [];
         }
 
-        const { data, errors } =
+        const data =
           await enrollmentService.getEnrollmentsWithDetailsForChildren(
             childrenIds
           );
-
-        if (errors) {
-          throw new Error(errors.map((error) => error.message).join(", "));
-        }
 
         const filteredEnrollments = data.filter((enrollment) => {
           return (
@@ -52,14 +48,15 @@ export function useEnrollments() {
         });
 
         dispatch(setEnrollments(filteredEnrollments));
+        dispatch(setError(null));
         return filteredEnrollments;
       } catch (err) {
         const error =
           err instanceof Error
             ? err
-            : new Error("Failed to fetch enrollments by day");
+            : new Error("Failed to fetch enrollments for today");
         dispatch(setError(error));
-        console.error("Error fetching enrollments by day:", err);
+        console.error("Error fetching enrollments for today:", err);
         return [];
       } finally {
         dispatch(setLoading(false));

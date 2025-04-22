@@ -37,11 +37,12 @@ export const logAuthState = (label?: string) => {
   logState({ slice: 'auth', label: label || 'AUTH STATE' });
 };
 
-/**
- * Log the current Redux profile state
- */
-export const logProfileState = (label?: string) => {
-  logState({ slice: 'profile', label: label || 'PROFILE STATE' });
+export const logChildrenState = (label?: string) => {
+  logState({ slice: 'children', label: label || 'CHILDREN STATE' });
+};
+
+export const logEnrollmentsState = (label?: string) => {
+  logState({ slice: 'enrollments', label: label || 'ENROLLMENTS STATE' });
 };
 
 /**

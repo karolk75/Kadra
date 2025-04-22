@@ -4,7 +4,7 @@
 // If user does not exist, redirect to sign-up
 
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 
@@ -104,7 +104,7 @@ export default function EmailCheckScreen() {
           lub zarejstruj się przez {"\n"} adres e-mail
         </SeparatorText>
 
-        {error ? <ErrorMessage message={error} /> : null}
+        <ErrorMessage message={error} />
 
         <AuthInput
           placeholder="Adres e-mail"

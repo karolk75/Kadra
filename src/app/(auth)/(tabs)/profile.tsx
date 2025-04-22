@@ -2,7 +2,7 @@ import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileMenuItem } from "@/components/profile/ProfileMenuItem";
-import { useSession } from "@/context";
+import { useSession } from "@/context/AuthContext";
 import ScreenBackground from "@/svg/background";
 import UserDataIcon from "@/svg/profile/data-icon";
 import HomeworkIcon from "@/svg/profile/homework-icon";
@@ -11,7 +11,7 @@ import SettingsIcon from "@/svg/profile/settings-icon";
 import { ScrollView, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { useMemo } from "react";
-import { UserAttributes } from "@/context";
+import { UserAttributes } from "@/context/AuthContext";
 import { selectAttributes } from "@/store/slices/authSlice";
 import { useSelector } from "react-redux";  
 

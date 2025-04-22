@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button } from 'react-native';
-import { logState, logAuthState, logProfileState, devLog } from '../../../utils/devTools';
-import { useAppSelector } from '../../../store';
+import { logState, logAuthState, devLog, logEnrollmentsState, logChildrenState } from '../../../utils/devTools';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { resetAuth } from '@/store/slices/authSlice';
+import { resetAll as resetChildren } from '@/store/slices/childrenSlice';
+import { resetAll as resetEnrollments } from '@/store/slices/enrollmentsSlice';
 
 /**
  * Developer tools screen that provides access to various debugging tools
  * You can use this during development to inspect app state
  */
 const DevToolsScreen: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [stateLoggerVisible, setStateLoggerVisible] = useState(false);
   const [watchChanges, setWatchChanges] = useState(false);
   
   // Subscribe to auth state to show in the UI
   const authState = useAppSelector(state => state.auth);
-  const profileState = useAppSelector(state => state.profile);
+  const childrenState = useAppSelector(state => state.children);
+  const enrollmentsState = useAppSelector(state => state.enrollments);
   
   useEffect(() => {
     // Log state when screen mounts
@@ -32,6 +37,14 @@ const DevToolsScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>State Logging</Text>
         <View style={styles.buttonRow}>
+          <Button
+            title="Clear All States"
+            onPress={() => {
+              dispatch(resetAuth());
+              dispatch(resetChildren());
+              dispatch(resetEnrollments());
+            }}
+          />
           <Button 
             title="Log All State" 
             onPress={() => logState({ label: 'Manual state log' })} 
@@ -41,8 +54,12 @@ const DevToolsScreen: React.FC = () => {
             onPress={() => logAuthState()} 
           />
           <Button 
-            title="Log Profile State" 
-            onPress={() => logProfileState()} 
+            title="Log Children State" 
+            onPress={() => logChildrenState()} 
+          />
+          <Button 
+            title="Log Enrollments State" 
+            onPress={() => logEnrollmentsState()} 
           />
         </View>
       </View>
@@ -73,10 +90,16 @@ const DevToolsScreen: React.FC = () => {
           <Text>Error: {authState.error ? authState.error.message : 'None'}</Text>
         </View>
         
-        {profileState && (
+        {childrenState && (
           <View style={styles.stateBox}>
-            <Text style={styles.stateLabel}>Profile State:</Text>
-            <Text>Available Properties: {Object.keys(profileState).join(', ')}</Text>
+            <Text style={styles.stateLabel}>Children State:</Text>
+            <Text>Available Properties: {Object.keys(childrenState).join(', ')}</Text>
+          </View>
+        )}
+        {enrollmentsState && (
+          <View style={styles.stateBox}>
+            <Text style={styles.stateLabel}>Enrollments State:</Text>
+            <Text>Available Properties: {Object.keys(enrollmentsState).join(', ')}</Text>
           </View>
         )}
       </View>

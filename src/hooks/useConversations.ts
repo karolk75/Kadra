@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSession } from '@/context';
+import { useSession } from '@/context/AuthContext';
 import { useData } from '@/context/DataContext';
 import { ConversationService } from '@/services/ConversationService';
 import { Schema } from 'amplify/data/resource';

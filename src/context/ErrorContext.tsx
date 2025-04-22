@@ -59,28 +59,30 @@ export const ErrorProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const dispatch = useAppDispatch();
 
   // Get errors from different Redux slices
-  const authError = useAppSelector(selectAuthError);
+  // const authError = useAppSelector(selectAuthError);
   const childrenError = useAppSelector(selectChildrenError);
   const enrollmentsError = useAppSelector(selectEnrollmentsError);
 
   // Watch for errors from Redux
   useEffect(() => {
     // Normalize all errors
-    const normalizedAuthError = normalizeError(authError, 'auth');
+    // const normalizedAuthError = normalizeError(authError, 'auth');
     const normalizedChildrenError = normalizeError(childrenError, 'children');
     const normalizedEnrollmentsError = normalizeError(enrollmentsError, 'enrollments');
     
     // Prioritize errors - you can change this order based on importance
-    if (normalizedAuthError) {
-      setError(normalizedAuthError);
-    } else if (normalizedChildrenError) {
+    // if (normalizedAuthError) {
+    //   setError(normalizedAuthError);
+    // } else
+    if (normalizedChildrenError) {
       setError(normalizedChildrenError);
     } else if (normalizedEnrollmentsError) {
       setError(normalizedEnrollmentsError);
     } else {
       setError(null);
     }
-  }, [authError, childrenError, enrollmentsError]);
+  // }, [authError, childrenError, enrollmentsError]);
+  }, [childrenError, enrollmentsError]);
 
   // Function to clear all errors
   const clearError = () => {
@@ -88,9 +90,9 @@ export const ErrorProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setError(null);
 
     // Clear errors from all Redux slices
-    if (authError) {
-      dispatch(setAuthError(null));
-    }
+    // if (authError) {
+    //   dispatch(setAuthError(null));
+    // }
     
     if (childrenError) {
       dispatch(setChildrenError(null));

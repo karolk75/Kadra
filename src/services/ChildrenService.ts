@@ -1,5 +1,5 @@
 import { useData } from "@/context/DataContext";
-import { Child } from "@/types/Child";
+import { Child, childSelectionSet } from "@/types/Child";
 import { generateClient } from "aws-amplify/api";
 import { Schema } from "amplify/data/resource";
 
@@ -15,9 +15,14 @@ export class ChildrenService {
    */
   public async getChildrenForParent(parentId: string) {
     try {
-      return await this.client.models.Child.list({
+      const { data: children, errors } = await this.client.models.Child.list({
         filter: { parentId: { eq: parentId } },
+        selectionSet: childSelectionSet,
       });
+      if (errors) {
+        throw new Error(errors.map((error) => error.message).join(", "));
+      }
+      return children;
     } catch (error) {
       console.error("Error getting children:", error);
       throw error;
@@ -29,7 +34,11 @@ export class ChildrenService {
    */
   public async createChild(child: Child) {
     try {
-      return await this.client.models.Child.create(child);
+      const { data: createdChild, errors } = await this.client.models.Child.create(child);
+      if (errors) {
+        throw new Error(errors.map((error) => error.message).join(", "));
+      }
+      return createdChild;
     } catch (error) {
       console.error("Error creating child:", error);
       throw error;

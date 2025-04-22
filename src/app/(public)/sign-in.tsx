@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
@@ -13,7 +13,7 @@ import { ErrorMessage } from "@/components/auth/ErrorMessage";
 import { SeparatorText } from "@/components/auth/SeparatorText";
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
-import { useSession } from "@/context";
+import { useSession } from "@/context/AuthContext";
 import LoginBackground from "@/svg/background";
 
 export default function CustomSignIn() {
@@ -26,10 +26,6 @@ export default function CustomSignIn() {
     router.push("/(public)/sign-up-email-check");
   };
 
-  const onSignInSuccess = () => {
-    router.replace("/(auth)/(tabs)");
-  };
-
   const handleSignIn = async () => {
     if (!validateEmail(username)) {
       setError("Nieprawidłowy adres e-mail.");
@@ -37,8 +33,10 @@ export default function CustomSignIn() {
     }
 
     try {
-      await signIn(username, password);
-      onSignInSuccess();
+      const result = await signIn(username, password);
+      if (!result) {
+        setError("Błędny adres e-mail lub hasło.");
+      }
     } catch (err: any) {
       setError(err?.message || "Błąd logowania");
     }
@@ -86,7 +84,7 @@ export default function CustomSignIn() {
           lub zaloguj się przez{"\n"}adres e-mail
         </SeparatorText>
 
-        {error ? <ErrorMessage message={error} /> : null}
+        <ErrorMessage message={error} />
 
         <AuthInput
           placeholder="Adres e-mail"

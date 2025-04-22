@@ -10,9 +10,6 @@ import MainIcon from "@/svg/tabs/main";
 import MessagesIcon from "@/svg/tabs/messages";
 import ProfileIcon from "@/svg/tabs/profile";
 
-export const unstable_settings = {
-  initialRouteName: "index",
-};
 
 const screenWidth = Dimensions.get("window").width;
 const tabWidth = screenWidth / 4;

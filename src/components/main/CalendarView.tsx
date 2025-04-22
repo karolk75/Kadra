@@ -3,20 +3,27 @@ import {
   StyleSheet,
   Text,
   View,
-  useWindowDimensions
+  useWindowDimensions,
 } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
 import { THEME_COLORS_HEX } from "@/constants/ThemeColors";
 import { useChildren } from "@/hooks/useChildren";
 import { useEnrollments } from "@/hooks/useEnrollments";
+import { useAppSelector } from "@/store";
+import {
+  selectChildren,
+  selectChildrenLoading,
+} from "@/store/slices/childrenSlice";
+import {
+  selectEnrollments,
+  selectEnrollmentsLoading,
+} from "@/store/slices/enrollmentsSlice";
 import { getCurrentDateInPolish } from "@/utils/utils";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { AppointmentCard } from "./AppointmentCard";
-import { useAppSelector } from "@/store";
-import { selectChildren, selectChildrenLoading, selectChildrenError } from "@/store/slices/childrenSlice";
-import { selectEnrollments, selectEnrollmentsLoading, selectEnrollmentsError } from "@/store/slices/enrollmentsSlice";
+
 type CalendarViewProps = {
   onEnrollmentPress: (enrollmentId: string) => void;
 };
@@ -26,12 +33,10 @@ export const CalendarView = ({
 }: CalendarViewProps) => {
   const children = useAppSelector(selectChildren);
   const childrenLoading = useAppSelector(selectChildrenLoading);
-  const childrenError = useAppSelector(selectChildrenError);
   const { fetchChildren } = useChildren();
 
   const enrollments = useAppSelector(selectEnrollments);
   const enrollmentsLoading = useAppSelector(selectEnrollmentsLoading);
-  const enrollmentsError = useAppSelector(selectEnrollmentsError);
   const { fetchEnrollmentsForToday } = useEnrollments();
 
   const { day, month } = getCurrentDateInPolish();
@@ -49,18 +54,17 @@ export const CalendarView = ({
           fetchEnrollmentsForToday(children.map((child) => child.id))
         );
       } else {
-        fetchEnrollmentsForToday(children.map((child) => child.id))
+        fetchEnrollmentsForToday(children.map((child) => child.id));
       }
     }, [fetchChildren, fetchEnrollmentsForToday, children])
   );
-  
 
   return (
     <View className="w-full bg-beige rounded-lg" style={styles.container}>
       <View className="flex-row justify-between items-start">
         <View
           className="justify-center items-center"
-          style={{ width: dateContainerWidth, marginLeft: scale(-5)}}
+          style={{ width: dateContainerWidth, marginLeft: scale(-5) }}
         >
           <Text
             className="font-bold text-white"
@@ -78,6 +82,7 @@ export const CalendarView = ({
           </Text>
         </View>
 
+        {/* Appointments Container */}
         <View className="flex-1" style={styles.appointmentsContainer}>
           {enrollmentsLoading || childrenLoading ? (
             <View className="flex-1 items-center justify-center">

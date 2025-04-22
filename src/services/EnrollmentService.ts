@@ -14,12 +14,16 @@ export class EnrollmentService {
    */
   public async getEnrollmentsWithDetailsForChildren(childrenIds: string[]) {
     try {
-      return await this.client.models.Enrollment.list({
+      const { data: enrollments, errors } = await this.client.models.Enrollment.list({
         filter: {
           or: childrenIds.map((id) => ({ childId: { eq: id } })),
         },
         selectionSet: enrollmentsWithDetailsSelectionSet,
       });
+      if (errors) {
+        throw new Error(errors.map((error) => error.message).join(", "));
+      }
+      return enrollments;
     } catch (error) {
       console.error(
         "Error getting enrollments with details for children:",

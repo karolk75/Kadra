@@ -1,5 +1,5 @@
 import { router, useGlobalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 
@@ -10,7 +10,7 @@ import { BackButton } from "@/components/auth/BackButton";
 import { ErrorMessage } from "@/components/auth/ErrorMessage";
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
-import { useSession } from "@/context";
+import { useSession } from "@/context/AuthContext";
 import LoginBackground from "@/svg/background";
 
 export default function CustomSignUp() {
@@ -54,7 +54,7 @@ export default function CustomSignUp() {
         <BackButton />
         <AuthTitle>Dołącz do nas!</AuthTitle>
 
-        {error ? <ErrorMessage message={error} /> : null}
+        <ErrorMessage message={error} />
 
         <AuthInput
           placeholder="Imię"

@@ -17,6 +17,7 @@ import authReducer from './slices/authSlice';
 import { performanceMiddleware } from './performance';
 import childrenReducer from './slices/childrenSlice';
 import enrollmentsReducer from './slices/enrollmentsSlice';
+import notificationsReducer from './slices/notificationsSlice';
 export interface StoreState {
   auth: ReturnType<typeof authReducer>;
   // Add other slice types as they are created
@@ -49,6 +50,7 @@ const rootReducer = combineReducers({
   auth: createPersistedReducer<ReturnType<typeof authReducer>>('auth', authReducer, true),
   children: createPersistedReducer<ReturnType<typeof childrenReducer>>('children', childrenReducer, false),
   enrollments: createPersistedReducer<ReturnType<typeof enrollmentsReducer>>('enrollments', enrollmentsReducer, false),
+  notifications: createPersistedReducer<ReturnType<typeof notificationsReducer>>('notifications', notificationsReducer, false),
 });
 
 // Define the store without immediate initialization
@@ -57,10 +59,11 @@ const configureAppStore = () => {
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) => {
       return getDefaultMiddleware({
-        serializableCheck: {
-          // Properly handle all redux-persist actions
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-        },
+        // serializableCheck: {
+        //   // Properly handle all redux-persist actions
+        //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        // },
+        serializableCheck: false,
         // Enable immutable state checks only in development
         // immutableCheck: __DEV__ ? { warnAfter: 128 } : false,
       })

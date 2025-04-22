@@ -7,10 +7,6 @@ import React, { useState } from "react";
 import { StatusBar, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-export const unstable_settings = {
-  initialRouteName: "/index",
-};
-
 
 export default function TeacherConversationScreen() {
   const params = useLocalSearchParams();

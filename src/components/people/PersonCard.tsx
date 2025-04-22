@@ -8,23 +8,15 @@ import {
   StyleSheet,
 } from "react-native";
 import { scale } from "react-native-size-matters";
-
+import { Child } from "@/types/Child";
 type PersonCardProps = {
-  id: string;
-  name: string;
-  surname: string;
-  relation: string;
-  avatarPath: ImageSourcePropType;
+  child: Child;
   backgroundColor: string;
   onPress: (id: string) => void;
 };
 
 export const PersonCard = ({
-  id,
-  name,
-  surname,
-  relation,
-  avatarPath,
+  child,
   backgroundColor,
   onPress,
 }: PersonCardProps) => {
@@ -32,7 +24,7 @@ export const PersonCard = ({
     <TouchableOpacity
       className={`relative`}
       style={styles.personContainer}
-      onPress={() => onPress(id)}
+      onPress={() => onPress(child.id)}
     >
       {/* Circle and stripe */}
       <View
@@ -52,13 +44,13 @@ export const PersonCard = ({
             className="font-poppins-bold text-white"
             style={styles.personName}
           >
-            {name.toUpperCase()}
+            {child.firstName.toUpperCase()}
           </Text>
           <Text
             className="font-poppins-bold text-white"
             style={styles.personSurname}
           >
-            {surname.toUpperCase()}
+            {child.lastName.toUpperCase()}
           </Text>
         </View>
       </View>
@@ -68,7 +60,9 @@ export const PersonCard = ({
         className="absolute rounded-full overflow-hidden justify-center items-center"
         style={styles.avatarContainer}
       >
-        <Image source={avatarPath} style={styles.avatarImage} />
+        {child.profileImageUrl && (
+          <Image source={{ uri: child.profileImageUrl }} style={styles.avatarImage} />
+        )}
       </View>
     </TouchableOpacity>
   );
