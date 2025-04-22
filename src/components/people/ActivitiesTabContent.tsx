@@ -1,24 +1,28 @@
-import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { scale, verticalScale } from 'react-native-size-matters';
-import moment from 'moment';
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { scale, verticalScale } from "react-native-size-matters";
+import moment from "moment";
 
-import { ThemeColors } from '@/constants/ThemeColors';
-import { EnrollmentWithDetails } from '@/types/Enrollment';
-import WeekDayPicker from './WeekDayPicker';
-import CompactChildCalendar from './CompactChildCalendar';
+import { ThemeColors } from "@/constants/ThemeColors";
+import { EnrollmentWithDetails } from "@/types/Enrollment";
+import WeekDayPicker from "./WeekDayPicker";
+import CompactChildCalendar from "./CompactChildCalendar";
 
 interface ActivitiesTabContentProps {
   childId?: string;
 }
 
 export const ActivitiesTabContent: React.FC<ActivitiesTabContentProps> = ({
-  childId
+  childId,
 }) => {
-  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(moment().day() === 0 ? 6 : moment().day() - 1);
-  const [selectedDate, setSelectedDate] = useState<string>(moment().format('YYYY-MM-DD'));
-  
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(
+    moment().day() === 0 ? 6 : moment().day() - 1,
+  );
+  const [selectedDate, setSelectedDate] = useState<string>(
+    moment().format("YYYY-MM-DD"),
+  );
+
   const handleDaySelected = (index: number, date: string) => {
     setSelectedDayIndex(index);
     setSelectedDate(date);
@@ -27,19 +31,19 @@ export const ActivitiesTabContent: React.FC<ActivitiesTabContentProps> = ({
   const handleAppointmentPress = (enrollment: EnrollmentWithDetails) => {
     Alert.alert(
       "Szczegóły zajęć",
-      `Miejsce: ${enrollment.schedule.class.facility.name}\nZajęcia: ${enrollment.schedule.class.name}\nCzas: ${moment(enrollment.schedule.startTime).utc(false).format('HH:mm')} - ${moment(enrollment.schedule.endTime).utc(false).format('HH:mm')}`,
-      [{ text: "OK" }]
+      `Miejsce: ${enrollment.schedule.class.facility.name}\nZajęcia: ${enrollment.schedule.class.name}\nCzas: ${moment(enrollment.schedule.startTime).utc(false).format("HH:mm")} - ${moment(enrollment.schedule.endTime).utc(false).format("HH:mm")}`,
+      [{ text: "OK" }],
     );
   };
 
   return (
     <View style={styles.container}>
       {/* Week Day Picker */}
-      <WeekDayPicker 
+      <WeekDayPicker
         selectedDayIndex={selectedDayIndex}
         onSelectDay={handleDaySelected}
       />
-      
+
       {/* Compact Child Calendar */}
       <View style={styles.calendarContainer}>
         {childId ? (
@@ -68,7 +72,7 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: scale(12),
     shadowColor: "#000",
     shadowOffset: {
@@ -78,7 +82,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   buttonText: {
     fontSize: scale(14),
@@ -89,4 +93,4 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColors.GOLD,
     paddingHorizontal: scale(12),
   },
-}); 
+});

@@ -61,7 +61,10 @@ export const PersonCard = ({
         style={styles.avatarContainer}
       >
         {child.profileImageUrl && (
-          <Image source={{ uri: child.profileImageUrl }} style={styles.avatarImage} />
+          <Image
+            source={{ uri: child.profileImageUrl }}
+            style={styles.avatarImage}
+          />
         )}
       </View>
     </TouchableOpacity>

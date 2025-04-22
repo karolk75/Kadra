@@ -56,7 +56,7 @@ export default function ProfileScreen() {
         onPress: signOut,
       },
     ],
-    [signOut]
+    [signOut],
   );
 
   return (
@@ -71,7 +71,10 @@ export default function ProfileScreen() {
           }}
           showsVerticalScrollIndicator={false}
         >
-          <ProfileHeader name={displayName} profileImage={attributes?.profileImageUrl} />
+          <ProfileHeader
+            name={displayName}
+            profileImage={attributes?.profileImageUrl}
+          />
 
           {menuItems.map((item) => (
             <ProfileMenuItem

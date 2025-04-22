@@ -45,10 +45,7 @@ export const AppointmentCard = ({
   };
 
   return (
-    <View
-      className={`rounded-lg shadow-sm`}
-      style={styles.cardContainer}
-    >
+    <View className={`rounded-lg shadow-sm`} style={styles.cardContainer}>
       <View
         className={`bg-white rounded-md`}
         style={{
@@ -78,12 +75,12 @@ export const AppointmentCard = ({
             {enrollment!.child!.profileImageUrl && (
               <Image
                 source={{ uri: enrollment!.child!.profileImageUrl }}
-              style={{
-                resizeMode: "cover",
-                top: scale(1),
-                left: scale(1),
-                width: avatarOnly ? scale(44) : scale(30),
-                height: avatarOnly ? scale(44) : scale(30),
+                style={{
+                  resizeMode: "cover",
+                  top: scale(1),
+                  left: scale(1),
+                  width: avatarOnly ? scale(44) : scale(30),
+                  height: avatarOnly ? scale(44) : scale(30),
                 }}
               />
             )}

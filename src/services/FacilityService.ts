@@ -1,5 +1,5 @@
-import { generateClient } from 'aws-amplify/data';
-import { Schema } from 'amplify/data/resource';
+import { generateClient } from "aws-amplify/data";
+import { Schema } from "amplify/data/resource";
 
 const client = generateClient<Schema>();
 
@@ -11,7 +11,7 @@ export class FacilityService {
     try {
       return await client.models.Facility.get({ id });
     } catch (error) {
-      console.error('Error getting facility:', error);
+      console.error("Error getting facility:", error);
       throw error;
     }
   }
@@ -19,10 +19,7 @@ export class FacilityService {
   /**
    * List all facilities
    */
-  static async listFacilities(options?: {
-    limit?: number;
-    city?: string;
-  }) {
+  static async listFacilities(options?: { limit?: number; city?: string }) {
     try {
       let filter = {};
       if (options?.city) {
@@ -34,7 +31,7 @@ export class FacilityService {
         limit: options?.limit,
       });
     } catch (error) {
-      console.error('Error listing facilities:', error);
+      console.error("Error listing facilities:", error);
       throw error;
     }
   }
@@ -57,10 +54,10 @@ export class FacilityService {
     try {
       return await client.models.Facility.create({
         ...facilityData,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
     } catch (error) {
-      console.error('Error creating facility:', error);
+      console.error("Error creating facility:", error);
       throw error;
     }
   }
@@ -68,25 +65,28 @@ export class FacilityService {
   /**
    * Update a facility
    */
-  static async updateFacility(id: string, facilityData: Partial<{
-    name: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    description: string;
-    phoneNumber: string;
-    email: string;
-    website: string;
-    logoUrl: string;
-  }>) {
+  static async updateFacility(
+    id: string,
+    facilityData: Partial<{
+      name: string;
+      address: string;
+      city: string;
+      postalCode: string;
+      description: string;
+      phoneNumber: string;
+      email: string;
+      website: string;
+      logoUrl: string;
+    }>,
+  ) {
     try {
       return await client.models.Facility.update({
         id,
         ...facilityData,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       });
     } catch (error) {
-      console.error('Error updating facility:', error);
+      console.error("Error updating facility:", error);
       throw error;
     }
   }
@@ -97,12 +97,12 @@ export class FacilityService {
   static async getFacilityClasses(facilityId: string) {
     try {
       const { data } = await client.models.Class.list({
-        filter: { facilityId: { eq: facilityId } }
+        filter: { facilityId: { eq: facilityId } },
       });
       return data;
     } catch (error) {
-      console.error('Error getting facility classes:', error);
+      console.error("Error getting facility classes:", error);
       throw error;
     }
   }
-} 
+}

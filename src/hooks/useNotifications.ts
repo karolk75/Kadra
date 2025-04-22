@@ -31,7 +31,9 @@ export function useNotifications() {
 
       // TODO: Sort by createdAt
       data.sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       });
 
       dispatch(setNotifications(data));
@@ -47,19 +49,23 @@ export function useNotifications() {
     }
   }, [user?.id]);
 
-  const updateNotificationsAsRead = useCallback(async (notificationsIds: string[]) => {
-    if (!user?.id || !isAuthenticated) return;
+  const updateNotificationsAsRead = useCallback(
+    async (notificationsIds: string[]) => {
+      if (!user?.id || !isAuthenticated) return;
 
-    try {
-      const updatedNotifications = await notificationService.updateNotificationsAsRead(notificationsIds);
-      dispatch(updateNotifications(updatedNotifications));
-      return updatedNotifications;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to update notification";
-      dispatch(setError(errorMessage));
-    }
-  }, [user?.id]);
+      try {
+        const updatedNotifications =
+          await notificationService.updateNotificationsAsRead(notificationsIds);
+        dispatch(updateNotifications(updatedNotifications));
+        return updatedNotifications;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to update notification";
+        dispatch(setError(errorMessage));
+      }
+    },
+    [user?.id],
+  );
 
   return { fetchNotifications, updateNotificationsAsRead };
 }

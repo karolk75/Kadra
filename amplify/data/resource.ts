@@ -1,17 +1,16 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-
 // BIG TODO: ADD SECONDARY INDEXES WHERE YOU LIST THINGS !!!!!!!!!!!!!!!!
-// For retriving lists by id 
+// For retriving lists by id
 // And for sorting by createdAt
 const schema = a.schema({
   // Enums
-  UserType: a.enum(['PARENT', 'FACILITY_ADMIN', 'TEACHER']),
-  EnrollmentStatus: a.enum(['PENDING', 'APPROVED', 'REJECTED', 'CANCELED']),
-  MessageStatus: a.enum(['SENT', 'DELIVERED', 'READ']),
-  VerificationType: a.enum(['UNVERIFIED', 'PENDING', 'VERIFIED']),
-  AttachmentType: a.enum(['FILE', 'IMAGE', 'AUDIO', 'VIDEO']),
-  NotificationType: a.enum(['MESSAGE', 'INFO', 'APPOINTMENT', 'SYSTEM']),
+  UserType: a.enum(["PARENT", "FACILITY_ADMIN", "TEACHER"]),
+  EnrollmentStatus: a.enum(["PENDING", "APPROVED", "REJECTED", "CANCELED"]),
+  MessageStatus: a.enum(["SENT", "DELIVERED", "READ"]),
+  VerificationType: a.enum(["UNVERIFIED", "PENDING", "VERIFIED"]),
+  AttachmentType: a.enum(["FILE", "IMAGE", "AUDIO", "VIDEO"]),
+  NotificationType: a.enum(["MESSAGE", "INFO", "APPOINTMENT", "SYSTEM"]),
   // 1. User
   User: a
     .model({
@@ -19,24 +18,24 @@ const schema = a.schema({
       firstName: a.string().required(),
       lastName: a.string().required(),
       phoneNumber: a.string(),
-      userType: a.ref('UserType').required(),
+      userType: a.ref("UserType").required(),
       profileImageUrl: a.string(),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       lastLoginAt: a.datetime(),
-      verificationStatus: a.ref('VerificationType').required(),
+      verificationStatus: a.ref("VerificationType").required(),
       // Relationships
-      children: a.hasMany('Child', 'parentId'),
-      adminFacility: a.hasOne('Facility', 'adminId'),
-      teacher: a.hasOne('Teacher', 'userId'),
-      sentMessages: a.hasMany('Message', 'senderId'),
-      conversations: a.hasMany('ConversationParticipant', 'userId'),
-      notifications: a.hasMany('Notification', 'userId'),
+      children: a.hasMany("Child", "parentId"),
+      adminFacility: a.hasOne("Facility", "adminId"),
+      teacher: a.hasOne("Teacher", "userId"),
+      sentMessages: a.hasMany("Message", "senderId"),
+      conversations: a.hasMany("ConversationParticipant", "userId"),
+      notifications: a.hasMany("Notification", "userId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.authenticated().to(['read']),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.authenticated().to(["read"]),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 
   // 2. Child
@@ -51,13 +50,13 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      parent: a.belongsTo('User', 'parentId'),
-      enrollments: a.hasMany('Enrollment', 'childId'),
+      parent: a.belongsTo("User", "parentId"),
+      enrollments: a.hasMany("Enrollment", "childId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
-      allow.authenticated().to(['read']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
+      allow.authenticated().to(["read"]),
     ]),
 
   // 3. Facility
@@ -76,14 +75,14 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      admin: a.belongsTo('User', 'adminId'),
-      teachers: a.hasMany('Teacher', 'facilityId'),
-      classes: a.hasMany('Class', 'facilityId'),
+      admin: a.belongsTo("User", "adminId"),
+      teachers: a.hasMany("Teacher", "facilityId"),
+      classes: a.hasMany("Class", "facilityId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.authenticated().to(['read']),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.authenticated().to(["read"]),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 
   // 4. Teacher
@@ -97,15 +96,15 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      user: a.belongsTo('User', 'userId'),
-      facility: a.belongsTo('Facility', 'facilityId'),
-      classes: a.hasMany('ClassTeacher', 'teacherId'),
-      schedules: a.hasMany('Schedule', 'teacherId'),
+      user: a.belongsTo("User", "userId"),
+      facility: a.belongsTo("Facility", "facilityId"),
+      classes: a.hasMany("ClassTeacher", "teacherId"),
+      schedules: a.hasMany("Schedule", "teacherId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.authenticated().to(['read']),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.authenticated().to(["read"]),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 
   // 5. ClassCategory
@@ -117,11 +116,11 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      classes: a.hasMany('Class', 'categoryId'),
+      classes: a.hasMany("Class", "categoryId"),
     })
     .authorization((allow) => [
-      allow.authenticated().to(['read']),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.authenticated().to(["read"]),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 
   // 6. Class
@@ -141,15 +140,15 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      facility: a.belongsTo('Facility', 'facilityId'),
-      category: a.belongsTo('ClassCategory', 'categoryId'),
-      teachers: a.hasMany('ClassTeacher', 'classId'),
-      schedules: a.hasMany('Schedule', 'classId'),
+      facility: a.belongsTo("Facility", "facilityId"),
+      category: a.belongsTo("ClassCategory", "categoryId"),
+      teachers: a.hasMany("ClassTeacher", "classId"),
+      schedules: a.hasMany("Schedule", "classId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.authenticated().to(['read']),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.authenticated().to(["read"]),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 
   // 7. ClassTeacher
@@ -160,13 +159,13 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      class: a.belongsTo('Class', 'classId'),
-      teacher: a.belongsTo('Teacher', 'teacherId'),
+      class: a.belongsTo("Class", "classId"),
+      teacher: a.belongsTo("Teacher", "teacherId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.authenticated().to(['read']),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.authenticated().to(["read"]),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 
   // 8. Schedule
@@ -182,15 +181,15 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      class: a.belongsTo('Class', 'classId'),
-      teacher: a.belongsTo('Teacher', 'teacherId'),
-      enrollments: a.hasMany('Enrollment', 'scheduleId'),
-      attendances: a.hasMany('Attendance', 'scheduleId'),
+      class: a.belongsTo("Class", "classId"),
+      teacher: a.belongsTo("Teacher", "teacherId"),
+      enrollments: a.hasMany("Enrollment", "scheduleId"),
+      attendances: a.hasMany("Attendance", "scheduleId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.authenticated().to(['read']),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.authenticated().to(["read"]),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 
   // 9. Enrollment
@@ -198,20 +197,20 @@ const schema = a.schema({
     .model({
       childId: a.string().required(),
       scheduleId: a.string().required(),
-      status: a.ref('EnrollmentStatus').required(),
+      status: a.ref("EnrollmentStatus").required(),
       enrollmentDate: a.datetime().required(),
       notes: a.string(),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      child: a.belongsTo('Child', 'childId'),
-      schedule: a.belongsTo('Schedule', 'scheduleId'),
-      attendances: a.hasMany('Attendance', 'enrollmentId'),
+      child: a.belongsTo("Child", "childId"),
+      schedule: a.belongsTo("Schedule", "scheduleId"),
+      attendances: a.hasMany("Attendance", "enrollmentId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
-      allow.authenticated().to(['read']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
+      allow.authenticated().to(["read"]),
     ]),
 
   // 10. Attendance
@@ -225,13 +224,13 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      enrollment: a.belongsTo('Enrollment', 'enrollmentId'),
-      schedule: a.belongsTo('Schedule', 'scheduleId'),
+      enrollment: a.belongsTo("Enrollment", "enrollmentId"),
+      schedule: a.belongsTo("Schedule", "scheduleId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
-      allow.authenticated().to(['read']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
+      allow.authenticated().to(["read"]),
     ]),
 
   // 11. Conversation
@@ -242,13 +241,13 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      participants: a.hasMany('ConversationParticipant', 'conversationId'),
-      messages: a.hasMany('Message', 'conversationId'),
+      participants: a.hasMany("ConversationParticipant", "conversationId"),
+      messages: a.hasMany("Message", "conversationId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
-      allow.authenticated().to(['read']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
+      allow.authenticated().to(["read"]),
     ]),
 
   // 12. ConversationParticipant
@@ -260,13 +259,13 @@ const schema = a.schema({
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      conversation: a.belongsTo('Conversation', 'conversationId'),
-      user: a.belongsTo('User', 'userId'),
+      conversation: a.belongsTo("Conversation", "conversationId"),
+      user: a.belongsTo("User", "userId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
-      allow.authenticated().to(['read', 'update']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
+      allow.authenticated().to(["read", "update"]),
     ]),
 
   // 13. Message
@@ -275,36 +274,36 @@ const schema = a.schema({
       conversationId: a.string().required(),
       senderId: a.string().required(),
       content: a.string().required(),
-      status: a.ref('MessageStatus').required(),
+      status: a.ref("MessageStatus").required(),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      conversation: a.belongsTo('Conversation', 'conversationId'),
-      sender: a.belongsTo('User', 'senderId'),
-      attachments: a.hasMany('MessageAttachment', 'messageId'),
+      conversation: a.belongsTo("Conversation", "conversationId"),
+      sender: a.belongsTo("User", "senderId"),
+      attachments: a.hasMany("MessageAttachment", "messageId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
-      allow.authenticated().to(['read']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
+      allow.authenticated().to(["read"]),
     ]),
 
   // 14. MessageAttachment
   MessageAttachment: a
     .model({
       messageId: a.string().required(),
-      type: a.ref('AttachmentType').required(),
+      type: a.ref("AttachmentType").required(),
       uri: a.string().required(),
       name: a.string().required(),
       size: a.integer(),
       createdAt: a.datetime().required(),
       // Relationships
-      message: a.belongsTo('Message', 'messageId'),
+      message: a.belongsTo("Message", "messageId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
-      allow.authenticated().to(['read']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
+      allow.authenticated().to(["read"]),
     ]),
 
   // 15. Notification
@@ -314,16 +313,16 @@ const schema = a.schema({
       title: a.string().required(),
       content: a.string().required(),
       isRead: a.boolean().required().default(false),
-      type: a.ref('NotificationType').required(),
+      type: a.ref("NotificationType").required(),
       relatedId: a.string(),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       // Relationships
-      user: a.belongsTo('User', 'userId'),
+      user: a.belongsTo("User", "userId"),
     })
     .authorization((allow) => [
       allow.owner(),
-      allow.groups(['Admin']).to(['create', 'read', 'update', 'delete']),
+      allow.groups(["Admin"]).to(["create", "read", "update", "delete"]),
     ]),
 });
 

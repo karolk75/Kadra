@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import {
   signIn as amplifySignIn,
   signUp as amplifySignUp,
@@ -8,9 +8,9 @@ import {
   fetchAuthSession,
   fetchUserAttributes,
   getCurrentUser,
-} from 'aws-amplify/auth';
-import { RootState } from '..';
-import { UserAttributes, UserData, AuthError } from '@/types/Auth';
+} from "aws-amplify/auth";
+import { RootState } from "..";
+import { UserAttributes, UserData, AuthError } from "@/types/Auth";
 
 interface AuthState {
   user: UserData | null;
@@ -32,17 +32,20 @@ const initialState: AuthState = {
 const parseAuthError = (error: unknown): AuthError => {
   if (error instanceof Error) return error as AuthError;
   return {
-    message: typeof error === "object" ? JSON.stringify(error) : String(error)
+    message: typeof error === "object" ? JSON.stringify(error) : String(error),
   };
 };
 
 // Create async thunks for authentication actions
 export const signInUser = createAsyncThunk(
-  'auth/signIn',
-  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
+  "auth/signIn",
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue },
+  ) => {
     try {
       const { isSignedIn } = await amplifySignIn({ username: email, password });
-      
+
       if (isSignedIn) {
         const userData = await getCurrentUser();
         const userObj = {
@@ -64,32 +67,35 @@ export const signInUser = createAsyncThunk(
 
         return {
           user: userObj,
-          attributes: attributesObj
+          attributes: attributesObj,
         };
       }
-      
+
       return rejectWithValue({ message: "Sign in failed" });
     } catch (error) {
       return rejectWithValue(parseAuthError(error));
     }
-  }
+  },
 );
 
 export const signUpUser = createAsyncThunk(
-  'auth/signUp',
-  async ({ 
-    email, 
-    password, 
-    firstName, 
-    lastName, 
-    phoneNumber 
-  }: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-  }, { rejectWithValue }) => {
+  "auth/signUp",
+  async (
+    {
+      email,
+      password,
+      firstName,
+      lastName,
+      phoneNumber,
+    }: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      phoneNumber: string;
+    },
+    { rejectWithValue },
+  ) => {
     try {
       await amplifySignUp({
         username: email,
@@ -107,23 +113,26 @@ export const signUpUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(parseAuthError(error));
     }
-  }
+  },
 );
 
 export const confirmSignUpUser = createAsyncThunk(
-  'auth/confirmSignUp',
-  async ({ email, code }: { email: string; code: string }, { rejectWithValue }) => {
+  "auth/confirmSignUp",
+  async (
+    { email, code }: { email: string; code: string },
+    { rejectWithValue },
+  ) => {
     try {
       await amplifyConfirmSignUp({ username: email, confirmationCode: code });
       return true;
     } catch (error) {
       return rejectWithValue(parseAuthError(error));
     }
-  }
+  },
 );
 
 export const resendSignUpCode = createAsyncThunk(
-  'auth/resendCode',
+  "auth/resendCode",
   async (username: string, { rejectWithValue }) => {
     try {
       await amplifyResendSignUpCode({ username });
@@ -131,11 +140,11 @@ export const resendSignUpCode = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(parseAuthError(error));
     }
-  }
+  },
 );
 
 export const signOutUser = createAsyncThunk(
-  'auth/signOut',
+  "auth/signOut",
   async (_, { rejectWithValue }) => {
     try {
       await amplifySignOut({ global: true });
@@ -143,21 +152,21 @@ export const signOutUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(parseAuthError(error));
     }
-  }
+  },
 );
 
 export const checkAuthState = createAsyncThunk(
-  'auth/checkAuthState',
+  "auth/checkAuthState",
   async (_, { rejectWithValue }) => {
     try {
       // First check if we have a valid session - handle any potential errors
       const session = await fetchAuthSession().catch(() => ({ tokens: null }));
-      
+
       if (!session.tokens) {
         // No valid tokens, return quickly
         return { isAuthenticated: false };
       }
-      
+
       // Try to get user data - if this fails, the session is invalid
       try {
         // If we have tokens, fetch the user data
@@ -167,7 +176,7 @@ export const checkAuthState = createAsyncThunk(
           email: userData.signInDetails?.loginId,
           username: userData.username,
         };
-  
+
         const userAttributes = await fetchUserAttributes();
         const attributesObj = {
           id: userData.userId,
@@ -178,11 +187,11 @@ export const checkAuthState = createAsyncThunk(
           phoneNumber: userAttributes.phone_number,
           profileImageUrl: userAttributes.picture,
         };
-  
+
         return {
           isAuthenticated: true,
           user: userObj,
-          attributes: attributesObj
+          attributes: attributesObj,
         };
       } catch (error) {
         // If user data fetch fails, session is invalid
@@ -193,11 +202,11 @@ export const checkAuthState = createAsyncThunk(
       console.log("Auth check error:", error);
       return { isAuthenticated: false };
     }
-  }
+  },
 );
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -234,8 +243,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = false;
       })
-      
-    // Handle signIn
+
+      // Handle signIn
       .addCase(signInUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -251,7 +260,7 @@ const authSlice = createSlice({
         state.error = action.payload as AuthError;
         state.isAuthenticated = false;
       })
-      
+
       // Handle signUp
       .addCase(signUpUser.pending, (state) => {
         state.isLoading = true;
@@ -264,7 +273,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as AuthError;
       })
-      
+
       // Handle confirmSignUp
       .addCase(confirmSignUpUser.pending, (state) => {
         state.isLoading = true;
@@ -277,7 +286,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as AuthError;
       })
-      
+
       // Handle resendCode
       .addCase(resendSignUpCode.pending, (state) => {
         state.isLoading = true;
@@ -290,7 +299,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as AuthError;
       })
-      
+
       // Handle signOut
       .addCase(signOutUser.pending, (state) => {
         state.isLoading = true;
@@ -310,20 +319,16 @@ const authSlice = createSlice({
         state.attributes = null;
         state.isAuthenticated = false;
       });
-  }
+  },
 });
 
-export const { 
-  setLoading, 
-  setUser, 
-  setAttributes, 
-  setError,
-  resetAuth
-} = authSlice.actions;
+export const { setLoading, setUser, setAttributes, setError, resetAuth } =
+  authSlice.actions;
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectAttributes = (state: RootState) => state.auth.attributes;
-export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
+export const selectIsAuthenticated = (state: RootState) =>
+  state.auth.isAuthenticated;
 export const selectError = (state: RootState) => state.auth.error;
 export const selectIsLoading = (state: RootState) => state.auth.isLoading;
 

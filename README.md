@@ -33,7 +33,9 @@ Kadra is built using modern technologies ensuring a robust, scalable, and user-f
 - **NativeWind (Tailwind CSS)**: For styling across all platforms
 - **AWS Amplify Gen 2**: For backend services, authentication, and data management
 - **Expo Router**: For navigation with deep-linking support
+- **Redux Toolkit**: For state management
 - **Reanimated**: For smooth animations and transitions
+- **Date-fns**: For date manipulation and formatting
 
 ## 📋 Architecture
 
@@ -48,19 +50,27 @@ kadra/
 ├── src/
 │   ├── app/             # Application routes (Expo Router)
 │   │   ├── (auth)/      # Authenticated routes
-│   │   │   └── (tabs)/  # Tab navigation screens
-│   │   └── (public)/    # Public (non-authenticated) routes
+│   │   │   ├── (tabs)/  # Tab navigation screens (Home, Calendar, Messages, Profile)
+│   │   │   ├── messages/# Message detail screens
+│   │   │   └── people/  # People-related screens
+│   │   └── (public)/    # Public routes (Login, Signup, etc.)
 │   ├── components/      # Reusable components
 │   │   ├── auth/        # Authentication components
 │   │   ├── main/        # Main app components
-│   │   └── messages/    # Messaging components
+│   │   ├── messages/    # Messaging components
+│   │   ├── calendar/    # Calendar-related components
+│   │   ├── people/      # People-related components
+│   │   └── profile/     # Profile components
 │   ├── context/         # React context providers
-│   ├── data/            # Data management
+│   ├── hooks/           # Custom React hooks
 │   ├── lib/             # Utility libraries
+│   ├── services/        # Service integrations
+│   ├── store/           # Redux store configuration
 │   ├── styles/          # Global styles
 │   ├── svg/             # SVG components
 │   ├── types/           # TypeScript type definitions
-│   └── utils/           # Utility functions
+│   ├── utils/           # Utility functions
+│   └── constants/       # Application constants
 ```
 
 ## 🚀 Getting Started
@@ -107,12 +117,12 @@ kadra/
 
 5. Run on specific platforms
    ```bash
-   # For iOS
+   # For iOS with development client
    npm run ios
-   # For Android
+   # For Android with development client
    npm run android
-   # For web
-   npm run web
+   # Using expo development client
+   npm run dev
    ```
 
 ## 🔧 Development Workflow
@@ -125,6 +135,14 @@ Kadra implements a comprehensive authentication system using AWS Amplify with:
 - Profile creation with required user attributes
 - Secure session management
 - Role-based access control
+
+### State Management
+
+The application uses Redux Toolkit for state management with:
+
+- Centralized state store
+- Redux Persist for offline data persistence
+- Expo FileSystem storage for persistence
 
 ### Data Management
 
@@ -142,14 +160,37 @@ Data is managed through AWS Amplify's data services with:
 - **Accessibility**: Following best practices for accessible mobile applications
 - **Performance**: Optimizing rendering and minimizing unnecessary re-renders
 
-## 🧪 Testing
+## 🧪 Testing and Development Tools
 
-Run tests using:
+The project includes several utility scripts for development:
 
 ```bash
+# Run tests
 npm test
-# or
-yarn test
+
+# Format code using Prettier
+npm run format
+
+# Check formatting
+npm run format:check
+
+# Lint code
+npm run lint
+
+# Populate test data
+npm run db:populate
+
+# Clear test data
+npm run db:clear
+
+# Reset database (clear and populate)
+npm run db:reset
+
+# Check dependencies
+npm run doctor
+
+# Fix dependencies
+npm run fix-dependencies
 ```
 
 ## 📱 Deployment

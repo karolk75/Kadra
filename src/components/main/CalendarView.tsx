@@ -51,12 +51,12 @@ export const CalendarView = ({
     useCallback(() => {
       if (!children || children.length === 0) {
         fetchChildren().then((children) =>
-          fetchEnrollmentsForToday(children.map((child) => child.id))
+          fetchEnrollmentsForToday(children.map((child) => child.id)),
         );
       } else {
         fetchEnrollmentsForToday(children.map((child) => child.id));
       }
-    }, [fetchChildren, fetchEnrollmentsForToday, children])
+    }, [fetchChildren, fetchEnrollmentsForToday, children]),
   );
 
   return (

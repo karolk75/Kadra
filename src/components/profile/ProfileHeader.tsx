@@ -7,10 +7,7 @@ type ProfileHeaderProps = {
   profileImage: string | undefined;
 };
 
-export const ProfileHeader = ({
-  name,
-  profileImage,
-}: ProfileHeaderProps) => {
+export const ProfileHeader = ({ name, profileImage }: ProfileHeaderProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
@@ -40,7 +37,11 @@ export const ProfileHeader = ({
             }}
           >
             <Image
-              source={profileImage ? { uri: profileImage } : require("assets/images/foto_boy.png")}
+              source={
+                profileImage
+                  ? { uri: profileImage }
+                  : require("assets/images/foto_boy.png")
+              }
               style={{ width: scale(85), height: scale(85) }}
             />
           </View>

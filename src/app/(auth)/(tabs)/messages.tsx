@@ -1,6 +1,12 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,21 +16,23 @@ import { SearchBar } from "@/components/main/SearchBar";
 import { useSession } from "@/context/AuthContext";
 import ScreenBackground from "@/svg/background";
 import { formatMessageTime } from "@/utils/utils";
-import { ConversationWithDetails, useConversations } from "@/hooks/useConversations";
-
+import {
+  ConversationWithDetails,
+  useConversations,
+} from "@/hooks/useConversations";
 
 export default function MessagesScreen() {
   const { user } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
-  const { 
-    conversations, 
-    loading, 
-    error, 
-    fetchConversations, 
-    markAsRead, 
-    createConversation 
+  const {
+    conversations,
+    loading,
+    error,
+    fetchConversations,
+    markAsRead,
+    createConversation,
   } = useConversations();
 
   // State for conversation modal
@@ -55,31 +63,39 @@ export default function MessagesScreen() {
     if (!searchQuery) return true;
 
     const query = searchQuery.toLowerCase();
-    
+
     // Search through participant names
-    return conv.participants?.some(p => 
-      p.user?.firstName?.toLowerCase().includes(query) || 
-      p.user?.lastName?.toLowerCase().includes(query)
-    ) || false;
+    return (
+      conv.participants?.some(
+        (p) =>
+          p.user?.firstName?.toLowerCase().includes(query) ||
+          p.user?.lastName?.toLowerCase().includes(query),
+      ) || false
+    );
   });
 
   const getConversationName = (conv: ConversationWithDetails) => {
     if (conv.title) return conv.title;
-    
-    const otherParticipants = conv.participants?.filter(p => p.userId !== user?.id) || [];
+
+    const otherParticipants =
+      conv.participants?.filter((p) => p.userId !== user?.id) || [];
     if (otherParticipants.length === 0) return "No participants";
-    
+
     return otherParticipants
-      .map(p => p.user?.firstName && p.user?.lastName ? `${p.user.firstName} ${p.user.lastName}` : "Unknown")
+      .map((p) =>
+        p.user?.firstName && p.user?.lastName
+          ? `${p.user.firstName} ${p.user.lastName}`
+          : "Unknown",
+      )
       .join(", ");
   };
 
   // Get subject for a teacher if available
   // const getTeacherSubject = (conv: ConversationWithDetails) => {
-  //   const teacherParticipant = conv.participants?.find(p => 
+  //   const teacherParticipant = conv.participants?.find(p =>
   //     p.user?.userType === 'TEACHER' && p.userId !== user?.id
   //   );
-    
+
   //   return teacherParticipant?.user?.teacher?.specialization || "";
   // };
 
@@ -110,14 +126,18 @@ export default function MessagesScreen() {
           {/* Loading state */}
           {loading && (
             <View className="py-10 items-center">
-              <Text className="font-poppins-regular text-gray-500">Ładowanie konwersacji...</Text>
+              <Text className="font-poppins-regular text-gray-500">
+                Ładowanie konwersacji...
+              </Text>
             </View>
           )}
 
           {/* Error state */}
           {error && (
             <View className="py-10 items-center">
-              <Text className="font-poppins-regular text-red-500">Wystąpił błąd podczas ładowania konwersacji</Text>
+              <Text className="font-poppins-regular text-red-500">
+                Wystąpił błąd podczas ładowania konwersacji
+              </Text>
             </View>
           )}
 
@@ -141,7 +161,8 @@ export default function MessagesScreen() {
               >
                 {/* Avatar */}
                 <View className="relative">
-                  <View className="bg-lightblue rounded-full overflow-hidden justify-center items-center"
+                  <View
+                    className="bg-lightblue rounded-full overflow-hidden justify-center items-center"
                     style={styles.avatarContainer}
                   >
                     {/* <Image

@@ -29,12 +29,14 @@ interface ConversationViewProps {
   // onBack: () => void;
 }
 
-export const ConversationView: React.FC<ConversationViewProps> = ({
-  // teacher,
-  // messages,
-  // onSendMessage,
-  // onBack,
-}) => {
+export const ConversationView: React.FC<ConversationViewProps> = (
+  {
+    // teacher,
+    // messages,
+    // onSendMessage,
+    // onBack,
+  },
+) => {
   const [message, setMessage] = useState("");
   // const [pendingAttachments, setPendingAttachments] = useState<Attachment[]>(
   //   [],

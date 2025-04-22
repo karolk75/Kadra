@@ -26,9 +26,7 @@ export function useChildren() {
         dispatch(setError(null));
       }
 
-      const data = await childrenService.getChildrenForParent(
-        user.id
-      );
+      const data = await childrenService.getChildrenForParent(user.id);
 
       dispatch(setChildren(data));
       dispatch(setError(null));

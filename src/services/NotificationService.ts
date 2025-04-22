@@ -15,10 +15,11 @@ export class NotificationService {
    */
   public async getNotificationsForUser(userId: string) {
     try {
-      const { data: notifications, errors } = await this.client.models.Notification.list({
-        filter: { userId: { eq: userId } },
-        selectionSet: notificationSelectionSet,
-      });
+      const { data: notifications, errors } =
+        await this.client.models.Notification.list({
+          filter: { userId: { eq: userId } },
+          selectionSet: notificationSelectionSet,
+        });
       if (errors) {
         throw new Error(errors.map((error) => error.message).join(", "));
       }
@@ -35,21 +36,22 @@ export class NotificationService {
   public async updateNotificationsAsRead(notificationsIds: string[]) {
     try {
       const updatePromises = notificationsIds.map(async (notificationId) => {
-        const {data: result, errors} = await this.client.models.Notification.update(
-          {
-            id: notificationId,
-            isRead: true,
-          },
-          // {
-          //   selectionSet: notificationSelectionSet,
-          // }
-        );
+        const { data: result, errors } =
+          await this.client.models.Notification.update(
+            {
+              id: notificationId,
+              isRead: true,
+            },
+            // {
+            //   selectionSet: notificationSelectionSet,
+            // }
+          );
         if (errors) {
           throw new Error(errors.map((error) => error.message).join(", "));
         }
         return result;
       });
-      
+
       return await Promise.all(updatePromises);
     } catch (error) {
       console.error("Error updating notifications:", error);

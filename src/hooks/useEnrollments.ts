@@ -38,7 +38,7 @@ export function useEnrollments() {
 
         const data =
           await enrollmentService.getEnrollmentsWithDetailsForChildren(
-            childrenIds
+            childrenIds,
           );
 
         const filteredEnrollments = data.filter((enrollment) => {
@@ -65,7 +65,7 @@ export function useEnrollments() {
         dispatch(setLoading(false));
       }
     },
-    [user?.id]
+    [user?.id],
   );
 
   // Fetch enrollments for a specific date
@@ -79,7 +79,7 @@ export function useEnrollments() {
 
         const data =
           await enrollmentService.getEnrollmentsWithDetailsForChildren(
-            childrenIds
+            childrenIds,
           );
 
         const filteredEnrollments = data.filter((enrollment) => {
@@ -106,7 +106,7 @@ export function useEnrollments() {
         dispatch(setLoading(false));
       }
     },
-    [user?.id]
+    [user?.id],
   );
 
   return {

@@ -65,13 +65,13 @@ export const ChildTimeCalendar: React.FC<ChildTimeCalendarProps> = ({
   // Generate array of hours to display
   const hours = Array.from(
     { length: endHour - startHour + 1 },
-    (_, i) => startHour + i
+    (_, i) => startHour + i,
   );
 
   // Check if two appointments overlap
   const doOverlap = (
     a: AppointmentWithTimes,
-    b: AppointmentWithTimes
+    b: AppointmentWithTimes,
   ): boolean => {
     return a.startTime < b.endTime && b.startTime < a.endTime;
   };
@@ -157,7 +157,7 @@ export const ChildTimeCalendar: React.FC<ChildTimeCalendarProps> = ({
         for (let i = 0; i < columns.length; i++) {
           const column = columns[i];
           const overlapsWithColumn = column.some((colApp) =>
-            doOverlap(colApp, app)
+            doOverlap(colApp, app),
           );
 
           if (!overlapsWithColumn) {
@@ -192,7 +192,7 @@ export const ChildTimeCalendar: React.FC<ChildTimeCalendarProps> = ({
   // Function to render appointments or an empty state message
   const renderContent = () => {
     const appointments = processAppointments();
-    
+
     if (appointments.length === 0) {
       return (
         <View className="items-center justify-center py-10">
@@ -202,7 +202,7 @@ export const ChildTimeCalendar: React.FC<ChildTimeCalendarProps> = ({
         </View>
       );
     }
-    
+
     return (
       <>
         {/* Hour grid lines */}
@@ -267,9 +267,7 @@ export const ChildTimeCalendar: React.FC<ChildTimeCalendarProps> = ({
             </View>
 
             {/* Appointments container */}
-            <View style={styles.appointmentsContainer}>
-              {renderContent()}
-            </View>
+            <View style={styles.appointmentsContainer}>{renderContent()}</View>
           </View>
         </ScrollView>
       )}
@@ -332,4 +330,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChildTimeCalendar; 
+export default ChildTimeCalendar;

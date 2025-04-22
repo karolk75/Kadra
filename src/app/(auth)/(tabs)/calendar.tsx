@@ -43,7 +43,7 @@ export default function CalendarScreen() {
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(
-    getMonthInPolish(moment().format("MMMM"))
+    getMonthInPolish(moment().format("MMMM")),
   );
   const [selectedYear, setSelectedYear] = useState(moment().format("YYYY"));
   const [todayButtonClicked, setTodayButtonClicked] = useState(false);
@@ -53,7 +53,7 @@ export default function CalendarScreen() {
 
   // Selected date in YYYY-MM-DD format for TimeCalendar
   const [selectedDate, setSelectedDate] = useState<string>(
-    moment().format("YYYY-MM-DD")
+    moment().format("YYYY-MM-DD"),
   );
 
   // Update days when month or year changes or today button is clicked
@@ -69,7 +69,7 @@ export default function CalendarScreen() {
   const generateDaysForMonth = (
     month: string,
     year: string,
-    selectToday = false
+    selectToday = false,
   ) => {
     // Convert Polish month name to month index (0-11)
     // This assumes the month provided is the Polish name of the month
@@ -190,7 +190,7 @@ export default function CalendarScreen() {
     Alert.alert(
       "Szczegóły zajęć",
       `Miejsce: ${enrollment.schedule.class.facility.name}\nZajęcia: ${enrollment.schedule.class.name}\nCzas: ${enrollment.schedule.startTime.split("T")[1]}:${enrollment.schedule.endTime.split("T")[1]}`,
-      [{ text: "OK" }]
+      [{ text: "OK" }],
     );
   };
 
@@ -250,7 +250,7 @@ export default function CalendarScreen() {
                   index: number,
                   isSelected: boolean,
                   relativePosition: number,
-                  animatedStyle: AnimatedStyle<any>
+                  animatedStyle: AnimatedStyle<any>,
                 ) => {
                   const dayItem = item as unknown as DayItem;
 
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     paddingVertical: verticalScale(4),
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   dayName: {
     fontSize: 12,

@@ -1,5 +1,11 @@
 import React, { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 
 type ProfileMenuItemProps = {
@@ -20,7 +26,6 @@ export const ProfileMenuItem = ({
       onPress={onPress}
       // style={({ pressed }) => [styles.container, pressed && styles.pressed]}
       style={styles.container}
-      
     >
       <View style={styles.iconContainer}>{icon}</View>
       <View style={styles.textContainer}>

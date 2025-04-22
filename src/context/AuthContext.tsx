@@ -23,7 +23,7 @@ interface AuthContextType {
     password: string,
     firstName: string,
     lastName: string,
-    phoneNumber: string
+    phoneNumber: string,
   ) => Promise<boolean>;
   confirmSignUp: (email: string, code: string) => Promise<boolean>;
   resendCode: (username: string) => Promise<void>;
@@ -70,12 +70,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
     signIn: async (email: string, password: string) => {
       const resultAction = await dispatch(signInUser({ email, password }));
       const success = !signInUser.rejected.match(resultAction);
-      
+
       if (success) {
         // If sign-in was successful, navigate to authenticated routes
         router.replace("/(auth)/(tabs)");
       }
-      
+
       return success;
     },
     signUp: async (
@@ -83,10 +83,10 @@ export function SessionProvider(props: React.PropsWithChildren) {
       password: string,
       firstName: string,
       lastName: string,
-      phoneNumber: string
+      phoneNumber: string,
     ) => {
       const resultAction = await dispatch(
-        signUpUser({ email, password, firstName, lastName, phoneNumber })
+        signUpUser({ email, password, firstName, lastName, phoneNumber }),
       );
       return !signUpUser.rejected.match(resultAction);
     },

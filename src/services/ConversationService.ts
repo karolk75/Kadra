@@ -71,7 +71,7 @@ export class ConversationService {
           conversationId,
           userId,
           createdAt: new Date().toISOString(),
-        })
+        }),
       );
 
       await Promise.all(participantPromises);
@@ -179,7 +179,7 @@ export class ConversationService {
       // Sort the messages by createdAt in descending order (newest first)
       const sortedData = [...result.data].sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
 
       return {
@@ -197,7 +197,7 @@ export class ConversationService {
    */
   static async updateMessageStatus(
     messageId: string,
-    status: "SENT" | "DELIVERED" | "READ"
+    status: "SENT" | "DELIVERED" | "READ",
   ) {
     try {
       return await client.models.Message.update({

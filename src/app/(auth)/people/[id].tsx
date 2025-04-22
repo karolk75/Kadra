@@ -23,7 +23,6 @@ import {
 } from "@/store/slices/childrenSlice";
 import ScreenBackground from "@/svg/background";
 import { Child } from "@/types/Child";
-import { format } from "date-fns";
 
 export default function PersonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -59,11 +58,11 @@ export default function PersonDetailScreen() {
         <View className="flex-1 items-center justify-center">
           <Text className="font-poppins-medium text-lg">
             Nie znaleziono osoby
-        </Text>
-        <TouchableOpacity
-          className="mt-4 px-4 py-2 rounded-lg bg-lightblue"
-          onPress={() => router.back()}
-        >
+          </Text>
+          <TouchableOpacity
+            className="mt-4 px-4 py-2 rounded-lg bg-lightblue"
+            onPress={() => router.back()}
+          >
             <Text className="font-poppins-medium text-white">Powrót</Text>
           </TouchableOpacity>
         </View>
@@ -149,9 +148,7 @@ export default function PersonDetailScreen() {
           {activeTab === "data" ? (
             <DataTabContent child={child} onEditPress={handleEditPress} />
           ) : (
-            <ActivitiesTabContent
-              childId={child.id}
-            />
+            <ActivitiesTabContent childId={child.id} />
           )}
         </ScrollView>
       </View>

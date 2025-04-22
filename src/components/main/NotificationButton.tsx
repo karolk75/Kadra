@@ -40,17 +40,16 @@ export default function NotificationButton() {
 
   // Update unread count whenever notifications change from Redux
   useEffect(() => {
-    const unreadNotifications = notifications?.filter(
-      (notification) => !notification.isRead
-    ) || [];
-    
+    const unreadNotifications =
+      notifications?.filter((notification) => !notification.isRead) || [];
+
     setUnreadCount(unreadNotifications.length);
   }, [notifications]);
 
   useFocusEffect(
     useCallback(() => {
       fetchNotifications();
-    }, [fetchNotifications])
+    }, [fetchNotifications]),
   );
 
   const bellAnimatedStyle = useAnimatedStyle(() => {
@@ -71,14 +70,14 @@ export default function NotificationButton() {
     bellScale.value = withSequence(
       withTiming(0.9, { duration: 60 }),
       withSpring(1.1, { damping: 12, stiffness: 180, mass: 0.6 }),
-      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 })
+      withSpring(1, { damping: 12, stiffness: 180, mass: 0.6 }),
     );
 
     // Add a very slight wobble effect
     bellRotate.value = withSequence(
       withTiming(2, { duration: 120 }),
       withTiming(-2, { duration: 140 }),
-      withTiming(0, { duration: 120 })
+      withTiming(0, { duration: 120 }),
     );
 
     // Open modal and mark notifications as read
@@ -87,9 +86,9 @@ export default function NotificationButton() {
     if (unreadCount > 0) {
       // Immediately set unread count to 0 as we're marking all as read
       setUnreadCount(0);
-      
+
       updateNotificationsAsRead(
-        notifications.map((notification) => notification.id)
+        notifications.map((notification) => notification.id),
       );
     }
   };

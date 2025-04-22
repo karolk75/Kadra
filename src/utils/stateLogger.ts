@@ -1,4 +1,4 @@
-import { store } from '../store';
+import { store } from "../store";
 
 /**
  * Logs the entire Redux state to the console
@@ -6,15 +6,15 @@ import { store } from '../store';
  */
 export const logReduxState = (prettyPrint = true) => {
   const state = store.getState();
-  
+
   if (prettyPrint) {
-    console.log('=== REDUX STATE ===');
+    console.log("=== REDUX STATE ===");
     console.log(JSON.stringify(state, null, 2));
-    console.log('==================');
+    console.log("==================");
   } else {
-    console.log('Redux State:', state);
+    console.log("Redux State:", state);
   }
-  
+
   return state;
 };
 
@@ -24,14 +24,16 @@ export const logReduxState = (prettyPrint = true) => {
  */
 export const logReduxSlice = (sliceName: string) => {
   const state = store.getState();
-  
+
   if (sliceName in state) {
     console.log(`=== REDUX SLICE: ${sliceName} ===`);
-    console.log(JSON.stringify(state[sliceName as keyof typeof state], null, 2));
-    console.log('=============================');
+    console.log(
+      JSON.stringify(state[sliceName as keyof typeof state], null, 2),
+    );
+    console.log("=============================");
   } else {
     console.log(`Slice "${sliceName}" not found in state.`);
-    console.log('Available slices:', Object.keys(state));
+    console.log("Available slices:", Object.keys(state));
   }
 };
 
@@ -41,17 +43,17 @@ export const logReduxSlice = (sliceName: string) => {
  */
 export const createReduxStateLogger = () => {
   let previousState = store.getState();
-  
+
   const unsubscribe = store.subscribe(() => {
     const currentState = store.getState();
-    
-    console.log('=== REDUX STATE CHANGED ===');
-    console.log('Previous:', JSON.stringify(previousState, null, 2));
-    console.log('Current:', JSON.stringify(currentState, null, 2));
-    console.log('=========================');
-    
+
+    console.log("=== REDUX STATE CHANGED ===");
+    console.log("Previous:", JSON.stringify(previousState, null, 2));
+    console.log("Current:", JSON.stringify(currentState, null, 2));
+    console.log("=========================");
+
     previousState = currentState;
   });
-  
+
   return unsubscribe;
-}; 
+};

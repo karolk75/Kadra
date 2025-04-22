@@ -41,11 +41,21 @@ const enrollmentsSlice = createSlice({
   },
 });
 
-export const { setEnrollments, setSelectedEnrollments, setError, setLoading, resetAll } = enrollmentsSlice.actions;
+export const {
+  setEnrollments,
+  setSelectedEnrollments,
+  setError,
+  setLoading,
+  resetAll,
+} = enrollmentsSlice.actions;
 
-export const selectTodayEnrollments = (state: RootState) => state.enrollments.todayEnrollments;
-export const selectSelectedEnrollments = (state: RootState) => state.enrollments.selectedEnrollments;
-export const selectEnrollmentsError = (state: RootState) => state.enrollments.error;
-export const selectEnrollmentsLoading = (state: RootState) => state.enrollments.isLoading;
+export const selectTodayEnrollments = (state: RootState) =>
+  state.enrollments.todayEnrollments;
+export const selectSelectedEnrollments = (state: RootState) =>
+  state.enrollments.selectedEnrollments;
+export const selectEnrollmentsError = (state: RootState) =>
+  state.enrollments.error;
+export const selectEnrollmentsLoading = (state: RootState) =>
+  state.enrollments.isLoading;
 
 export default enrollmentsSlice.reducer;

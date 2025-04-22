@@ -35,10 +35,12 @@ const childrenSlice = createSlice({
   },
 });
 
-export const { setChildren, setError, setLoading, resetAll } = childrenSlice.actions;
+export const { setChildren, setError, setLoading, resetAll } =
+  childrenSlice.actions;
 
 export const selectChildren = (state: RootState) => state.children.children;
-export const selectChildrenLoading = (state: RootState) => state.children.isLoading;
+export const selectChildrenLoading = (state: RootState) =>
+  state.children.isLoading;
 export const selectChildrenError = (state: RootState) => state.children.error;
 
 export default childrenSlice.reducer;

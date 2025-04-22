@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Schema } from 'amplify/data/resource';
-import { useData } from '@/context/DataContext';
+import { useState, useEffect } from "react";
+import { Schema } from "amplify/data/resource";
+import { useData } from "@/context/DataContext";
 
-type User = Schema['User']['type'];
+type User = Schema["User"]["type"];
 
 export function useUsers() {
   const { client } = useData();
@@ -17,8 +17,12 @@ export function useUsers() {
       const { data } = await client.models.User.list();
       setUsers(data);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('An error occurred fetching users'));
-      console.error('Error fetching users:', err);
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("An error occurred fetching users"),
+      );
+      console.error("Error fetching users:", err);
     } finally {
       setLoading(false);
     }
@@ -31,8 +35,12 @@ export function useUsers() {
       const user = await client.models.User.get({ id });
       return user;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('An error occurred fetching user'));
-      console.error('Error fetching user:', err);
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("An error occurred fetching user"),
+      );
+      console.error("Error fetching user:", err);
       return null;
     } finally {
       setLoading(false);
@@ -43,7 +51,7 @@ export function useUsers() {
     email: string;
     firstName: string;
     lastName: string;
-    userType: 'PARENT' | 'FACILITY_ADMIN' | 'TEACHER';
+    userType: "PARENT" | "FACILITY_ADMIN" | "TEACHER";
     phoneNumber?: string;
     profileImageUrl?: string;
   }) => {
@@ -52,15 +60,19 @@ export function useUsers() {
     try {
       const newUser = await client.models.User.create({
         ...userData,
-        verificationStatus: 'UNVERIFIED',
-        createdAt: new Date().toISOString()
+        verificationStatus: "UNVERIFIED",
+        createdAt: new Date().toISOString(),
       });
       // Refresh the users list
       fetchUsers();
       return newUser;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('An error occurred creating user'));
-      console.error('Error creating user:', err);
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("An error occurred creating user"),
+      );
+      console.error("Error creating user:", err);
       return null;
     } finally {
       setLoading(false);
@@ -74,14 +86,18 @@ export function useUsers() {
       const updatedUser = await client.models.User.update({
         id,
         ...userData,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       });
       // Refresh the users list
       fetchUsers();
       return updatedUser;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('An error occurred updating user'));
-      console.error('Error updating user:', err);
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("An error occurred updating user"),
+      );
+      console.error("Error updating user:", err);
       return null;
     } finally {
       setLoading(false);
@@ -99,6 +115,6 @@ export function useUsers() {
     fetchUsers,
     getUserById,
     createUser,
-    updateUser
+    updateUser,
   };
-} 
+}

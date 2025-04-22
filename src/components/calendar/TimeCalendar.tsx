@@ -68,24 +68,30 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
     useCallback(() => {
       if (!children || children.length === 0) {
         fetchChildren().then((children) =>
-          fetchEnrollmentsForDate(children.map((child) => child.id), selectedDate)
+          fetchEnrollmentsForDate(
+            children.map((child) => child.id),
+            selectedDate,
+          ),
         );
       } else {
-        fetchEnrollmentsForDate(children.map((child) => child.id), selectedDate);
+        fetchEnrollmentsForDate(
+          children.map((child) => child.id),
+          selectedDate,
+        );
       }
-    }, [fetchChildren, fetchEnrollmentsForDate, children, selectedDate])
+    }, [fetchChildren, fetchEnrollmentsForDate, children, selectedDate]),
   );
 
   // Generate array of hours to display
   const hours = Array.from(
     { length: endHour - startHour + 1 },
-    (_, i) => startHour + i
+    (_, i) => startHour + i,
   );
 
   // Check if two appointments overlap
   const doOverlap = (
     a: AppointmentWithTimes,
-    b: AppointmentWithTimes
+    b: AppointmentWithTimes,
   ): boolean => {
     return a.startTime < b.endTime && b.startTime < a.endTime;
   };
@@ -172,7 +178,7 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
         for (let i = 0; i < columns.length; i++) {
           const column = columns[i];
           const overlapsWithColumn = column.some((colApp) =>
-            doOverlap(colApp, app)
+            doOverlap(colApp, app),
           );
 
           if (!overlapsWithColumn) {

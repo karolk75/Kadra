@@ -28,7 +28,7 @@ const notificationsSlice = createSlice({
         ? state.notifications.map((notification) =>
             notification.id === action.payload.id
               ? action.payload
-              : notification
+              : notification,
           )
         : [];
     },

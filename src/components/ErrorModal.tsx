@@ -1,9 +1,9 @@
-import React from 'react';
-import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
-import { scale, verticalScale } from 'react-native-size-matters';
-import { Ionicons } from '@expo/vector-icons';
-import { ThemeColors } from '@/constants/ThemeColors';
-import { useError } from '@/context/ErrorContext';
+import React from "react";
+import { Modal, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { scale, verticalScale } from "react-native-size-matters";
+import { Ionicons } from "@expo/vector-icons";
+import { ThemeColors } from "@/constants/ThemeColors";
+import { useError } from "@/context/ErrorContext";
 
 interface ErrorModalProps {
   // Optional additional props if needed
@@ -11,19 +11,19 @@ interface ErrorModalProps {
 
 // Helper function to format error source for display
 const formatErrorSource = (source?: string): string => {
-  if (!source) return '';
-  
+  if (!source) return "";
+
   // Capitalize first letter and add a colon
-  return source.charAt(0).toUpperCase() + source.slice(1) + ': ';
+  return source.charAt(0).toUpperCase() + source.slice(1) + ": ";
 };
 
 const ErrorModal: React.FC<ErrorModalProps> = () => {
   // Use the error context hook
   const { error, clearError } = useError();
-  
+
   // Check if there's an error to display
   const hasError = error !== null;
-  
+
   // Handle closing the modal and clearing the error
   const handleClose = () => {
     clearError();
@@ -87,7 +87,7 @@ const ErrorModal: React.FC<ErrorModalProps> = () => {
               className="font-poppins-medium text-center mt-2"
             >
               {formatErrorSource(error?.source)}
-              {error?.message || 'Wystąpił nieznany błąd'}
+              {error?.message || "Wystąpił nieznany błąd"}
             </Text>
           </View>
 
@@ -97,7 +97,10 @@ const ErrorModal: React.FC<ErrorModalProps> = () => {
             style={styles.button}
             className="bg-[#0B3954] mx-4 mb-4 rounded-full items-center justify-center"
           >
-            <Text className="text-white font-poppins-medium" style={styles.buttonText}>
+            <Text
+              className="text-white font-poppins-medium"
+              style={styles.buttonText}
+            >
               Zamknij
             </Text>
           </TouchableOpacity>
@@ -137,7 +140,7 @@ const styles = StyleSheet.create({
   },
   errorCode: {
     fontSize: scale(14),
-    color: '#666',
+    color: "#666",
     marginBottom: verticalScale(4),
   },
   errorText: {
@@ -152,4 +155,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ErrorModal; 
+export default ErrorModal;

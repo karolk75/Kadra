@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { scale } from "react-native-size-matters";
 
@@ -16,7 +16,10 @@ import { PersonCard } from "@/components/people/PersonCard";
 import { THEME_COLORS, THEME_COLORS_HEX } from "@/constants/ThemeColors";
 import { useChildren } from "@/hooks/useChildren";
 import { useAppSelector } from "@/store";
-import { selectChildren, selectChildrenLoading } from "@/store/slices/childrenSlice";
+import {
+  selectChildren,
+  selectChildrenLoading,
+} from "@/store/slices/childrenSlice";
 import ScreenBackground from "@/svg/background";
 
 export default function PeopleScreen() {
@@ -27,7 +30,7 @@ export default function PeopleScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchChildren();
-    }, [fetchChildren])
+    }, [fetchChildren]),
   );
 
   const handlePersonClick = (id: string) => {

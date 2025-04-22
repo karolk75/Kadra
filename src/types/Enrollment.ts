@@ -1,7 +1,7 @@
 import { Schema } from "amplify/data/resource";
 import { SelectionSet } from "aws-amplify/api";
 
-export type Enrollment = Schema['Enrollment']['type'];
+export type Enrollment = Schema["Enrollment"]["type"];
 
 export const enrollmentsWithDetailsSelectionSet = [
   "id",

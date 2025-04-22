@@ -1,5 +1,5 @@
-import * as React from "react"
-import Svg, { G, Ellipse, Defs } from "react-native-svg"
+import * as React from "react";
+import Svg, { G, Ellipse, Defs } from "react-native-svg";
 /* SVGR has dropped some elements not supported by react-native-svg: filter */
 const SvgComponent = (props) => (
   <Svg
@@ -14,5 +14,5 @@ const SvgComponent = (props) => (
     </G>
     <Defs></Defs>
   </Svg>
-)
-export default SvgComponent
+);
+export default SvgComponent;

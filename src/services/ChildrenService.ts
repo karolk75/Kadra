@@ -34,7 +34,8 @@ export class ChildrenService {
    */
   public async createChild(child: Child) {
     try {
-      const { data: createdChild, errors } = await this.client.models.Child.create(child);
+      const { data: createdChild, errors } =
+        await this.client.models.Child.create(child);
       if (errors) {
         throw new Error(errors.map((error) => error.message).join(", "));
       }

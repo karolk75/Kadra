@@ -18,13 +18,17 @@ export const RecommendedItem = ({
   // TODO: Remove this once we have the real data
   // images will be stored in bucket
   // data will point to the bucket
-  const backgroundSource = item.backgroundImage || 
-    (item.id === "rec1" ? require("assets/images/school-background.png") : 
-    require("assets/images/ballet-background1.png"));
-  
-  const logoSource = item.logoImage || 
-    (item.id === "rec1" ? require("assets/images/school-logo.png") : 
-    require("assets/images/ballet-logo.png"));
+  const backgroundSource =
+    item.backgroundImage ||
+    (item.id === "rec1"
+      ? require("assets/images/school-background.png")
+      : require("assets/images/ballet-background1.png"));
+
+  const logoSource =
+    item.logoImage ||
+    (item.id === "rec1"
+      ? require("assets/images/school-logo.png")
+      : require("assets/images/ballet-logo.png"));
 
   return (
     <View className="flex-1 rounded-sm" style={styles.container}>
