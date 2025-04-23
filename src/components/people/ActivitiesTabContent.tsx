@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import moment from "moment";
 
 import { ThemeColors } from "@/constants/ThemeColors";
 import { EnrollmentWithDetails } from "@/types/Enrollment";
 import WeekDayPicker from "./WeekDayPicker";
 import CompactChildCalendar from "./CompactChildCalendar";
+import { formatDate, DATE_FORMATS, getDayOfWeek } from "@/utils/date-fns-utils";
 
 interface ActivitiesTabContentProps {
   childId?: string;
@@ -16,11 +16,15 @@ interface ActivitiesTabContentProps {
 export const ActivitiesTabContent: React.FC<ActivitiesTabContentProps> = ({
   childId,
 }) => {
-  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(
-    moment().day() === 0 ? 6 : moment().day() - 1,
-  );
+  // Get current day index (0-6, where Sunday is 0, but we want Monday as 0)
+  const today = new Date();
+  const currentDayOfWeek = getDayOfWeek(today);
+  // Transform to Monday=0, Sunday=6 format
+  const initialDayIndex = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(initialDayIndex);
   const [selectedDate, setSelectedDate] = useState<string>(
-    moment().format("YYYY-MM-DD"),
+    formatDate(today, DATE_FORMATS.ISO)
   );
 
   const handleDaySelected = (index: number, date: string) => {
@@ -29,9 +33,12 @@ export const ActivitiesTabContent: React.FC<ActivitiesTabContentProps> = ({
   };
 
   const handleAppointmentPress = (enrollment: EnrollmentWithDetails) => {
+    const startTime = formatDate(enrollment.schedule.startTime, DATE_FORMATS.TIME);
+    const endTime = formatDate(enrollment.schedule.endTime, DATE_FORMATS.TIME);
+    
     Alert.alert(
       "Szczegóły zajęć",
-      `Miejsce: ${enrollment.schedule.class.facility.name}\nZajęcia: ${enrollment.schedule.class.name}\nCzas: ${moment(enrollment.schedule.startTime).utc(false).format("HH:mm")} - ${moment(enrollment.schedule.endTime).utc(false).format("HH:mm")}`,
+      `Miejsce: ${enrollment.schedule.class.facility.name}\nZajęcia: ${enrollment.schedule.class.name}\nCzas: ${startTime} - ${endTime}`,
       [{ text: "OK" }],
     );
   };

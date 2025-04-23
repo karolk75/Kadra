@@ -1,3 +1,17 @@
+import { THEME_COLORS_HEX } from "@/constants/ThemeColors";
+import { useEnrollments } from "@/hooks/useEnrollments";
+import { useAppSelector } from "@/store";
+import {
+  selectEnrollmentsLoading,
+  selectSelectedEnrollments,
+} from "@/store/slices/enrollmentsSlice";
+import { EnrollmentWithDetails } from "@/types/Enrollment";
+import {
+  DATE_FORMATS,
+  diffInMinutes,
+  formatDate,
+  toLocalDate,
+} from "@/utils/date-fns-utils";
 import React, { useEffect } from "react";
 import {
   ActivityIndicator,
@@ -9,15 +23,6 @@ import {
   View,
 } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import moment from "moment";
-import { THEME_COLORS_HEX } from "@/constants/ThemeColors";
-import { useEnrollments } from "@/hooks/useEnrollments";
-import { useAppSelector } from "@/store";
-import {
-  selectEnrollmentsLoading,
-  selectSelectedEnrollments,
-} from "@/store/slices/enrollmentsSlice";
-import { EnrollmentWithDetails } from "@/types/Enrollment";
 
 interface CompactChildCalendarProps {
   selectedDate: string;
@@ -52,22 +57,24 @@ export const CompactChildCalendar: React.FC<CompactChildCalendarProps> = ({
   // Generate array of hours to display
   const hours = Array.from(
     { length: endHour - startHour + 1 },
-    (_, i) => startHour + i,
+    (_, i) => startHour + i
   );
 
   // Process appointments
   const processAppointments = () => {
     return selectedEnrollments.map((enrollment, index) => {
       // Parse appointment time
-      const startTime = moment(enrollment.schedule.startTime).utc(false);
-      const endTime = moment(enrollment.schedule.endTime).utc(false);
+      const startTime = toLocalDate(enrollment.schedule.startTime);
+      const endTime = toLocalDate(enrollment.schedule.endTime);
 
       // Calculate top position based on start time
-      const startHourDecimal = startTime.hour() + startTime.minutes() / 60;
+      const startHourDecimal =
+        startTime.getHours() + startTime.getMinutes() / 60;
       const top = (startHourDecimal - startHour) * HOUR_HEIGHT;
 
       // Calculate height based on duration
-      const durationHours = endTime.diff(startTime, "minutes") / 60;
+      const durationMinutes = diffInMinutes(endTime, startTime);
+      const durationHours = durationMinutes / 60;
       const height = Math.max(durationHours * HOUR_HEIGHT, verticalScale(35)); // Smaller minimum height
 
       // Select a color
@@ -104,31 +111,41 @@ export const CompactChildCalendar: React.FC<CompactChildCalendarProps> = ({
         ))}
 
         {/* Appointments */}
-        {appointments.map((item, index) => (
-          <TouchableOpacity
-            key={`appointment-${index}`}
-            style={[
-              styles.appointmentCard,
-              {
-                top: item.top,
-                height: item.height,
-                backgroundColor: item.color,
-              },
-            ]}
-            onPress={() => onAppointmentPress?.(item.enrollment)}
-          >
-            <Text style={styles.appointmentTitle} numberOfLines={1}>
-              {item.enrollment.schedule.class.name}
-            </Text>
-            <Text style={styles.appointmentTime} numberOfLines={1}>
-              {item.enrollment.schedule.startTime} -
-              {item.enrollment.schedule.endTime}
-            </Text>
-            <Text style={styles.appointmentLocation} numberOfLines={1}>
-              {item.enrollment.schedule.class.facility.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {appointments.map((item, index) => {
+          const startTime = formatDate(
+            item.enrollment.schedule.startTime,
+            DATE_FORMATS.TIME
+          );
+          const endTime = formatDate(
+            item.enrollment.schedule.endTime,
+            DATE_FORMATS.TIME
+          );
+
+          return (
+            <TouchableOpacity
+              key={`appointment-${index}`}
+              style={[
+                styles.appointmentCard,
+                {
+                  top: item.top,
+                  height: item.height,
+                  backgroundColor: item.color,
+                },
+              ]}
+              onPress={() => onAppointmentPress?.(item.enrollment)}
+            >
+              <Text style={styles.appointmentTitle} numberOfLines={1}>
+                {item.enrollment.schedule.class.name}
+              </Text>
+              <Text style={styles.appointmentTime} numberOfLines={1}>
+                {startTime} - {endTime}
+              </Text>
+              <Text style={styles.appointmentLocation} numberOfLines={1}>
+                {item.enrollment.schedule.class.facility.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </>
     );
   };

@@ -15,11 +15,11 @@ import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { SearchBar } from "@/components/main/SearchBar";
 import { useSession } from "@/context/AuthContext";
 import ScreenBackground from "@/svg/background";
-import { formatMessageTime } from "@/utils/utils";
 import {
   ConversationWithDetails,
   useConversations,
 } from "@/hooks/useConversations";
+import { formatMessageTime } from "@/utils/date-fns-utils";
 
 export default function MessagesScreen() {
   const { user } = useSession();

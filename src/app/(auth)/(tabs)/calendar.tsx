@@ -1,5 +1,4 @@
 import { Background } from "@/components/Background";
-import moment, { Moment } from "moment";
 import { useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
@@ -11,17 +10,24 @@ import HorizontalScrollPicker, {
 import TimeCalendar from "@/components/calendar/TimeCalendar";
 import TodayButton from "@/components/calendar/TodayButton";
 import { SafeAreaContainer } from "@/components/SafeAreaContainer";
-import { SHORT_DAYS } from "@/constants/Days";
-import {
-  getMonthInPolish,
-  getMonthItems,
-  getMonthNumber,
-} from "@/constants/Months";
 import { ScrollPickerColors } from "@/constants/ThemeColors";
-import { getYears } from "@/constants/Years";
+import { SHORT_DAYS } from "@/constants/Days";
 import ScreenBackground from "@/svg/background";
 import { EnrollmentWithDetails } from "@/types/Enrollment";
 import { Item } from "@/types/ScrollPicker";
+import {
+  createDate,
+  createSpecificDate,
+  DATE_FORMATS,
+  formatDate,
+  getDateOfMonth,
+  getDaysInMonthForDate,
+  getDisplayMonthName,
+  getMonthItems,
+  getMonthNumber,
+  getYears,
+  isToday,
+} from "@/utils/date-fns-utils";
 import OutsidePressHandler from "react-native-outside-press";
 import { scale, verticalScale } from "react-native-size-matters";
 
@@ -34,18 +40,21 @@ interface DayItem {
 }
 
 export default function CalendarScreen() {
-  const todaysDayIndex = moment().date() - 1;
+  const today = new Date();
+  const todaysDayIndex = getDateOfMonth(today) - 1;
   const monthItems = getMonthItems();
   const yearItems = getYears();
   const scrollPickerRef = useRef<HorizontalScrollPickerRef>(null);
 
-  const [selectedDay, setSelectedDay] = useState<Moment | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(
-    getMonthInPolish(moment().format("MMMM")),
+    getDisplayMonthName(today)
   );
-  const [selectedYear, setSelectedYear] = useState(moment().format("YYYY"));
+  const [selectedYear, setSelectedYear] = useState(
+    formatDate(today, DATE_FORMATS.YEAR)
+  );
   const [todayButtonClicked, setTodayButtonClicked] = useState(false);
 
   // Days of the selected month
@@ -53,7 +62,7 @@ export default function CalendarScreen() {
 
   // Selected date in YYYY-MM-DD format for TimeCalendar
   const [selectedDate, setSelectedDate] = useState<string>(
-    moment().format("YYYY-MM-DD"),
+    formatDate(today, DATE_FORMATS.ISO)
   );
 
   // Update days when month or year changes or today button is clicked
@@ -69,43 +78,42 @@ export default function CalendarScreen() {
   const generateDaysForMonth = (
     month: string,
     year: string,
-    selectToday = false,
+    selectToday = false
   ) => {
-    // Convert Polish month name to month index (0-11)
-    // This assumes the month provided is the Polish name of the month
+    // Convert Polish month name to month index (1-12)
     const monthNumber = getMonthNumber(month);
-    if (monthNumber === undefined) return;
+    if (monthNumber === undefined) {
+      console.error("Month not found:", month);
+      return;
+    }
 
-    // Month number from getMonthNumber is 1-based, but moment expects 0-based
-    const monthIndex = monthNumber - 1;
-
-    // Create a moment instance for the 1st day of the selected month
-    const firstDayOfMonth = moment()
-      .year(parseInt(year))
-      .month(monthIndex)
-      .date(1);
+    // Create a date for the 1st day of the selected month
+    // Note: Month is 0-based in JavaScript Date, so we subtract 1
+    const firstDayOfMonth = createSpecificDate(parseInt(year), monthNumber, 1);
 
     // Determine the number of days in the month
-    const daysCount = firstDayOfMonth.daysInMonth();
+    const daysCount = getDaysInMonthForDate(firstDayOfMonth);
 
     // Get today's date
-    const today = moment();
+    const currentMonth = today.getMonth() + 1; // 1-based
+    const currentYear = today.getFullYear();
     const isSameMonthYear =
-      today.month() === monthIndex && today.year() === parseInt(year);
+      currentMonth === monthNumber && currentYear === parseInt(year);
 
     // Generate an array of day items
     const days: DayItem[] = [];
     for (let day = 1; day <= daysCount; day++) {
-      const date = moment().year(parseInt(year)).month(monthIndex).date(day);
-      const dayOfWeek = date.day(); // 0-6 (Sunday-Saturday)
+      const date = createSpecificDate(parseInt(year), monthNumber, day);
+      const dayOfWeek = date.getDay(); // 0-6 (Sunday-Saturday)
+      const dateString = formatDate(date, DATE_FORMATS.ISO);
 
-      if (date.format("YYYY-MM-DD") === today.format("YYYY-MM-DD")) {
+      if (isToday(date)) {
         days.push({
           label: day.toString(),
           value: day,
           dayOfWeek: dayOfWeek,
           dayName: "Dziś",
-          fullDate: date.format("YYYY-MM-DD"),
+          fullDate: dateString,
         });
       } else {
         days.push({
@@ -113,7 +121,7 @@ export default function CalendarScreen() {
           value: day,
           dayOfWeek: dayOfWeek,
           dayName: SHORT_DAYS[dayOfWeek],
-          fullDate: date.format("YYYY-MM-DD"),
+          fullDate: dateString,
         });
       }
     }
@@ -122,9 +130,9 @@ export default function CalendarScreen() {
 
     // Set selected day to today if in the same month/year and selectToday is true
     if (isSameMonthYear) {
-      const todayIndex = today.date() - 1; // Convert from 1-based to 0-based index
+      const todayIndex = today.getDate() - 1; // Convert from 1-based to 0-based index
       handleMoveTo(todayIndex);
-      setSelectedDate(today.format("YYYY-MM-DD"));
+      setSelectedDate(formatDate(today, DATE_FORMATS.ISO));
     } else if (!selectToday) {
       handleMoveTo(0);
       if (days.length > 0) {
@@ -135,14 +143,14 @@ export default function CalendarScreen() {
 
   // TODAY BUTTON
   const selectTodayButton = () => {
-    const today = moment();
-    const todayMonth = getMonthInPolish(today.format("MMMM"));
-    const todayYear = today.format("YYYY");
+    const today = new Date();
+    const todayMonth = getDisplayMonthName(today);
+    const todayYear = formatDate(today, DATE_FORMATS.YEAR);
 
     setSelectedMonth(todayMonth);
     setSelectedYear(todayYear);
     setTodayButtonClicked(true);
-    setSelectedDate(today.format("YYYY-MM-DD"));
+    setSelectedDate(formatDate(today, DATE_FORMATS.ISO));
 
     setIsMonthPickerOpen(false);
     setIsYearPickerOpen(false);
@@ -174,7 +182,7 @@ export default function CalendarScreen() {
   const handleDaySelected = (day: number) => {
     const selectedDayItem = daysInMonth.find((d) => d.value === day);
     if (selectedDayItem) {
-      setSelectedDay(moment(selectedDayItem.fullDate));
+      setSelectedDay(createDate(selectedDayItem.fullDate));
       setSelectedDate(selectedDayItem.fullDate);
     } else {
       setSelectedDay(null);
@@ -190,7 +198,7 @@ export default function CalendarScreen() {
     Alert.alert(
       "Szczegóły zajęć",
       `Miejsce: ${enrollment.schedule.class.facility.name}\nZajęcia: ${enrollment.schedule.class.name}\nCzas: ${enrollment.schedule.startTime.split("T")[1]}:${enrollment.schedule.endTime.split("T")[1]}`,
-      [{ text: "OK" }],
+      [{ text: "OK" }]
     );
   };
 
@@ -250,7 +258,7 @@ export default function CalendarScreen() {
                   index: number,
                   isSelected: boolean,
                   relativePosition: number,
-                  animatedStyle: AnimatedStyle<any>,
+                  animatedStyle: AnimatedStyle<any>
                 ) => {
                   const dayItem = item as unknown as DayItem;
 
@@ -281,8 +289,6 @@ export default function CalendarScreen() {
           <View style={styles.timeCalendarContainer}>
             <TimeCalendar
               selectedDate={selectedDate}
-              // startHour={8}
-              // endHour={20}
               onAppointmentPress={handleAppointmentPress}
             />
           </View>

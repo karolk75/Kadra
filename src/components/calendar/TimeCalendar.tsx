@@ -12,9 +12,9 @@ import {
   selectSelectedEnrollments,
 } from "@/store/slices/enrollmentsSlice";
 import { EnrollmentWithDetails } from "@/types/Enrollment";
+import { diffInMinutes, toLocalDate } from "@/utils/date-fns-utils";
 import { useFocusEffect } from "@react-navigation/native";
-import moment from "moment";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -34,8 +34,8 @@ interface TimeCalendarProps {
 
 interface AppointmentWithTimes {
   enrollment: EnrollmentWithDetails;
-  startTime: moment.Moment;
-  endTime: moment.Moment;
+  startTime: Date;
+  endTime: Date;
   top: number;
   height: number;
   color: string;
@@ -70,28 +70,28 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
         fetchChildren().then((children) =>
           fetchEnrollmentsForDate(
             children.map((child) => child.id),
-            selectedDate,
-          ),
+            selectedDate
+          )
         );
       } else {
         fetchEnrollmentsForDate(
           children.map((child) => child.id),
-          selectedDate,
+          selectedDate
         );
       }
-    }, [fetchChildren, fetchEnrollmentsForDate, children, selectedDate]),
+    }, [fetchChildren, fetchEnrollmentsForDate, children, selectedDate])
   );
 
   // Generate array of hours to display
   const hours = Array.from(
     { length: endHour - startHour + 1 },
-    (_, i) => startHour + i,
+    (_, i) => startHour + i
   );
 
   // Check if two appointments overlap
   const doOverlap = (
     a: AppointmentWithTimes,
-    b: AppointmentWithTimes,
+    b: AppointmentWithTimes
   ): boolean => {
     return a.startTime < b.endTime && b.startTime < a.endTime;
   };
@@ -101,15 +101,17 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
     // First, process basic properties for each appointment
     const processed = selectedEnrollments.map((enrollment, index) => {
       // Parse appointment time (format: ISO datetime string)
-      const startTime = moment(enrollment.schedule.startTime).utc(false);
-      const endTime = moment(enrollment.schedule.endTime).utc(false);
+      const startTime = toLocalDate(enrollment.schedule.startTime);
+      const endTime = toLocalDate(enrollment.schedule.endTime);
 
       // Calculate top position based on start time
-      const startHourDecimal = startTime.hour() + startTime.minutes() / 60;
+      const startHourDecimal =
+        startTime.getHours() + startTime.getMinutes() / 60;
       const top = (startHourDecimal - startHour) * HOUR_HEIGHT;
 
       // Calculate height based on duration
-      const durationHours = endTime.diff(startTime, "minutes") / 60;
+      const durationMinutes = diffInMinutes(endTime, startTime);
+      const durationHours = durationMinutes / 60;
       const height = Math.max(durationHours * HOUR_HEIGHT, verticalScale(60)); // Ensure minimum height
 
       // Select a color for this appointment
@@ -127,10 +129,15 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
 
     // Sort appointments by start time (and then by duration if same start time)
     processed.sort((a, b) => {
-      if (a.startTime.isSame(b.startTime)) {
-        return a.endTime.diff(a.startTime) - b.endTime.diff(b.startTime);
+      // First compare start times
+      const startComparison = a.startTime.getTime() - b.startTime.getTime();
+      if (startComparison === 0) {
+        // If start times are the same, compare duration
+        const aDuration = a.endTime.getTime() - a.startTime.getTime();
+        const bDuration = b.endTime.getTime() - b.startTime.getTime();
+        return aDuration - bDuration;
       }
-      return a.startTime.diff(b.startTime);
+      return startComparison;
     });
 
     // Group overlapping appointments into collision groups
@@ -178,7 +185,7 @@ export const TimeCalendar: React.FC<TimeCalendarProps> = ({
         for (let i = 0; i < columns.length; i++) {
           const column = columns[i];
           const overlapsWithColumn = column.some((colApp) =>
-            doOverlap(colApp, app),
+            doOverlap(colApp, app)
           );
 
           if (!overlapsWithColumn) {

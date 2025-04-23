@@ -1,9 +1,14 @@
+import { SHORT_DAYS } from "@/constants/Days";
+import { ScrollPickerColors } from "@/constants/ThemeColors";
+import {
+  DATE_FORMATS,
+  formatDate,
+  getDateOfMonth,
+  isToday,
+} from "@/utils/date-fns-utils";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import moment from "moment";
-import { SHORT_DAYS } from "@/constants/Days";
-import { ScrollPickerColors } from "@/constants/ThemeColors";
 
 interface WeekDayPickerProps {
   selectedDayIndex: number;
@@ -16,22 +21,30 @@ export const WeekDayPicker: React.FC<WeekDayPickerProps> = ({
 }) => {
   // Generate the current week days
   const generateWeekDays = () => {
-    const today = moment();
-    const startOfWeek = today.clone().startOf("week").add(1, "days");
+    const today = new Date();
+    const currentDayOfWeek = today.getDay(); // 0-6 (Sunday-Saturday)
+
+    // Calculate the date for Monday of current week (first day)
+    const mondayDiff = currentDayOfWeek === 0 ? -6 : -(currentDayOfWeek - 1);
+    const currentMonday = new Date(today);
+    currentMonday.setDate(today.getDate() + mondayDiff);
 
     const days = [];
 
     for (let i = 0; i < 7; i++) {
-      const date = startOfWeek.clone().add(i, "days");
-      const dayOfWeek = date.day(); // 0-6 (Sunday-Saturday)
-      const isToday = date.format("YYYY-MM-DD") === today.format("YYYY-MM-DD");
+      const date = new Date(currentMonday);
+      date.setDate(currentMonday.getDate() + i);
+
+      const dayOfWeek = date.getDay(); // 0-6 (Sunday-Saturday)
+      const dateString = formatDate(date, DATE_FORMATS.ISO);
+      const isCurrentDay = isToday(date);
 
       days.push({
-        label: date.date().toString(), // Day number
+        label: getDateOfMonth(date).toString(), // Day number
         dayOfWeek: dayOfWeek,
-        dayName: isToday ? "Dziś" : SHORT_DAYS[dayOfWeek],
-        fullDate: date.format("YYYY-MM-DD"),
-        isToday,
+        dayName: isCurrentDay ? "Dziś" : SHORT_DAYS[dayOfWeek],
+        fullDate: dateString,
+        isToday: isCurrentDay,
       });
     }
 

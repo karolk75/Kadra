@@ -1,6 +1,11 @@
 import { THEME_COLORS_HEX } from "@/constants/ThemeColors";
-import { formatDay } from "@/utils/utils";
-import moment from "moment";
+import {
+  createDate,
+  DATE_FORMATS,
+  formatDate,
+  formatDay,
+  getDateOfMonth,
+} from "@/utils/date-fns-utils";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   Platform,
@@ -25,7 +30,7 @@ if (Platform.OS === "android") {
 }
 
 interface DateProps {
-  date: moment.Moment;
+  date: Date;
   onSelectDate: (date: string) => void;
   selected: string | null;
   colorIndex: number;
@@ -50,15 +55,14 @@ const DateComponent: React.FC<DateProps> = ({
   // Previous selected state to detect changes
   const prevSelectedRef = useRef<string | null>(null);
 
-  // Use moment to compare the date to today
-  // If today, show 'Today', otherwise show day of the week e.g 'Mon', 'Tue', 'Wed'
+  // Format day of week (e.g., 'Mon', 'Tue', 'Today')
   const day = formatDay(date);
 
   // Get the day number e.g 1, 2, 3, 4, 5, 6, 7
-  const dayNumber = moment(date).format("D");
+  const dayNumber = getDateOfMonth(date).toString();
 
   // Get the full date e.g 2021-01-01 - we'll use this to compare the date to the selected date
-  const fullDate = moment(date).format("YYYY-MM-DD");
+  const fullDate = formatDate(date, DATE_FORMATS.ISO);
 
   // Determine if this date is selected
   const isSelected = selected === fullDate;
@@ -82,11 +86,12 @@ const DateComponent: React.FC<DateProps> = ({
     // Check if we have a selected date in the current visible dates
     if (selected && visibleDatesCount > 0) {
       // Get the selected date's day of month (1-31)
-      const selectedDay = moment(selected).date();
+      const selectedDate = createDate(selected);
+      const selectedDay = getDateOfMonth(selectedDate);
 
       // Check if selected date is from the same month
-      const selectedMonth = moment(selected).month();
-      const currentMonth = date.month();
+      const selectedMonth = selectedDate.getMonth();
+      const currentMonth = date.getMonth();
 
       // Only apply varying heights if the selected date is in the current month view
       if (selectedMonth === currentMonth) {

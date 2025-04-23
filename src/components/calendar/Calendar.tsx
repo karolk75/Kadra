@@ -1,6 +1,15 @@
+import {
+  createSpecificDate,
+  DATE_FORMATS,
+  formatDate,
+  getCurrentYear,
+  getDaysInMonthForDate,
+  getDisplayMonthName,
+  getMonthNames,
+  getMonthNumber,
+} from "@/utils/date-fns-utils";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import moment from "moment";
 import {
   forwardRef,
   useEffect,
@@ -54,15 +63,16 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
       selected,
       numberOfDays = 30, // Default to 30 days
     },
-    ref,
+    ref
   ) => {
-    const [dates, setDates] = useState<moment.Moment[]>([]);
+    const [dates, setDates] = useState<Date[]>([]);
     const [scrollPosition, setScrollPosition] = useState(0);
+    const today = new Date();
     const [currentMonth, setCurrentMonth] = useState<string>(
-      moment().format("MMMM"),
+      getDisplayMonthName(today)
     );
     const [currentYear, setCurrentYear] = useState<string>(
-      moment().format("YYYY"),
+      formatDate(today, DATE_FORMATS.YEAR)
     );
     const [visibleMonths, setVisibleMonths] = useState<string[]>([]);
     const [visibleYears, setVisibleYears] = useState<string[]>([]);
@@ -84,11 +94,11 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
     // Initialize months and years
     useEffect(() => {
       // Generate months
-      const months = moment.months();
+      const months = getMonthNames();
       setVisibleMonths(months);
 
       // Generate years (5 years before and after current year)
-      const currentYearNum = parseInt(moment().format("YYYY"));
+      const currentYearNum = getCurrentYear();
       const years = [];
       for (let i = currentYearNum - 5; i <= currentYearNum + 5; i++) {
         years.push(i.toString());
@@ -149,7 +159,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
             if (finished) {
               runOnJS(safeSetShowMonthPicker)(false);
             }
-          },
+          }
         );
       }
     };
@@ -198,7 +208,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
             if (finished) {
               runOnJS(safeSetShowYearPicker)(false);
             }
-          },
+          }
         );
       }
     };
@@ -230,7 +240,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
           if (finished) {
             runOnJS(safeSetShowMonthPicker)(false);
           }
-        },
+        }
       );
     };
 
@@ -261,7 +271,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
           if (finished) {
             runOnJS(safeSetShowYearPicker)(false);
           }
-        },
+        }
       );
     };
 
@@ -269,19 +279,25 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
 
     // Get the dates for the selected month and year
     const getDatesForMonthYear = () => {
-      const _dates: moment.Moment[] = [];
-      const monthIndex = moment.months().indexOf(currentMonth);
+      const _dates: Date[] = [];
+      const monthNumber = getMonthNumber(currentMonth);
+
+      if (monthNumber === undefined) {
+        console.error("Month not found:", currentMonth);
+        return;
+      }
+
       const year = parseInt(currentYear);
 
-      // Get the first day of the month
-      const startDate = moment([year, monthIndex, 1]);
+      // Create a date for the first day of the month
+      const startDate = createSpecificDate(year, monthNumber, 1);
 
       // Get the number of days in the month
-      const daysInMonth = startDate.daysInMonth();
+      const daysInMonth = getDaysInMonthForDate(startDate);
 
       // Add all days of the month
       for (let i = 0; i < daysInMonth; i++) {
-        const date = moment([year, monthIndex, i + 1]);
+        const date = createSpecificDate(year, monthNumber, i + 1);
         _dates.push(date);
       }
 
@@ -301,33 +317,34 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
 
     // Function to scroll to today's date
     const scrollToToday = () => {
-      const today = moment();
+      const today = new Date();
 
       // Update current month and year to today's
-      setCurrentMonth(today.format("MMMM"));
-      setCurrentYear(today.format("YYYY"));
+      setCurrentMonth(getDisplayMonthName(today));
+      setCurrentYear(formatDate(today, DATE_FORMATS.YEAR));
       isManualSelection.current = true;
 
       // After dates are updated, find today's date and scroll to it
       setTimeout(() => {
         // Recalculate dates array manually to avoid waiting for state update
-        const monthIndex = moment.months().indexOf(today.format("MMMM"));
-        const year = parseInt(today.format("YYYY"));
+        const todayMonth = today.getMonth() + 1; // 1-based month
+        const year = today.getFullYear();
 
         // Create a temporary array of dates for the current month
-        const tempDates: moment.Moment[] = [];
-        const startDate = moment([year, monthIndex, 1]);
-        const daysInMonth = startDate.daysInMonth();
+        const tempDates: Date[] = [];
+        const daysInMonth = getDaysInMonthForDate(
+          createSpecificDate(year, todayMonth, 1)
+        );
 
         for (let i = 0; i < daysInMonth; i++) {
-          const date = moment([year, monthIndex, i + 1]);
+          const date = createSpecificDate(year, todayMonth, i + 1);
           tempDates.push(date);
         }
 
         // Find today's index in this array
-        const todayStr = today.format("YYYY-MM-DD");
+        const todayStr = formatDate(today, DATE_FORMATS.ISO);
         const todayIndex = tempDates.findIndex(
-          (date) => date.format("YYYY-MM-DD") === todayStr,
+          (date) => formatDate(date, DATE_FORMATS.ISO) === todayStr
         );
 
         if (todayIndex >= 0 && scrollViewRef.current) {
@@ -338,7 +355,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
           const screenWidth = Dimensions.get("window").width;
           const centerOffset = Math.max(
             0,
-            dateCardWidth * todayIndex - screenWidth / 2 + dateCardWidth / 2,
+            dateCardWidth * todayIndex - screenWidth / 2 + dateCardWidth / 2
           );
 
           scrollViewRef.current.scrollTo({
@@ -351,8 +368,8 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
 
     // Function to select today's date
     const selectToday = () => {
-      const today = moment();
-      const todayStr = today.format("YYYY-MM-DD");
+      const today = new Date();
+      const todayStr = formatDate(today, DATE_FORMATS.ISO);
 
       // Call the selection handler to update the parent component's state
       if (onSelectDate) {
@@ -373,31 +390,6 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
       getDatesForMonthYear();
     }, [currentMonth, currentYear]);
 
-    // TODO: Scroll to center when selected date changes
-    // useEffect(() => {
-    //   if (selected && dates.length > 0) {
-    //     // Find the index of the selected date
-    //     const selectedIndex = dates.findIndex(
-    //       (date) => date.format("YYYY-MM-DD") === selected
-    //     );
-
-    //     if (selectedIndex >= 0 && scrollViewRef.current) {
-    //       // Calculate the exact width of a date card including margins
-    //       const dateCardWidth = scale(57); // width + margins
-    //       const offset = scale(170);
-
-    //       // Get the content offset
-    //       const screenWidth = Dimensions.get('window').width;
-    //       const centerOffset = dateCardWidth * selectedIndex - offset;
-    //       // Use a single smooth scroll with appropriate config
-    //       scrollViewRef.current.scrollTo({
-    //         x: centerOffset,
-    //         animated: true,
-    //       });
-    //     }
-    //   }
-    // }, [selected, dates]);
-
     // Update month/year based on scroll position
     const updateMonthYearFromScroll = () => {
       if (dates.length === 0) return;
@@ -407,8 +399,8 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
       const dateIndex = Math.floor(scrollPosition / dateCardWidth);
 
       if (dateIndex >= 0 && dateIndex < dates.length) {
-        const newMonth = dates[dateIndex].format("MMMM");
-        const newYear = dates[dateIndex].format("YYYY");
+        const newMonth = getDisplayMonthName(dates[dateIndex]);
+        const newYear = formatDate(dates[dateIndex], DATE_FORMATS.YEAR);
 
         // Only update if changed and not during manual selection
         if (
@@ -560,7 +552,7 @@ const Calendar = forwardRef<CalendarHandles, CalendarProps>(
         </View>
       </View>
     );
-  },
+  }
 );
 
 export default Calendar;

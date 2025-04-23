@@ -1,6 +1,5 @@
-import moment from "moment";
 
-const currentYear = parseInt(moment().format("YYYY"));
+const currentYear = new Date().getFullYear();
 
 export const getYears = (range: number = 5) => {
   const years = [];

@@ -19,7 +19,7 @@ import {
   selectEnrollmentsLoading,
   selectTodayEnrollments,
 } from "@/store/slices/enrollmentsSlice";
-import { getCurrentDateInPolish } from "@/utils/utils";
+import { getCurrentDateInPolish } from "@/utils/date-fns-utils";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { AppointmentCard } from "./AppointmentCard";

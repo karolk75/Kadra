@@ -1,13 +1,4 @@
-import { documentDirectory, EncodingType } from "expo-file-system";
-import { createExpoFileSystemStorage } from "redux-persist-expo-file-system-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Create storage based on platform
-const ExpoFileSystemStorage = createExpoFileSystemStorage({
-  // Optimize path for faster access
-  storagePath: `${documentDirectory}redux-persist/`,
-  encoding: EncodingType.UTF8,
-  // Debug only in development
-  debug: false,
-});
-
-export default ExpoFileSystemStorage;
+// Export AsyncStorage directly as a replacement for the file system storage
+export default AsyncStorage;
