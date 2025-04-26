@@ -18,6 +18,8 @@ import { performanceMiddleware } from "./performance";
 import childrenReducer from "./slices/childrenSlice";
 import enrollmentsReducer from "./slices/enrollmentsSlice";
 import notificationsReducer from "./slices/notificationsSlice";
+import conversationsReducer from "./slices/conversationsSlice";
+import messagesReducer from "./slices/messagesSlice";
 export interface StoreState {
   auth: ReturnType<typeof authReducer>;
   // Add other slice types as they are created
@@ -65,6 +67,14 @@ const rootReducer = combineReducers({
   notifications: createPersistedReducer<
     ReturnType<typeof notificationsReducer>
   >("notifications", notificationsReducer, false),
+  conversations: createPersistedReducer<
+    ReturnType<typeof conversationsReducer>
+  >("conversations", conversationsReducer, false),
+  messages: createPersistedReducer<ReturnType<typeof messagesReducer>>(
+    "messages",
+    messagesReducer,
+    false,
+  ),
 });
 
 // Define the store without immediate initialization
@@ -94,7 +104,7 @@ export const store = configureAppStore();
 
 export const persistor = persistStore(store, {}, () => {
   // Log when persistence is complete, useful for debugging
-  console.log("Redux persistence rehydration complete");
+  // console.log("Redux persistence rehydration complete");
 });
 
 // Define the persisted root state type

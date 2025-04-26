@@ -1,55 +1,66 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  StyleSheet,
 } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
-import { Ionicons } from "@expo/vector-icons";
 
 import { Background } from "@/components/Background";
 import { KeyboardAwareContainer } from "@/components/KeyboardAwareContainer";
 import { SearchBar } from "@/components/main/SearchBar";
-import { useSession } from "@/context/AuthContext";
-import ScreenBackground from "@/svg/background";
+import { ThemeColors } from "@/constants/ThemeColors";
+import { useConversations } from "@/hooks/useConversations";
+import { useAppSelector } from "@/store";
+import { selectAttributes } from "@/store/slices/authSlice";
 import {
-  ConversationWithDetails,
-  useConversations,
-} from "@/hooks/useConversations";
+  selectConversations,
+  selectConversationsError,
+  selectConversationsLoading,
+} from "@/store/slices/conversationsSlice";
+import ScreenBackground from "@/svg/background";
+import { ConversationWithDetails } from "@/types/Conversation";
 import { formatMessageTime } from "@/utils/date-fns-utils";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import { useSelector } from "react-redux";
 
 export default function MessagesScreen() {
-  const { user } = useSession();
+  const attributes = useSelector(selectAttributes);
+
+  const conversations = useAppSelector(selectConversations);
+  const loading = useAppSelector(selectConversationsLoading);
+  const error = useAppSelector(selectConversationsError);
+  const { fetchConversations, markConversationAsRead } = useConversations();
+
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-
-  const {
-    conversations,
-    loading,
-    error,
-    fetchConversations,
-    markAsRead,
-    createConversation,
-  } = useConversations();
-
-  // State for conversation modal
   const [modalVisible, setModalVisible] = useState(false);
 
   // Get unique schools from teachers
   // const schools = [...new Set(MOCK_TEACHERS.map((teacher) => teacher.school))];
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchConversations();
+    }, [fetchConversations])
+  );
+
   // Handle opening a chat with a teacher
-  const handleOpenChat = (conversationId: string) => {
+  const handleOpenChat = (conversation: ConversationWithDetails) => {
     // Mark conversation as read
-    markAsRead(conversationId);
+    markConversationAsRead(conversation);
 
     // Navigate to the conversation screen
     router.push({
       pathname: "/(auth)/messages/conversation",
-      params: { id: conversationId },
+      params: { conversationId: conversation.id },
     });
   };
 
@@ -59,35 +70,56 @@ export default function MessagesScreen() {
   };
 
   // Filter contacts based on search query
-  const filteredConversations = conversations.filter((conv) => {
-    if (!searchQuery) return true;
+  const getFilteredConversations = useMemo(() => {
+    if (!conversations || !Array.isArray(conversations)) return [];
+    if (!searchQuery) return conversations;
 
     const query = searchQuery.toLowerCase();
 
-    // Search through participant names
-    return (
+    return conversations.filter((conv) =>
       conv.participants?.some(
         (p) =>
           p.user?.firstName?.toLowerCase().includes(query) ||
-          p.user?.lastName?.toLowerCase().includes(query),
-      ) || false
+          p.user?.lastName?.toLowerCase().includes(query)
+      )
     );
-  });
+  }, [conversations, searchQuery]);
 
   const getConversationName = (conv: ConversationWithDetails) => {
     if (conv.title) return conv.title;
 
     const otherParticipants =
-      conv.participants?.filter((p) => p.userId !== user?.id) || [];
+      conv.participants?.filter((p) => p.user.id !== attributes?.id) || [];
     if (otherParticipants.length === 0) return "No participants";
 
     return otherParticipants
       .map((p) =>
         p.user?.firstName && p.user?.lastName
           ? `${p.user.firstName} ${p.user.lastName}`
-          : "Unknown",
+          : "Unknown"
       )
       .join(", ");
+  };
+
+  const getConversationProfileImage = (
+    conversation: ConversationWithDetails
+  ) => {
+    return (
+      conversation.participants?.find((p) => p.user.id !== attributes?.id)?.user
+        .profileImageUrl ?? undefined
+    );
+  };
+
+  const getConversationRead = (conversation: ConversationWithDetails) => {
+    const lastRead = conversation.participants?.find(
+      (p) => p.user.id === attributes?.id
+    )?.lastReadAt;
+    const updatedAt = conversation?.updatedAt
+      ? new Date(conversation.updatedAt)
+      : null;
+    const lastReadDate = lastRead ? new Date(lastRead) : null;
+
+    return lastReadDate && updatedAt && lastReadDate > updatedAt;
   };
 
   // Get subject for a teacher if available
@@ -126,9 +158,9 @@ export default function MessagesScreen() {
           {/* Loading state */}
           {loading && (
             <View className="py-10 items-center">
-              <Text className="font-poppins-regular text-gray-500">
-                Ładowanie konwersacji...
-              </Text>
+              <View className="flex-1 items-center justify-center">
+                <ActivityIndicator size="large" color={ThemeColors.GOLD} />
+              </View>
             </View>
           )}
 
@@ -142,7 +174,7 @@ export default function MessagesScreen() {
           )}
 
           {/* Empty state */}
-          {!loading && !error && filteredConversations.length === 0 && (
+          {!loading && !error && getFilteredConversations.length === 0 && (
             <View className="py-10 items-center">
               <Text className="font-poppins-regular text-gray-500">
                 {searchQuery ? "Brak wyników wyszukiwania" : "Brak konwersacji"}
@@ -152,82 +184,78 @@ export default function MessagesScreen() {
 
           {/* Contact List */}
           <View className="flex-1">
-            {filteredConversations.map((conversation) => (
-              <TouchableOpacity
-                key={conversation.id}
-                className="flex-row items-center py-3 border-b border-gray-100"
-                onPress={() => handleOpenChat(conversation.id)}
-                activeOpacity={0.7}
-              >
-                {/* Avatar */}
-                <View className="relative">
-                  <View
-                    className="bg-lightblue rounded-full overflow-hidden justify-center items-center"
-                    style={styles.avatarContainer}
-                  >
-                    {/* <Image
-                      source={conversation.participants?.[0]?.user?.profileImageUrl}
-                      style={styles.avatar}
-                    /> */}
-                  </View>
-                </View>
-
-                {/* Message preview */}
-                <View className="flex-1 ml-3" style={styles.messagePreview}>
-                  <View className="flex-row justify-between items-center w-full">
-                    <Text
-                      className="font-poppins-bold text-lightblue"
-                      style={styles.contactName}
-                      numberOfLines={1}
+            {Array.isArray(getFilteredConversations) &&
+              !loading &&
+              getFilteredConversations.map((conversation) => (
+                <TouchableOpacity
+                  key={conversation.id}
+                  className="flex-row items-center py-3 border-b border-gray-100"
+                  onPress={() => handleOpenChat(conversation)}
+                  activeOpacity={0.7}
+                >
+                  {/* Avatar */}
+                  <View className="relative">
+                    <View
+                      className="bg-lightblue rounded-full overflow-hidden justify-center items-center"
+                      style={styles.avatarContainer}
                     >
-                      {getConversationName(conversation)}
-                    </Text>
-                    {conversation.updatedAt && (
+                      <Image
+                        source={{
+                          uri: getConversationProfileImage(conversation),
+                        }}
+                        style={styles.avatar}
+                      />
+                    </View>
+                  </View>
+
+                  {/* Message preview */}
+                  <View className="flex-1 ml-3" style={styles.messagePreview}>
+                    <View className="flex-row justify-between items-center w-full">
                       <Text
-                        className="text-gray-400 font-poppins-regular shrink-0"
-                        style={styles.messageTime}
+                        className="font-poppins-bold text-lightblue"
+                        style={styles.contactName}
+                        numberOfLines={1}
                       >
-                        {formatMessageTime(new Date(conversation.updatedAt))}
+                        {getConversationName(conversation)}
+                      </Text>
+                      {conversation.updatedAt && (
+                        <Text
+                          className="text-gray-400 font-poppins-regular shrink-0"
+                          style={styles.messageTime}
+                        >
+                          {formatMessageTime(new Date(conversation.updatedAt))}
+                        </Text>
+                      )}
+                    </View>
+
+                    {conversation.lastMessage && (
+                      <Text
+                        className={`${
+                          getConversationRead(conversation)
+                            ? "font-poppins-regular text-gray-500"
+                            : "font-poppins-bold text-gray-800"
+                        }`}
+                        style={styles.lastMessage}
+                        numberOfLines={1}
+                      >
+                        {conversation.lastMessage}
                       </Text>
                     )}
                   </View>
 
-                  {/* Subject */}
-                  {/* <Text
-                    className="text-gray-500 font-poppins-regular"
-                    style={styles.subjectText}
-                  >
-                    {conversation.subject}
-                  </Text> */}
-
-                  {conversation.lastMessage && (
-                    <Text
-                      className={`${
-                        conversation.unread
-                          ? "font-poppins-bold text-gray-800"
-                          : "font-poppins-regular text-gray-500"
-                      }`}
-                      style={styles.lastMessage}
-                      numberOfLines={1}
-                    >
-                      {conversation.lastMessage}
-                    </Text>
-                  )}
-                </View>
-
-                {/* Unread badge */}
-                {conversation.unread && (
+                  {/* Unread badge */}
+                  {/* {conversation.unread && (
                   <View className="bg-lightblue rounded-full h-6 w-6 justify-center items-center ml-2">
                     <Text
                       className="text-white font-poppins-bold"
                       style={styles.unreadBadgeText}
                     >
-                      {/* {teacher.unreadCount} */}
+                      {teacher.unreadCount}
                     </Text>
                   </View>
-                )}
-              </TouchableOpacity>
-            ))}
+                )} */}
+                </TouchableOpacity>
+              ))}
           </View>
         </ScrollView>
       </KeyboardAwareContainer>
@@ -269,18 +297,20 @@ const styles = StyleSheet.create({
     fontSize: scale(24),
   },
   avatarContainer: {
-    width: scale(34),
-    height: scale(34),
+    width: scale(36),
+    height: scale(36),
   },
   avatar: {
-    width: scale(32),
-    height: scale(32),
+    width: scale(34),
+    height: scale(34),
+    justifyContent: "center",
+    alignItems: "center",
   },
   messagePreview: {
-    maxWidth: "75%",
+    maxWidth: "90%",
   },
   contactName: {
-    fontSize: scale(14),
+    fontSize: scale(15),
     flex: 1,
     marginRight: scale(8),
   },
